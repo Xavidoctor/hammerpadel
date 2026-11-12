@@ -5,20 +5,55 @@ import { Price } from "@/components/Price";
 import { MotionToggle, ScrollCraftStage } from "@/components/ScrollCraftStage";
 import { alquiler, lemas, localidades, maquina, recogebolas } from "@/content/catalogo";
 import { HORIZONTAL, VERTICAL, golpes, proyectar } from "@/lib/pista";
+import { mediosPista } from "@/content/medios";
 
 const pct = (v: number, t: number) => `${((v / t) * 100).toFixed(2)}%`;
 
 export default function Inicio() {
+  const medios = mediosPista();
   return (
     <ScrollCraftStage>
-      {/* ESCENA 1 · LA PISTA (animada: pin + capas) */}
-      <section id="pista" className="act act--pista" data-sc-act="pin" data-sc-span="2.2" data-sc-drift="#0b0d10" aria-labelledby="t-hero">
+      {/* ESCENA 1 · LA PISTA. Usa los medios reales si existen (ver src/content/medios.ts). */}
+      <section
+        id="pista"
+        className={`act act--pista${medios.foto ? " act--pista-real" : ""}`}
+        data-sc-act={medios.video ? "scrub" : "pin"}
+        data-sc-span="2.2"
+        data-sc-drift="#0b0d10"
+        aria-labelledby="t-hero"
+      >
         <div data-sc-stage className="stage">
-          <div className="pista__sky" aria-hidden="true" />
-          <div className="pista__court">
-            <CourtSvg e={HORIZONTAL} className="only-wide" />
-            <CourtSvg e={VERTICAL} className="only-tall" />
-          </div>
+          {medios.foto ? (
+            <>
+              <picture>
+                {medios.fotoMovil ? <source media="(max-width: 860px)" srcSet={medios.fotoMovil} /> : null}
+                <img
+                  className={medios.video ? "sc-stage__poster pista__photo" : "pista__photo pista__photo--fx"}
+                  src={medios.foto}
+                  alt=""
+                  fetchPriority="high"
+                />
+              </picture>
+              {medios.video ? (
+                <video
+                  data-sc-scrub
+                  data-sc-src={medios.video}
+                  {...(medios.videoMovil ? { "data-sc-src-mobile": medios.videoMovil } : {})}
+                  muted
+                  playsInline
+                  aria-hidden="true"
+                />
+              ) : null}
+            </>
+          ) : (
+            <>
+              <div className="pista__sky" aria-hidden="true" />
+              <div className="pista__court">
+                <CourtSvg e={HORIZONTAL} className="only-wide" />
+                <CourtSvg e={VERTICAL} className="only-tall" />
+              </div>
+            </>
+          )}
           <div className="pista__haze" aria-hidden="true" />
           <div className="sc-scrim sc-scrim--lead only-wide" aria-hidden="true" />
           <div className="pista__product">

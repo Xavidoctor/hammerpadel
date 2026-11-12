@@ -201,6 +201,15 @@ html:not(.js) [data-sc-stagger] > *, html.hp-static [data-sc-stagger] > * {
 .light__pole { stroke: #2a2f38; stroke-width: 3; }
 .light__head { fill: #f5f7ff; opacity: calc(0.25 + var(--on) * 0.75); }
 .light__halo { opacity: var(--on); }
+/* Foto real de la pista: ocupa el escenario. Sin vídeo, el encendido y el
+   avance de cámara se simulan con brillo y escala desde --sc-p. */
+.pista__photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.pista__photo--fx {
+  transform-origin: 50% 62%;
+  transform: scale(calc(1 + var(--sc-p, 1) * 0.12));
+  filter: brightness(calc(0.35 + var(--sc-p, 1) * 0.65)) saturate(calc(0.7 + var(--sc-p, 1) * 0.3));
+  will-change: transform, filter;
+}
 .pista__haze {
   position: absolute; inset: auto 0 0 0; height: 45%;
   background: linear-gradient(to top, #07080b 0%, color-mix(in oklab, #07080b 60%, transparent) 45%, transparent);

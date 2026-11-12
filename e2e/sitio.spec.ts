@@ -55,11 +55,17 @@ test.describe("la landing nunca bloquea la compra", () => {
     await ctx.close();
   });
 
-  test("el motor Scroll Craft se monta y el vídeo no está en la carga inicial", async ({ page }) => {
+  test("el motor Scroll Craft se monta y ningún vídeo bloquea la carga inicial", async ({ page }) => {
     await page.goto("/");
     await page.waitForFunction(() => document.documentElement.classList.contains("sc-ready"));
-    const mp4 = await page.evaluate(() => performance.getEntriesByType("resource").filter((r) => r.name.endsWith(".mp4")).length);
-    expect(mp4).toBe(0);
+    await page.waitForTimeout(500);
+    const r = await page.evaluate(() => {
+      const nav = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
+      const mp4 = performance.getEntriesByType("resource").filter((e) => e.name.endsWith(".mp4"));
+      return { load: nav.loadEventStart, inicios: mp4.map((e) => e.startTime) };
+    });
+    // Los vídeos solo se piden después del evento load (el póster es lo primero).
+    for (const t of r.inicios) expect(t).toBeGreaterThanOrEqual(r.load);
   });
 
   test("las páginas de compra y alquiler no cargan el motor", async ({ page }) => {
