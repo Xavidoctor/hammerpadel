@@ -1,0 +1,151 @@
+<!doctype html>
+<!--
+  PROTOTIPO. Escena provisional para el momento "transición hacia el alquiler".
+  No es arte final: la cámara sube desde una pista esquemática hasta un mapa
+  esquemático (no a escala) con cuatro puntos de luz. Sin texto dentro de la
+  imagen: los nombres de las localidades van en HTML en la web.
+  Se renderiza fotograma a fotograma con generar-transicion.mjs.
+-->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: #0b0d10; overflow: hidden; }
+  svg { display: block; }
+</style>
+</head>
+<body>
+<svg id="s" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+  const W = innerWidth, H = innerHeight, portrait = H > W;
+  const svg = document.getElementById('s');
+  svg.setAttribute('width', W); svg.setAttribute('height', H);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const ease = x => { x = clamp(x); return x * x * (3 - 2 * x); };
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const sub = (a, b) => [a[0]-b[0], a[1]-b[1], a[2]-b[2]];
+  const cross = (a, b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+  const dot = (a, b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+  const norm = a => { const l = Math.hypot(...a); return [a[0]/l, a[1]/l, a[2]/l]; };
+
+  // Pista esquemática 10 x 20 m (medidas reglamentarias de pádel). Líneas de
+  // saque a 6,95 m de la red. Paredes de fondo indicadas con trazo fino.
+  const court = [
+    [[-5,0,-10],[5,0,-10]], [[5,0,-10],[5,0,10]], [[5,0,10],[-5,0,10]], [[-5,0,10],[-5,0,-10]],
+    [[-5,0,-6.95],[5,0,-6.95]], [[-5,0,6.95],[5,0,6.95]],
+    [[0,0,-6.95],[0,0,6.95]],
+  ];
+  const net = [[-5,0.88,0],[5,0.88,0]];
+  const walls = [
+    [[-5,0,-10],[-5,4,-10]], [[5,0,-10],[5,4,-10]], [[-5,4,-10],[5,4,-10]],
+    [[-5,0,10],[-5,4,10]], [[5,0,10],[5,4,10]], [[-5,4,10],[5,4,10]],
+  ];
+
+  function project(cam, target, fov) {
+    const f = norm(sub(target, cam));
+    let r = norm(cross(f, [0,1,0]));
+    if (!isFinite(r[0])) r = [1,0,0];
+    const u = cross(r, f);
+    const k = (Math.min(W, H) / 2) / Math.tan(fov / 2);
+    return p => {
+      const d = sub(p, cam);
+      const z = dot(d, f);
+      return [W/2 + dot(d, r) * k / z, H/2 - dot(d, u) * k / z, z];
+    };
+  }
+
+  function line(P, a, b, stroke, width, op) {
+    const A = P(a), B = P(b);
+    if (A[2] <= 0.1 || B[2] <= 0.1) return '';
+    return `<line x1="${A[0].toFixed(1)}" y1="${A[1].toFixed(1)}" x2="${B[0].toFixed(1)}" y2="${B[1].toFixed(1)}" stroke="${stroke}" stroke-width="${width}" stroke-opacity="${op}" stroke-linecap="round"/>`;
+  }
+  function poly(P, pts, fill, op) {
+    const q = pts.map(P);
+    if (q.some(v => v[2] <= 0.1)) return '';
+    return `<polygon points="${q.map(v => v[0].toFixed(1) + ',' + v[1].toFixed(1)).join(' ')}" fill="${fill}" fill-opacity="${op}"/>`;
+  }
+
+  // Mapa esquemático: costa estilizada y cuatro puntos. NO es un mapa real.
+  // Coordenadas en un lienzo 1000 x 700; orden oeste a este como en la web.
+  const pts = [
+    { x: 470, y: 470 }, // Pedreguer
+    { x: 540, y: 380 }, // Ondara
+    { x: 640, y: 350 }, // La Xara
+    { x: 750, y: 300 }, // Dénia
+  ];
+  const coast = 'M 120 120 C 300 170, 520 250, 700 240 C 760 236, 800 250, 840 300 C 880 350, 930 380, 1000 420 L 1000 0 L 0 0 L 0 90 Z';
+  const ridges = [
+    'M 120 600 C 260 520, 380 560, 470 640',
+    'M 600 520 C 700 470, 820 470, 900 540',
+    'M 300 700 C 420 600, 560 620, 700 700',
+  ];
+
+  window.render = (t) => {
+    // 0.00-0.50: la cámara sube desde el fondo de pista hasta un cenital alto.
+    // 0.35-0.70: la pista se funde y aparece el mapa esquemático (zoom out).
+    // 0.62-0.95: se encienden los cuatro puntos, uno tras otro.
+    const rise = ease(t / 0.55);
+    const cam = [
+      0,
+      lerp(1.7, 70, rise * rise),
+      lerp(-17, -0.5, rise),
+    ];
+    const P = project(cam, [0, 0, 0], portrait ? 1.05 : 0.9);
+    const courtOp = 1 - ease((t - 0.36) / 0.22);
+    const glow = 0.35 + 0.65 * ease(t / 0.2);
+
+    let s = `<defs>
+      <radialGradient id="halo" cx="50%" cy="50%" r="50%">
+        <stop offset="0" stop-color="#dcff2e" stop-opacity="0.9"/>
+        <stop offset="0.35" stop-color="#dcff2e" stop-opacity="0.25"/>
+        <stop offset="1" stop-color="#dcff2e" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="pool" cx="50%" cy="45%" r="60%">
+        <stop offset="0" stop-color="#1b2a44" stop-opacity="1"/>
+        <stop offset="1" stop-color="#0b0d10" stop-opacity="1"/>
+      </radialGradient>
+    </defs>
+    <rect width="${W}" height="${H}" fill="url(#pool)"/>`;
+
+    // Mapa (detrás), con zoom desde el punto de Dénia hacia el conjunto.
+    const mapIn = ease((t - 0.34) / 0.3);
+    if (mapIn > 0) {
+      const fit = Math.min(W / 1000, H / 700) * (portrait ? 1.55 : 0.95);
+      const zoom = lerp(7, 1, ease((t - 0.34) / 0.45));
+      const fx = lerp(pts[3].x, 560, ease((t - 0.34) / 0.45));
+      const fy = lerp(pts[3].y, 380, ease((t - 0.34) / 0.45));
+      const sc = fit * zoom;
+      s += `<g opacity="${mapIn.toFixed(3)}" transform="translate(${W/2} ${H/2}) scale(${sc.toFixed(4)}) translate(${-fx} ${-fy})">
+        <rect x="-2000" y="-2000" width="5000" height="5000" fill="#10141b"/>
+        <path d="${coast}" fill="#0a1a33"/>
+        <path d="${coast}" fill="none" stroke="#2c6fd6" stroke-opacity="0.55" stroke-width="${(2/sc*fit).toFixed(2)}"/>
+        ${ridges.map(d => `<path d="${d}" fill="none" stroke="#f2f1ec" stroke-opacity="0.08" stroke-width="${(1.5/sc*fit).toFixed(2)}"/>`).join('')}
+      `;
+      pts.forEach((p, i) => {
+        const on = ease((t - (0.62 + i * 0.075)) / 0.08);
+        if (on <= 0) return;
+        const r = 26 / zoom;
+        s += `<circle cx="${p.x}" cy="${p.y}" r="${(r * 2.6 * on).toFixed(2)}" fill="url(#halo)"/>
+              <circle cx="${p.x}" cy="${p.y}" r="${(r * 0.32).toFixed(2)}" fill="#dcff2e" opacity="${on.toFixed(3)}"/>`;
+      });
+      s += `</g>`;
+    }
+
+    // Pista (delante), con trazo que se adelgaza al alejarse.
+    if (courtOp > 0) {
+      const lw = Math.max(1.2, lerp(4, 1.4, rise));
+      s += `<g opacity="${courtOp.toFixed(3)}">`;
+      s += poly(P, [[-5,0,-10],[5,0,-10],[5,0,10],[-5,0,10]], '#1f5fbf', 0.55 * glow + 0.2);
+      court.forEach(([a, b]) => { s += line(P, a, b, '#f2f1ec', lw, 0.85); });
+      walls.forEach(([a, b]) => { s += line(P, a, b, '#9fc2ff', lw * 0.6, 0.35); });
+      s += line(P, net[0], net[1], '#f2f1ec', lw * 0.8, 0.6);
+      s += `</g>`;
+    }
+    svg.innerHTML = s;
+  };
+  window.render(0);
+</script>
+</body>
+</html>

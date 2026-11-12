@@ -1,0 +1,11 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.env*
+!.env.example
+# Capturas de verificación (se regeneran con npm run comprobar)
+lab/
+produccion/prototipo/frames/
+scrollcraft/builds/*/lab/
