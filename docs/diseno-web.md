@@ -1,0 +1,534 @@
+# Hammer Padel — Documento de diseño de la web oficial
+
+**Versión:** 0.1 (borrador para revisión) · **Fecha:** 12/11/2026 · **Estado:** pendiente de aprobación de Xavi
+
+> Este documento no implementa nada. No se ha generado ningún recurso, no se han gastado créditos, no se ha contratado ni configurado ningún servicio y no se ha desplegado nada.
+
+### Convención usada en el documento
+
+- **[CONFIRMADO]**: dato dado por Hammer Padel (precios, productos, zonas, reglas).
+- **[PROPUESTA]**: recomendación mía, pendiente de tu aprobación.
+- **[PENDIENTE]**: información que falta y que no voy a inventar.
+- **[VERIFICAR]**: dato externo (precio de un proveedor, límite de un plan) que hay que comprobar antes de decidir.
+
+### Punto de partida
+
+- **Repositorio** `Xavidoctor/hammerpadel`: está vacío (sin commits). Partimos de cero, sin deuda técnica.
+- **Skill `scroll-world`**: no está instalada en este entorno ni en tu lista de skills. La he leído desde su repositorio público (`github.com/oso95/scroll-world`, licencia MIT; existe una variante más antigua en `attentiondotnet/scroll-world`). Todo lo que digo sobre la skill sale de su README y su `SKILL.md`. Habrá que instalarla (gratis) cuando empecemos a implementar.
+
+#### Qué hace la skill scroll-world (resumen)
+
+- Construye una landing de tipo "vuelo a través del mundo": la cámara entra en cada escena y viaja a la siguiente sin cortes. El scroll controla el tiempo de **vídeos pregenerados** (no es 3D en tiempo real).
+- Flujo: entrevista → una imagen fija por escena → un clip de vídeo "dive-in" por escena → clips "conectores" entre escenas (arrancan en el último fotograma real del clip anterior y terminan en el primero del siguiente) → codificación con ffmpeg → montaje con un motor de scrub en JavaScript sin dependencias (`scrub-engine.js`) → QA.
+- Dos arquitecturas de cámara: **A** (una toma continua, sin conectores) y **B** ("fly through the world", con clip por escena + conectores).
+- Modelos: imágenes con `gpt_image_2` (vía Higgsfield o Codex); vídeo con **Seedance 2.0** por defecto (vía Monid o Higgsfield), Kling 3.0 como alternativa. **Todos son servicios de pago.**
+- Soporta una **cadena móvil nativa 9:16** (la propia skill dice que no se debe entregar el recorte central como versión móvil), stills como póster y fallback, y modo reducido sin vídeo para `prefers-reduced-motion`.
+- Motor: ajusta `video.currentTime` según el scroll, carga cada clip como Blob en memoria, hace crossfade en las uniones y sirve clips móviles en pantallas ≤860 px o puntero táctil.
+
+---
+
+## 1. Arquitectura propuesta
+
+### 1.1 Principio rector [PROPUESTA]
+
+Dos capas separadas que nunca dependen la una de la otra:
+
+1. **Capa audiovisual (Scroll World)**: solo en la landing `/`. Es una mejora progresiva por encima de un HTML completo. Si no carga, no pasa nada: el usuario ve stills y texto.
+2. **Capa comercial**: navegación, productos, reservas, compra, FAQ, contacto y SEO. HTML renderizado en servidor, rápido, accesible e indexable. No carga ni un byte de vídeo de Scroll World.
+
+### 1.2 Mapa del sitio [PROPUESTA sobre tu estructura]
+
+| Ruta | Contenido | Tipo de render |
+|---|---|---|
+| `/` | Landing: Scroll World + bloque HTML de conversión + resumen indexable | Estático + mejora progresiva |
+| `/comprar` | Máquina Hammer Padel, 2.300 € | Estático |
+| `/recogebolas` | Recogebolas Hammer, 85 € | Estático |
+| `/alquiler` | Reserva en 4 pasos, 20 € / 90 min | Estático + interactivo (cliente) |
+| `/alquiler/[localidad]` | Solo cuando haya contenido real por localidad (ver SEO) | Estático |
+| `/como-funciona` | Funcionamiento de la máquina (con documentación real) | Estático |
+| `/entrenamientos` | Ejercicios y rutinas | Estático (contenido editorial) |
+| `/clubes` | Clubes, academias y entrenadores | Estático + formulario |
+| `/soporte` | Manuales, FAQ técnica, garantía | Estático |
+| `/contacto` | Contacto comercial | Estático + formulario |
+| `/carrito`, `/checkout/*` | Fase 2, cuando se elija pasarela | Dinámico |
+| `/legal/*` | Aviso legal, privacidad, cookies, condiciones de venta y de alquiler | Estático |
+
+Rutas de sistema: `/api/availability`, `/api/bookings`, `/api/checkout`, `/api/webhooks/[proveedor]` (estas dos últimas en fase 2).
+
+### 1.3 Stack técnico [PROPUESTA]
+
+- **Next.js (App Router) + TypeScript**: SSG para todo el contenido comercial, rutas de servidor para reservas y pagos, buen SEO y buen rendimiento. Es lo que ya contemplabais.
+- **Base de datos PostgreSQL**: imprescindible por una razón concreta: permite garantizar a nivel de base de datos que una máquina no se reserve dos veces a la vez (restricción de exclusión sobre rangos de tiempo, ver §8). Proveedor gestionado (Supabase o Neon) con plan gratuito para desarrollo.
+- **ORM**: Drizzle (ligero, tipado, migraciones SQL legibles).
+- **Estilos**: CSS propio con tokens de diseño (variables CSS) y Tailwind solo como utilitario. El aspecto "plantilla SaaS" viene de usar componentes prefabricados, no de la herramienta; no usaremos kits de UI genéricos.
+- **Scroll World**: el `scrub-engine.js` de la skill envuelto en un componente cliente de Next.js que se carga de forma diferida.
+- **Contenido**: textos de productos y entrenamientos en archivos MDX/TypeScript dentro del repo (sin CMS de pago). Si más adelante necesitáis editar sin programador, se evalúa un CMS.
+
+### 1.4 Diagrama lógico
+
+```
+Navegador
+ ├─ HTML estático (todas las páginas)  ← CDN
+ ├─ Scroll World (solo /)               ← vídeos MP4 + stills en CDN, carga diferida
+ └─ Formularios / reserva / checkout    → Rutas de servidor Next.js
+                                            ├─ PostgreSQL (máquinas, ubicaciones, reservas, pedidos)
+                                            ├─ Email transaccional (confirmaciones)
+                                            └─ Pasarela de pago (fase 2, por decidir)
+```
+
+---
+
+## 2. Storyboard definitivo
+
+Mantengo tu historia y la ajusto en tres puntos [PROPUESTA]:
+
+- **Separo "precio" de "experiencia"**: en el Scroll World el precio y el CTA aparecen como **HTML superpuesto** (texto real, clicable e indexable), nunca dentro del vídeo. Así se puede cambiar un precio sin regenerar nada.
+- **El CTA doble de la escena 1 se mantiene**, pero también hay una **barra fija mínima** (Comprar · Alquilar) visible durante todo el recorrido, para que nadie tenga que terminar la animación para comprar.
+- **Añado una escena de cierre** que hace de puente físico hacia el formulario de reserva.
+
+> Cámara: arquitectura **B** de la skill (escenas + conectores). La A (toma única) da menos control para detenerse en el producto y no permite rehacer una escena sin rehacer todo lo posterior.
+
+### Escena 1 — La pista
+- **Visual**: noche, pista de pádel azul vacía, cristales con reflejos, focos encendiéndose uno a uno. La cámara avanza desde fuera del cristal hacia el centro. Al llegar, la máquina Hammer Padel aparece en el fondo de pista, iluminada como un objeto de exposición.
+- **Texto (HTML)**: HAMMER PADEL · Tu entrenamiento. Tu ritmo. Tu pista.
+- **CTA (HTML)**: Comprar máquina — 2.300 € · Alquilar — 20 € / 90 min
+- **Póster/LCP**: still de la pista con la máquina ya visible (para que el primer impacto incluya el producto aunque no cargue el vídeo).
+
+### Escena 2 — Entrenamiento
+- **Visual**: la máquina lanza; trazas de bola amarillo fluorescente; un jugador a contraluz (silueta recortada por los focos) repite golpes. Sin primeros planos de cara ni de manos (ver riesgos §16).
+- **Texto progresivo (HTML, aparece según el scroll)**: Derecha · Revés · Bandeja · Víbora · Volea · Desplazamiento · Repetición.
+- **Mensaje**: NO ESPERES A TU COMPAÑERO. ENTRENA.
+
+### Escena 3 — Hammer Padel (hero de producto)
+- **Visual**: la pista se apaga, queda la máquina sola sobre fondo grafito, luz cenital y luz lateral rasante, giro lento de cámara a su alrededor.
+- **Texto**: HAMMER PADEL · 2.300 € · CTA COMPRAR HAMMER PADEL (+ enlace secundario "Cómo funciona").
+- **Nota crítica**: esta escena es la que más exige fidelidad al producto real. Ver §16 (riesgo 1): propongo que se haga a partir de fotografía o render 3D real, no generada libremente.
+
+### Escena 4 — Recogebolas
+- **Visual**: vuelve la luz; el suelo de la pista está lleno de bolas. La cámara baja a ras de suelo, entre las bolas, y aparece el recogebolas Hammer recogiéndolas.
+- **Texto**: MENOS TIEMPO RECOGIENDO. MÁS TIEMPO ENTRENANDO. · RECOGEBOLAS HAMMER · 85 € · CTA COMPRAR RECOGEBOLAS.
+
+### Escena 5 — Alquiler en la Marina Alta
+- **Visual**: la cámara sube por encima del cristal y se eleva hasta una vista aérea nocturna estilizada de la costa de la Marina Alta; cuatro puntos de luz amarilla se encienden.
+- **Texto**: ¿QUIERES PROBARLA? · ALQUILA HAMMER PADEL · 20 € · 90 MINUTOS · Dénia · Ondara · La Xara · Pedreguer.
+- **Precaución**: es una vista **conceptual**, no un mapa con ubicaciones concretas (las ubicaciones exactas no están definidas y no debemos sugerir instalaciones propias).
+
+### Escena 6 — Cierre / umbral
+- **Visual**: la cámara desciende de nuevo a una pista, se detiene frente a la máquina con el foco encendido. Plano estable, sin movimiento final.
+- **Texto**: RESERVAR ENTRENAMIENTO.
+- **Transición**: al terminar el scroll del vídeo, el fondo se funde a grafito y el usuario está ya en el **bloque HTML de reserva** (paso 1: elegir localidad), sin cambiar de página. El mismo bloque está en `/alquiler`.
+
+---
+
+## 3. Número recomendado de escenas
+
+**Recomendación: 6 escenas (N = 6)**, la mitad del rango que propone la skill (5–7).
+
+- 5 escenas narrativas (las tuyas) + 1 de cierre que resuelve la transición a reserva.
+- Más escenas alargan el scroll, suben el peso y el coste (cada escena añade 1 imagen + 2 vídeos por formato) y alejan el CTA.
+- **Alternativa de ahorro**: N = 5 fusionando la escena 6 con la 5 (la cámara baja desde el aéreo directamente al plano final). Reduce 2 vídeos por formato. La dejaría como plan B si las pruebas de borrador muestran que la escena 5 se sostiene sola.
+
+Con N = 6 y arquitectura B: **6 imágenes + 11 vídeos (6 escenas + 5 conectores) por formato** (escritorio 16:9 y móvil 9:16).
+
+---
+
+## 4. Transición entre escenas
+
+| De → A | Conector (vídeo) | Idea visual |
+|---|---|---|
+| 1 → 2 | Pista vacía → entrenamiento | La primera bola sale de la máquina y la cámara la sigue: el disparo **es** el corte. |
+| 2 → 3 | Entrenamiento → producto | Los focos se apagan salvo uno sobre la máquina; el jugador sale de plano; fondo a grafito. |
+| 3 → 4 | Producto → recogebolas | Se encienden las luces; la cámara pasa por encima de la máquina y cae hacia el suelo lleno de bolas. |
+| 4 → 5 | Bolas → Marina Alta | Una bola rebota, la cámara sube con ella por encima del cristal y se eleva al aéreo. |
+| 5 → 6 | Aéreo → pista final | Picado hacia uno de los puntos de luz, aterrizaje en una pista con la máquina encendida. |
+| 6 → HTML | Sin vídeo | Fundido a grafito + aparición del formulario de reserva. |
+
+Reglas técnicas (de la skill): los conectores se generan desde el **último fotograma real** del clip anterior y el **primero real** del siguiente (no desde el still), siempre con **el mismo modelo** en toda la cadena, y si un conector no funciona se sustituye por un crossfade (sin bloquear el lanzamiento).
+
+---
+
+## 5. Dirección artística
+
+### 5.1 Concepto [PROPUESTA]: "Ingeniería bajo los focos"
+El producto tratado como un objeto de ingeniería expuesto en un escenario deportivo nocturno. Referencia de tono: presentación de producto de automoción/tecnología, no catálogo deportivo.
+
+### 5.2 Paleta [PROPUESTA]
+| Token | Uso | Valor orientativo |
+|---|---|---|
+| `--hp-black` | Fondo principal | #0A0B0D |
+| `--hp-graphite` | Superficies, bloques | #16181C / #22252B |
+| `--hp-court` | Azul pista (acentos, escenas) | #1E5BD8 aprox. (ajustar al azul real de pista) |
+| `--hp-ball` | Amarillo fluorescente (CTA, datos clave) | #D7FF1E aprox. |
+| `--hp-ink` | Texto | #F2F3F5 / gris #9AA0A8 |
+
+Regla: el amarillo es escaso y significa "acción" (CTA, precio, bola). Si todo es amarillo, nada lo es.
+
+### 5.3 Tipografía [PROPUESTA]
+- Titulares: grotesca condensada y pesada en mayúsculas (familias libres en Google Fonts como Anton, Oswald o "Archivo" en su corte expandido/condensado; elegir tras prueba visual). Tamaños muy grandes (hasta ~12vw en móvil).
+- Texto y UI: una sans legible (Inter o similar) para formularios y textos largos.
+- Cifras: tabulares, para precios y horarios.
+- Ambas autoalojadas (sin coste, sin peticiones a terceros).
+
+### 5.4 Producto
+- **[PENDIENTE]** Color, materiales y forma reales de la máquina y del recogebolas. Pediste "negro/grafito si es compatible con el diseño real": no lo asumo. Necesito fotos reales (o CAD/3D) antes de generar nada.
+- Prompt base para la cadena (borrador): "cinematic night padel court, deep blue court surface, glass walls with reflections, high-contrast stadium lighting, graphite and black tones, fluorescent yellow padel balls, photoreal, shallow depth of field, 35 mm". **Sustituye** el estilo por defecto de la skill (diorama low-poly de arcilla), que no encaja con la marca.
+
+### 5.5 Copy: evaluación y propuestas [PROPUESTA]
+| Mensaje | Valoración | Propuesta |
+|---|---|---|
+| Tu entrenamiento. Tu ritmo. Tu pista. | El mejor. Ritmo de tres, propio, memorable. | Mantener como claim principal. |
+| No esperes a tu compañero. Entrena. | Muy bueno: nombra el problema real (depender de otros). | Mantener en escena 2. |
+| 100 bolas. Un objetivo. Repetir hasta dominarlo. | Concreto, pero "100" puede leerse como capacidad de la máquina (no confirmada). | Evitar la cifra hasta confirmar capacidad. Alternativa: "Repite. Mejora. Domina." |
+| Menos tiempo recogiendo. Más tiempo entrenando. | Claro y útil para el recogebolas. | Mantener. |
+| Tu pista. Tu ritmo. Hammer Padel. | Repite el claim principal desordenado. | Descartar o usar solo como firma de pie de página. |
+| (nuevo) "Sin compañero. Sin excusas." | Corto, agresivo-elegante. | Opción para anuncios o escena 2. |
+| (nuevo) "Pruébala por 20 €." | Baja la barrera de entrada del alquiler. | CTA secundario en escena 5 y en `/comprar` ("¿Dudas? Pruébala por 20 €"). |
+| (nuevo) "Golpe a golpe." | Refuerza repetición. | Titular de `/entrenamientos`. |
+
+Idea con valor comercial: **el alquiler como prueba de compra**. En `/comprar` un bloque "Pruébala antes: 20 € / 90 min" lleva a `/alquiler`. (Un descuento del alquiler sobre la compra sería una promoción: **no** se implementa sin tu aprobación.)
+
+---
+
+## 6. Arquitectura frontend
+
+### 6.1 Estructura de carpetas [PROPUESTA]
+```
+src/
+  app/
+    (marketing)/page.tsx            # landing
+    (marketing)/comprar/page.tsx
+    (marketing)/recogebolas/page.tsx
+    (marketing)/alquiler/page.tsx
+    ... resto de páginas
+    api/availability/route.ts
+    api/bookings/route.ts
+  components/
+    scroll-world/ScrollWorld.tsx    # wrapper cliente (dynamic import, ssr:false)
+    scroll-world/scrub-engine.js    # motor de la skill
+    scroll-world/SceneOverlay.tsx   # textos y CTA en HTML
+    booking/BookingFlow.tsx         # 4 pasos
+    commerce/ProductHero.tsx, PriceTag.tsx, BuyButton.tsx
+    ui/                             # botones, campos, tipografía propios
+  content/
+    products.ts                     # fuente única de precios/textos [CONFIRMADO]
+    scenes.ts                       # configuración del Scroll World
+    locations.ts                    # semilla de localidades
+  lib/db/, lib/booking/, lib/seo/
+public/media/scroll-world/{desktop,mobile}/  # (o CDN de assets)
+```
+
+### 6.2 Cómo encaja Scroll World en la landing
+1. El servidor entrega el HTML completo de `/`: las 6 escenas como `<section>` con su `<h2>`, texto, CTA y una imagen still (`<picture>` AVIF/WebP).
+2. Tras el evento `load` y en tiempo de inactividad, el componente cliente decide si activar el vídeo (§7.3). Si sí, monta el motor encima de esas mismas secciones: el HTML pasa a ser la capa de texto superpuesta.
+3. Si no, la página queda como una landing estática editorial con stills grandes: igual de navegable y vendible.
+
+Así **el contenido indexable y los CTA existen siempre**, y el JavaScript del Scroll World no está en el camino crítico.
+
+### 6.3 Gestión de estado
+Sin librerías globales. Estado local en el flujo de reserva; carrito (fase 2) en cookie firmada o en servidor. Precios **siempre** recalculados en servidor.
+
+---
+
+## 7. Estrategia desktop / mobile
+
+### 7.1 Dos cadenas nativas [PROPUESTA]
+- **Escritorio 16:9** (1080p) y **móvil 9:16** (720 px de ancho), cada una con sus propias imágenes, escenas y conectores. Composición pensada para vertical: producto centrado en el tercio inferior, aire arriba para el titular.
+- Los textos HTML se maquetan aparte para cada formato (no se escalan).
+- La skill ya selecciona clips móviles en pantallas ≤860 px o puntero táctil.
+
+### 7.2 Diferencias de composición por escena (móvil)
+| Escena | Escritorio | Móvil 9:16 |
+|---|---|---|
+| 1 | Pista completa en panorámica | Plano desde el fondo de pista, cristal vertical como marco |
+| 2 | Jugador y máquina en el mismo plano | Alterna: primero la máquina disparando, luego la bola llegando al jugador |
+| 3 | Giro alrededor del producto | Producto vertical, encuadre más cerrado |
+| 4 | Suelo con bolas en panorámica | Picado cenital sobre las bolas |
+| 5 | Costa en horizontal | Recorrido vertical sur-norte con los 4 puntos apilados |
+| 6 | Máquina centrada | Máquina centrada, CTA en zona del pulgar |
+
+### 7.3 Niveles de experiencia (degradación progresiva)
+| Nivel | Cuándo | Qué ve el usuario |
+|---|---|---|
+| **Completo** | Dispositivo capaz, buena red, sin preferencia de reducir movimiento | Scroll World con vídeo |
+| **Ligero** | Red lenta (`effectiveType` 3g o peor), `saveData`, poca memoria (`deviceMemory` ≤ 2) o pocos núcleos | Stills con transiciones CSS suaves, sin vídeo |
+| **Reducido** | `prefers-reduced-motion: reduce` | Stills fijas, sin animaciones de scroll |
+| **Básico** | Sin JavaScript, navegador antiguo o fallo de reproducción | HTML + imágenes, todo funcional |
+
+**iOS Low Power Mode**: no se puede detectar directamente. Heurística [PROPUESTA]: antes de activar el motor, intentar `video.play()` de un clip mudo con `playsinline`; en modo ahorro iOS rechaza la promesa → se pasa a nivel Ligero. También se baja de nivel si se mide un frame rate bajo durante los primeros segundos de scroll.
+
+Siempre: un botón visible "Ver sin animación" que fija el nivel Reducido (y se recuerda en `localStorage`).
+
+---
+
+## 8. Sistema de reservas
+
+### 8.1 Flujo de usuario (4 pasos) [CONFIRMADO el flujo, PROPUESTA el detalle]
+1. **Ubicación**: 4 botones grandes (Dénia, Ondara, La Xara, Pedreguer).
+2. **Fecha**: tira de los próximos 14 días como botones (días sin disponibilidad deshabilitados con texto "Completo"). Evita calendarios emergentes poco accesibles en móvil.
+3. **Horario**: lista de franjas de 90 min disponibles.
+4. **Datos y confirmación**: nombre, email, teléfono, aceptación de condiciones → resumen "20 € · 90 min · Dénia · jueves 19/11 · 18:00–19:30" → Reservar (MVP sin pago online; pago en fase 2).
+
+Toda la reserva en una sola página, sin animaciones, con el resumen siempre visible.
+
+### 8.2 Modelo de datos [PROPUESTA]
+```
+locations           id, slug, name, municipality, region, active, notes
+machines            id, serial, label, status (active|maintenance|retired)
+machine_locations   machine_id, location_id, valid_from, valid_to     -- dónde está cada máquina y cuándo
+rate_plans          id, name, duration_min (90), price_cents (2000), currency, valid_from/to, location_id?  -- precios y duraciones distintas
+availability_rules  id, machine_id|location_id, weekday, start_time, end_time, slot_step_min, valid_from/to
+blackouts           id, machine_id?, location_id?, period tstzrange, reason (maintenance|holiday|manual)
+customers           id, name, email, phone, created_at
+bookings            id, machine_id, location_id, customer_id, rate_plan_id, period tstzrange,
+                    status (hold|pending|confirmed|cancelled|completed|no_show),
+                    price_cents, hold_expires_at, rescheduled_from_id, created_at
+booking_events      booking_id, type, payload, at                      -- historial (cancelaciones, reprogramaciones)
+payments            id, booking_id|order_id, provider, provider_ref, amount_cents, status   -- fase 2
+```
+
+### 8.3 Regla "una máquina no puede reservarse dos veces"
+Garantía en la propia base de datos, no solo en el código:
+```sql
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+ALTER TABLE bookings ADD CONSTRAINT no_double_booking
+  EXCLUDE USING gist (machine_id WITH =, period WITH &&)
+  WHERE (status IN ('hold','pending','confirmed'));
+```
+Aunque dos personas pulsen "Reservar" a la vez, PostgreSQL rechaza la segunda. Se puede añadir un margen entre reservas (transporte, montaje) ampliando el rango guardado.
+
+### 8.4 Cálculo de disponibilidad
+Franjas = reglas de disponibilidad de las máquinas asignadas a esa ubicación − bloqueos − reservas activas. El usuario elige **ubicación y hora**; el sistema asigna la máquina libre automáticamente (el cliente no necesita saber qué unidad le toca).
+
+### 8.5 Preparado para el futuro
+- **Mantenimiento/bloqueos**: tabla `blackouts`.
+- **Cancelaciones y reprogramaciones**: estados + `booking_events` + `rescheduled_from_id`.
+- **Precios y duraciones distintas**: `rate_plans` (p. ej. 60 min, bonos, precio club).
+- **Más localidades y máquinas**: altas en tablas, sin tocar código.
+- **Reservas con pago**: estado `hold` con caducidad (p. ej. 15 min) mientras se paga.
+
+### 8.6 [PENDIENTE] Decisiones de negocio que bloquean el detalle
+- Modelo operativo: ¿quién lleva la máquina?, ¿en qué clubes o pistas?, ¿la pista la reserva el cliente aparte?
+- Horarios de servicio y margen entre reservas.
+- Número de máquinas de alquiler al inicio.
+- Política de cancelación, fianza y responsabilidad por daños.
+
+---
+
+## 9. Ecommerce
+
+### 9.1 Modelo de datos [PROPUESTA]
+```
+products        id, slug, name, type (machine|accessory|spare|pack), active
+product_variants id, product_id, sku, name, price_cents, currency, tax_rate, stock_policy
+                  -- Hammer Padel 230000 · Recogebolas 8500 [CONFIRMADO, IVA incluido: VERIFICAR]
+bundles          bundle_id, variant_id, qty                -- packs (futuro)
+coupons          code, type, value, valid_from/to, limits  -- futuro, sin activar
+orders           id, customer_id, status, subtotal, discount, shipping, tax, total, currency
+order_items      order_id, variant_id, qty, unit_price_cents
+shipments        order_id, carrier, tracking, status       -- futuro
+payments         (compartida con reservas)
+```
+Precios en céntimos y en una sola fuente (`content/products.ts` → BD). El servidor recalcula siempre el total.
+
+### 9.2 Pasarela de pago: análisis (sin decidir) [VERIFICAR comisiones]
+| Opción | A favor | En contra |
+|---|---|---|
+| **Stripe Checkout** | Sin cuota mensual, integración rápida, página de pago alojada (menos carga legal PCI), admite métodos como Klarna para pagar a plazos | Comisión por transacción; Bizum no nativo |
+| **Redsys (TPV de tu banco)** | Comisiones normalmente negociables y bajas en España, admite **Bizum**, confianza del comprador español | Contrato con banco, integración más antigua y laboriosa |
+| **PayPal** | Confianza, pago rápido | Comisiones más altas, no aporta mucho como único método |
+| **Financiación (SeQura, Aplazame, Klarna)** | Muy relevante para un producto de 2.300 € | Coste por operación al comercio; requiere alta y aprobación |
+| **Transferencia bancaria** | Coste cero, habitual en compras de clubes | Manual, confirmación lenta |
+
+**Recomendación preliminar**: diseñar una capa `PaymentProvider` común para poder empezar con un proveedor y añadir otro. Decidir entre Stripe y Redsys según las condiciones que te ofrezca tu banco. **No se integra nada hasta tu decisión.**
+
+### 9.3 [PENDIENTE] Antes de vender online
+Gastos y plazos de envío, IVA y facturación, garantía, derecho de desistimiento (14 días), condiciones de venta, datos fiscales de la empresa. Mientras tanto, el MVP puede usar "Solicitar compra" (formulario) en lugar de pago.
+
+---
+
+## 10. SEO
+
+### 10.1 Estructura de contenidos [PROPUESTA]
+| Página | Intención de búsqueda principal | H1 orientativo |
+|---|---|---|
+| `/` | Hammer Padel (marca) | Hammer Padel. Tu entrenamiento. Tu ritmo. Tu pista. |
+| `/comprar` | máquina lanzapelotas pádel · máquina entrenamiento pádel | Máquina lanzapelotas de pádel Hammer Padel |
+| `/recogebolas` | recogebolas pádel | Recogebolas Hammer |
+| `/alquiler` | alquiler máquina pádel + 4 localidades | Alquiler de máquina lanzapelotas de pádel en la Marina Alta |
+| `/entrenamientos` | entrenamiento individual pádel | Entrenamientos de pádel con máquina |
+
+### 10.2 Localidades sin páginas duplicadas
+- **Fase 1**: una sola `/alquiler` con una sección por localidad (`<h2>Alquiler de máquina de pádel en Dénia</h2>` + información real de esa zona).
+- **Más adelante**: `/alquiler/denia`, etc., **solo** cuando cada una tenga contenido propio (clubes concretos, horarios, cómo se entrega). Cuatro páginas iguales cambiando el nombre del pueblo serían contenido duplicado.
+
+### 10.3 Técnica
+- Metadatos únicos por página, `canonical`, `sitemap.xml`, `robots.txt`, Open Graph con stills de Scroll World.
+- Datos estructurados: `Organization`, `Product` + `Offer` (2.300 € / 85 €, EUR), `Service` de alquiler con `areaServed` = las 4 localidades (no `LocalBusiness` con dirección mientras no haya instalación propia), `FAQPage` donde haya FAQ real, `BreadcrumbList`.
+- En la landing, el texto de cada escena es HTML real; además un bloque final "Qué es Hammer Padel" con texto útil (no relleno).
+- Idiomas: español por defecto en la raíz; estructura preparada para `/en/` (y otros) con `hreflang`. Sugerencia: el inglés tiene sentido pronto en Dénia por la población residente extranjera; el valenciano es otra opción a valorar.
+- Sin keyword stuffing: cada término aparece donde aporta información.
+
+---
+
+## 11. Performance
+
+### 11.1 Objetivos [PROPUESTA]
+LCP < 2,5 s · INP < 200 ms · CLS < 0,1 (percentil 75, móvil). Páginas comerciales: LCP < 1,5 s.
+
+### 11.2 Estrategia de carga del Scroll World
+1. **LCP = still de la escena 1** (AVIF/WebP, `fetchpriority="high"`, tamaño según dispositivo). Nunca un vídeo.
+2. **Cero vídeo en la carga inicial**: el motor y los clips se piden tras `load` + `requestIdleCallback`, y solo en nivel Completo.
+3. **Carga por proximidad**: se descarga el clip de la escena actual y la siguiente; el resto, a medida que se avanza. (La skill descarga cada clip como Blob; lo mantenemos pero por escena, no todo de golpe.)
+4. **Pósters** por escena como fallback instantáneo.
+5. **Formatos**: MP4 H.264 sin audio, `+faststart`, GOP corto (8 en escritorio, 4 en móvil, según la skill) para que el scrub sea fluido. H.264 por compatibilidad universal; AV1/HEVC solo si las pruebas lo justifican.
+6. **Presupuesto de peso** [PROPUESTA]: según la skill, un clip de 8 s a 1080p ronda ~8 MB. 11 clips de escritorio serían ~60–80 MB en total; por eso la carga progresiva es obligatoria. Objetivo móvil: < 3 MB por clip a 720p y < 25 MB por recorrido completo; revisar tras el primer borrador.
+7. **Reducción por dispositivo**: niveles de §7.3.
+8. **Caché**: activos con nombre versionado y `Cache-Control: immutable`.
+9. **Fuentes** autoalojadas con `font-display: swap` y subset latino.
+10. **Medición**: Lighthouse en CI y Web Vitals de usuarios reales (sin servicio de pago; con la librería `web-vitals` hacia un endpoint propio o la analítica del hosting).
+
+---
+
+## 12. Accesibilidad
+
+Objetivo: **WCAG 2.2 nivel AA** [PROPUESTA].
+- Todo el texto y los CTA del Scroll World son HTML real; los vídeos son decorativos (`aria-hidden`, sin audio).
+- Enlace "Saltar al contenido / a la reserva" al principio de la landing, y botón "Ver sin animación".
+- `prefers-reduced-motion` respetado (nivel Reducido).
+- Navegación completa con teclado y foco visible (amarillo sobre negro: contraste muy alto). Cuidado inverso: **nunca** texto amarillo sobre fondo claro.
+- Contraste de texto gris sobre grafito ≥ 4,5:1.
+- Formulario de reserva: etiquetas reales, errores en texto asociados al campo, botones de fecha/hora con estado anunciado (`aria-pressed`), área táctil ≥ 44 px.
+- `lang="es"`, jerarquía de encabezados correcta, textos alternativos descriptivos en stills de producto.
+- Pruebas: axe automatizado + revisión manual con VoiceOver (iOS) y TalkBack (Android).
+
+---
+
+## 13. Dependencias externas necesarias
+
+| Dependencia | Para qué | Coste | Cuándo |
+|---|---|---|---|
+| Next.js, React, TypeScript, Drizzle, Tailwind | Base del sitio | Gratis (open source) | Fase 1 |
+| Skill `scroll-world` (MIT) | Pipeline y motor de scrub | Gratis | Fase 2 |
+| ffmpeg / ffprobe, Python + Pillow | Codificación de vídeo | Gratis | Fase 2 |
+| Repositorio GitHub | Código | Ya disponible | — |
+| Hosting web (Vercel u otro) | Servir la web | Ver §14 | Al publicar |
+| PostgreSQL gestionado (Supabase o Neon) | Reservas y pedidos | Plan gratuito para desarrollo | Fase 1–2 |
+| Email transaccional (p. ej. Resend) | Confirmaciones de reserva | Plan gratuito suficiente al inicio [VERIFICAR] | Fase 1–2 |
+| Monid y/o Higgsfield | Generación de imágenes y vídeo | **De pago** | Fase 2, con tu autorización |
+| Pasarela de pago | Cobros | Comisión por operación | Fase 2, tras decidir |
+| Dominio | hammerpadel.xx | Anual | Al publicar [PENDIENTE: ¿lo tenéis?] |
+
+He visto que el proyecto tiene conectados Supabase y Vercel. **No los he tocado** y no los usaré sin tu permiso.
+
+---
+
+## 14. Servicios que implican coste
+
+| Servicio | Tipo de coste | Estimación | Notas |
+|---|---|---|---|
+| **Generación IA (Monid / Higgsfield)** | Por generación | Ver §15: ~45–75 USD para la versión completa | El mayor gasto puntual. Requiere tu autorización. |
+| **Hosting** | Mensual | Vercel Hobby es gratis pero **no permite uso comercial**; para una web que vende habría que ir a Pro (~20 USD/mes por miembro) [VERIFICAR]. Alternativas: Cloudflare Pages / Netlify con planes gratuitos que admiten uso comercial [VERIFICAR]. | Decidir antes de publicar. |
+| **Base de datos** | Mensual | Plan gratuito para desarrollo; Supabase gratuito pausa proyectos inactivos; Pro ~25 USD/mes [VERIFICAR]. Neon tiene plan gratuito sin pausa de datos [VERIFICAR]. | Para producción conviene plan de pago o uno gratuito sin pausas. |
+| **Pasarela de pago** | % por operación | Depende del proveedor | Sin cuota en Stripe; Redsys según banco. |
+| **Financiación** | % por operación | Depende del proveedor | Opcional. |
+| **Email** | Mensual por volumen | 0 € con poco volumen [VERIFICAR] | — |
+| **Dominio** | Anual | ~10–20 €/año | — |
+| **Fotografía / 3D del producto** | Puntual | Variable | Muy recomendable (ver riesgo 1). |
+
+---
+
+## 15. Estimación de generaciones para Scroll World
+
+Fórmula de la skill: **N imágenes + (2N − 1) vídeos por formato**, +~15 % de repeticiones. Precios de la skill **verificados por su autor el 25/07/2026** (hace casi 4 meses, hay que re-verificarlos).
+
+### 15.1 Recuento (N = 6, arquitectura B)
+| Paso | Escritorio 16:9 | Móvil 9:16 | Total |
+|---|---|---|---|
+| Imágenes (stills) | 6 | 6 | 12 |
+| Vídeos de escena | 6 | 6 | 12 |
+| Conectores | 5 | 5 | 10 |
+| **Subtotal** | 6 img + 11 vídeos | 6 img + 11 vídeos | **12 img + 22 vídeos** |
+| Repeticiones (~15–30 %) | | | +2–4 img, +4–7 vídeos |
+| Borradores previos baratos (480p) | | | +11 vídeos |
+| **Total estimado** | | | **~14–16 imágenes y ~37–40 vídeos** |
+
+### 15.2 Coste estimado (Monid, Seedance 2.0, precios de la skill)
+- Borradores 480p: 11 × ~0,30 $ ≈ **3–4 USD**
+- Escritorio 1080p: 6 × 2,99 + 5 × 1,87 ≈ **27 USD**
+- Móvil 720p: 6 × 1,21 + 5 × 0,76 ≈ **11 USD**
+- Repeticiones: **+6–15 USD**
+- Imágenes: según proveedor (en Higgsfield ~15 créditos/imagen)
+- **Total orientativo: ~45–75 USD**. En créditos Higgsfield: ~40–55 créditos por vídeo y ~15 por imagen → ~1.700–2.400 créditos.
+
+### 15.3 Propuesta de gasto escalonado (cada paso con tu autorización)
+1. **Prueba de viabilidad** (< 5 USD): 1–2 stills + 1 vídeo borrador de la escena 3 con fotos reales del producto como referencia. Sirve para ver si el modelo respeta el diseño de la máquina.
+2. **Cadena de borrador** 480p completa (escritorio) para validar ritmo y storyboard.
+3. **Cadena final escritorio**.
+4. **Cadena final móvil**.
+
+---
+
+## 16. Riesgos técnicos
+
+| # | Riesgo | Impacto | Mitigación |
+|---|---|---|---|
+| 1 | **La IA no reproduce fielmente la máquina real** (forma, logos, detalles). Es el riesgo principal. | Alto: los renders deben respetar el diseño real. | Usar fotos/CAD reales como imagen de referencia; mantener el producto pequeño o en contraluz en escenas dinámicas; escena 3 a partir de fotografía o render 3D real; prueba de viabilidad antes de gastar más. |
+| 2 | Humanos jugando al pádel con biomecánica o manos raras | Medio: resta credibilidad | Jugador en silueta/contraluz, planos medios, sin primeros planos de manos y cara. |
+| 3 | Física de la bola poco creíble | Medio | Trazas de luz estilizadas en vez de bola "realista"; cortes en el momento del golpe. |
+| 4 | Saltos visibles entre escenas ("pop") | Medio | Reglas de la skill: conectores desde fotogramas reales, un único modelo; crossfade como último recurso. |
+| 5 | Peso de vídeo en móvil y consumo de datos | Alto | Carga por proximidad, 720p, niveles de degradación, nada en la carga inicial. |
+| 6 | iOS (Low Power Mode, autoplay, memoria con Blobs grandes) | Medio | Heurística de `play()`, liberar Blobs de escenas lejanas, pruebas en iPhone reales. |
+| 7 | Scroll "secuestrado" que frustra al usuario | Medio | No bloquear el scroll nativo; barra fija con CTA; botón "Ver sin animación"; recorrido de ~6 pantallas como máximo. |
+| 8 | Dobles reservas | Alto | Restricción de exclusión en PostgreSQL + `hold` con caducidad. |
+| 9 | Zona horaria y cambio de hora | Medio | Guardar en UTC (`timestamptz`), mostrar en `Europe/Madrid`, tests en fechas de cambio de hora. |
+| 10 | Precios de proveedores IA cambiantes, URLs de salida que caducan en 24–48 h (Monid) | Bajo | Re-verificar antes de generar; descargar y versionar los recursos al momento. |
+| 11 | Filtros de contenido del modelo de vídeo | Bajo | Presupuesto de repeticiones; Kling como alternativa. |
+| 12 | Hosting gratuito no apto para uso comercial / BD que se pausa | Medio | Decidir plan antes de producción (§14). |
+| 13 | Aspectos legales (RGPD, cookies, LSSI, condiciones) | Alto si se ignora | Textos legales revisados antes de abrir reservas o ventas. |
+
+---
+
+## 17. Fases de implementación
+
+### Fase 0 — Decisiones (ahora)
+Aprobación de este documento y respuesta a los [PENDIENTE] (ver al final).
+
+### Fase 1 — Base, identidad, catálogo y alquiler (sin coste)
+1. Proyecto Next.js + TypeScript, tokens de diseño, tipografías, componentes UI propios.
+2. Landing en versión estática premium (stills provisionales o fotos reales, mismas secciones que el Scroll World) — ya es la versión "fallback" definitiva.
+3. `/comprar`, `/recogebolas`, `/como-funciona` (con documentación real), `/clubes`, `/soporte`, `/contacto`, legales.
+4. Modelo de datos de reservas + `/alquiler` con disponibilidad real y reserva sin pago.
+5. SEO técnico, accesibilidad, medición de rendimiento.
+6. Verificación: Lighthouse, axe, pruebas de reservas concurrentes, pruebas en iOS y Android.
+
+### Fase 2 — Scroll World, pagos y ecommerce (con tu autorización de gasto)
+1. Instalar skill, prueba de viabilidad (§15.3), cadena borrador, cadenas finales.
+2. Integración del motor con niveles de degradación.
+3. Decisión de pasarela → checkout de productos y pago de reservas.
+4. Panel interno mínimo para gestionar reservas, bloqueos y mantenimiento.
+
+### Fase 3 — Crecimiento
+Portal de clientes y clubes, historial de alquileres, registro de máquinas y garantías, repuestos, packs, cupones, financiación, idiomas, páginas por localidad con contenido propio, promociones alquiler→compra (con tu aprobación).
+
+---
+
+## 18. Propuesta de primera versión (MVP)
+
+**Objetivo**: una web publicable que ya presente la marca con calidad premium, enseñe los productos y capte reservas, **sin gastar en generación IA ni en pagos**.
+
+Incluye:
+- Landing con la estructura narrativa de las 6 escenas en versión estática (stills/fotos reales + tipografía grande + animaciones CSS ligeras). Cuando llegue el Scroll World, se monta encima sin rehacer nada.
+- Páginas `/comprar` y `/recogebolas` con precio y botón **"Solicitar compra"** (formulario que os llega por email) en lugar de pago online.
+- `/alquiler` con el flujo de 4 pasos real, disponibilidad desde base de datos, prevención de dobles reservas y confirmación por email. Estado "pendiente de confirmación"; el pago se acuerda aparte hasta fase 2.
+- `/contacto`, `/clubes` (formulario), legales, SEO técnico completo, accesibilidad AA, móvil primero.
+- Coste mensual: 0 € en desarrollo; al publicar, el que elijas de hosting/BD (§14).
+
+No incluye: vídeos Scroll World, pago online, cupones, financiación, cuentas de cliente.
+
+### Lo que necesito de ti para empezar
+1. **Aprobación** (o cambios) de este documento.
+2. **Fotos reales, CAD o fichas** de la máquina y del recogebolas (color, materiales, formas). Sin ellas no puedo diseñar la escena 3 ni garantizar fidelidad.
+3. **Modelo operativo del alquiler**: dónde se usa la máquina, quién la entrega, horarios, número de máquinas, política de cancelación.
+4. ¿Tenéis **dominio**? ¿Preferencia de **hosting**?
+5. ¿Aceptas el MVP con **"Solicitar compra"** y **reserva sin pago** hasta decidir pasarela?
+6. Cuándo quieras, **autorización** para la prueba de viabilidad de Scroll World (< 5 USD).
