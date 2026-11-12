@@ -9,3 +9,5 @@ next-env.d.ts
 lab/
 produccion/prototipo/frames/
 scrollcraft/builds/*/lab/
+test-results/
+playwright-report/

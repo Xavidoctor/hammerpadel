@@ -1,36 +1,61 @@
 /**
  * Fuente única de precios y datos comerciales del prototipo.
  * [CONFIRMADO] por Hammer Padel: precios y localidades de alquiler.
+ * [PENDIENTE] tratamiento del IVA: no se indica "IVA incluido" hasta confirmarlo.
  * Nada de especificaciones técnicas: están pendientes de documentación oficial.
  */
 
-export const maquina = {
+export const IVA_PENDIENTE = true;
+export const NOTA_IVA = "Tratamiento del IVA pendiente de confirmar.";
+
+export type Producto = {
+  id: "maquina" | "recogebolas";
+  nombre: string;
+  descripcion: string;
+  precioCentimos: number;
+  precioTexto: string;
+  ruta: string;
+};
+
+export const maquina: Producto = {
+  id: "maquina",
   nombre: "Hammer Padel",
   descripcion: "Máquina lanzapelotas para entrenar pádel de forma autónoma.",
-  precioEuros: 2300,
+  precioCentimos: 230000,
   precioTexto: "2.300 €",
   ruta: "/comprar",
-} as const;
+};
 
-export const recogebolas = {
+export const recogebolas: Producto = {
+  id: "recogebolas",
   nombre: "Recogebolas Hammer",
   descripcion: "Accesorio para recoger pelotas de forma cómoda y rápida.",
-  precioEuros: 85,
+  precioCentimos: 8500,
   precioTexto: "85 €",
   ruta: "/recogebolas",
-} as const;
+};
+
+export const productos = [maquina, recogebolas] as const;
 
 export const alquiler = {
-  precioEuros: 20,
+  precioCentimos: 2000,
   precioTexto: "20 €",
   duracionMinutos: 90,
   duracionTexto: "90 minutos",
   resumen: "20 € por sesión de 90 minutos",
   ruta: "/alquiler",
-  /** Orden de oeste a este. Ubicaciones exactas pendientes de definir. */
-  localidades: ["Pedreguer", "Ondara", "La Xara", "Dénia"],
   comarca: "Marina Alta, Alicante",
 } as const;
+
+/** Orden de oeste a este. Ubicaciones exactas pendientes de definir. */
+export const localidades = [
+  { id: "pedreguer", nombre: "Pedreguer" },
+  { id: "ondara", nombre: "Ondara" },
+  { id: "la-xara", nombre: "La Xara" },
+  { id: "denia", nombre: "Dénia" },
+] as const;
+
+export type LocalidadId = (typeof localidades)[number]["id"];
 
 export const lemas = {
   principal: "Tu entrenamiento. Tu ritmo. Tu pista.",

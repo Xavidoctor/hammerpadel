@@ -1,8 +1,38 @@
 # Hammer Padel — Documento de diseño de la web oficial
 
-**Versión:** 0.1 (borrador para revisión) · **Fecha:** 12/11/2026 · **Estado:** pendiente de aprobación de Xavi
+**Versión:** 0.2 (decisiones unificadas) · **Fecha:** 13/11/2026 · **Estado:** Fase 1 aprobada como prototipo local
 
-> Este documento no implementa nada. No se ha generado ningún recurso, no se han gastado créditos, no se ha contratado ni configurado ningún servicio y no se ha desplegado nada.
+> No se ha generado ningún recurso de pago, no se han gastado créditos, no se ha contratado ni configurado ningún servicio y no se ha desplegado nada.
+
+## Decisiones unificadas (v0.2, 13/11/2026)
+
+Estas decisiones de Xavi **prevalecen** sobre cualquier texto de la v0.1 que las contradiga. Las secciones 13 a 15 y la descripción del motor ya están reescritas; en el resto, donde ponga "Scroll World" léase **Scroll Craft**.
+
+| # | Decisión [CONFIRMADO] | Cómo se aplica |
+|---|---|---|
+| 1 | Scroll Craft sustituye a Scroll World como motor de animación | Motor `nateherkai/scroll-craft` 0.3.1 (MIT) vendorizado sin modificar en `src/vendor/scrollcraft` |
+| 2 | Producción audiovisual futura con Blender y fotografía real | Ver §15 reescrita |
+| 3 | Monid, Higgsfield y Seedance no son dependencias | Eliminados de §13 y §14. La API kie.ai que menciona Scroll Craft tampoco se usa |
+| 4 | Seis escenas, pero solo tres animadas al principio | Animadas: 1 La pista, 2 Entrenamiento, 5 Alquiler. Estructura preparada para 3, 4 y 6 (`src/content/escenas.ts`) |
+| 5 | Recursos provisionales gratuitos sin inventar el producto | Pista y mapa esquemáticos dibujados en SVG; el producto es un hueco marcado "fotografía real pendiente" |
+| 6 | Textos, precios y CTA en HTML semántico | Nada de texto dentro de imágenes o vídeos |
+| 7 | Compra y alquiler independientes de las animaciones | `/comprar`, `/recogebolas` y `/alquiler` no cargan el motor (verificado en las pruebas) |
+| 8 | Escritorio y móvil desde el principio | Encuadre de pista propio para vertical, clip móvil 9:16 propio |
+| 9 | Traslados y preparación entre ubicaciones | §8.3 bis: margen = recogida + traslado + preparación, desactivable |
+| 10 | No suponer pistas o instalaciones propias | Ubicación exacta "pendiente" en todas las páginas; el mapa es conceptual |
+| 11 | Sin pasarela de pago | Botones "Solicitar compra" y "Solicitar reserva" sin cobro |
+| 12 | No publicar horarios ficticios | El paso 3 pide una franja **preferida**; los huecos reales solo saldrán de reglas reales |
+| 13 | Sin características técnicas no verificadas | Fichas técnicas con "Pendiente de documentación oficial" |
+| 14 | Precios: 2.300 €, 85 €, 20 €/90 min. IVA pendiente | Fuente única `src/content/catalogo.ts`; nota "Tratamiento del IVA pendiente de confirmar" |
+| 15 | Web funcional, rápida y visualmente excelente | Sin vídeo en la carga inicial; motor diferido; niveles de degradación |
+
+### 8.3 bis · Traslados entre ubicaciones [PROPUESTA, solo si el modelo operativo lo requiere]
+Si una misma máquina presta servicio en varias localidades, entre dos sesiones hace falta tiempo para recoger, trasladar y preparar. La lógica (`src/lib/reservas/disponibilidad.ts`, con pruebas) lo modela así:
+
+- `margen(A → B) = recogida + traslado(A, B) + preparación` si A ≠ B; en la misma ubicación, el mayor de recogida y preparación.
+- Dos sesiones de la misma máquina chocan si no cabe ese margen entre ellas.
+- Con todo a 0 se comporta como un calendario normal. En base de datos se traduce a la restricción de exclusión de §8.3 aplicada sobre el rango ampliado con el margen, más una comprobación en la transacción para el traslado entre ubicaciones distintas.
+- Pendiente de Xavi: si habrá traslados y sus tiempos reales.
 
 ### Convención usada en el documento
 
@@ -14,16 +44,15 @@
 ### Punto de partida
 
 - **Repositorio** `Xavidoctor/hammerpadel`: está vacío (sin commits). Partimos de cero, sin deuda técnica.
-- **Skill `scroll-world`**: no está instalada en este entorno ni en tu lista de skills. La he leído desde su repositorio público (`github.com/oso95/scroll-world`, licencia MIT; existe una variante más antigua en `attentiondotnet/scroll-world`). Todo lo que digo sobre la skill sale de su README y su `SKILL.md`. Habrá que instalarla (gratis) cuando empecemos a implementar.
+- **Motor de animación: Scroll Craft** (`github.com/nateherkai/scroll-craft`, licencia MIT, © 2026 Nate Herk). Copia sin modificar en `src/vendor/scrollcraft` con su licencia y sumas SHA256.
 
-#### Qué hace la skill scroll-world (resumen)
+#### Qué es Scroll Craft (resumen)
 
-- Construye una landing de tipo "vuelo a través del mundo": la cámara entra en cada escena y viaja a la siguiente sin cortes. El scroll controla el tiempo de **vídeos pregenerados** (no es 3D en tiempo real).
-- Flujo: entrevista → una imagen fija por escena → un clip de vídeo "dive-in" por escena → clips "conectores" entre escenas (arrancan en el último fotograma real del clip anterior y terminan en el primero del siguiente) → codificación con ffmpeg → montaje con un motor de scrub en JavaScript sin dependencias (`scrub-engine.js`) → QA.
-- Dos arquitecturas de cámara: **A** (una toma continua, sin conectores) y **B** ("fly through the world", con clip por escena + conectores).
-- Modelos: imágenes con `gpt_image_2` (vía Higgsfield o Codex); vídeo con **Seedance 2.0** por defecto (vía Monid o Higgsfield), Kling 3.0 como alternativa. **Todos son servicios de pago.**
-- Soporta una **cadena móvil nativa 9:16** (la propia skill dice que no se debe entregar el recorte central como versión móvil), stills como póster y fallback, y modo reducido sin vídeo para `prefers-reduced-motion`.
-- Motor: ajusta `video.currentTime` según el scroll, carga cada clip como Blob en memoria, hace crossfade en las uniones y sirve clips móviles en pantallas ≤860 px o puntero táctil.
+- Motor en JavaScript sin dependencias que **no genera DOM**: lee atributos `data-sc-*` sobre HTML real (renderizado en servidor) y lo anima desde un único valor de scroll.
+- Dispositivos: `pin` (la escena se fija mientras el contenido avanza), `scrub` (el scroll controla un vídeo o secuencia de imágenes), `pan`, `parallax`, `cue`, `kinetic`, `reveal`, `drift` de color, y efectos de puntero.
+- Publica el progreso de cada acto como `--sc-p`, así que el comportamiento propio de Hammer Padel (las trazas de bola) se escribe en CSS/SVG sin tocar el motor.
+- Respeta `prefers-reduced-motion` (sin vídeo, sin desplazamientos), sirve clips móviles distintos y tiene `destroy()` para Next.js.
+- La skill incluye un método de diseño (curva de sensación, un único pico, movimiento propio) y una herramienta opcional de generación con kie.ai que **no usamos**.
 
 ---
 
@@ -405,68 +434,35 @@ Objetivo: **WCAG 2.2 nivel AA** [PROPUESTA].
 
 ## 13. Dependencias externas necesarias
 
-| Dependencia | Para qué | Coste | Cuándo |
+| Dependencia | Para qué | Coste | Estado |
 |---|---|---|---|
-| Next.js, React, TypeScript, Drizzle, Tailwind | Base del sitio | Gratis (open source) | Fase 1 |
-| Skill `scroll-world` (MIT) | Pipeline y motor de scrub | Gratis | Fase 2 |
-| ffmpeg / ffprobe, Python + Pillow | Codificación de vídeo | Gratis | Fase 2 |
-| Repositorio GitHub | Código | Ya disponible | — |
-| Hosting web (Vercel u otro) | Servir la web | Ver §14 | Al publicar |
-| PostgreSQL gestionado (Supabase o Neon) | Reservas y pedidos | Plan gratuito para desarrollo | Fase 1–2 |
-| Email transaccional (p. ej. Resend) | Confirmaciones de reserva | Plan gratuito suficiente al inicio [VERIFICAR] | Fase 1–2 |
-| Monid y/o Higgsfield | Generación de imágenes y vídeo | **De pago** | Fase 2, con tu autorización |
-| Pasarela de pago | Cobros | Comisión por operación | Fase 2, tras decidir |
-| Dominio | hammerpadel.xx | Anual | Al publicar [PENDIENTE: ¿lo tenéis?] |
-
-He visto que el proyecto tiene conectados Supabase y Vercel. **No los he tocado** y no los usaré sin tu permiso.
-
----
+| Next.js 16, React 19, TypeScript | Base del sitio | Gratis (open source) | En uso |
+| Scroll Craft 0.3.1 (MIT) | Motor de animación por scroll | Gratis | En uso, vendorizado |
+| Geist y Archivo (OFL) vía npm | Tipografías autoalojadas | Gratis | En uso |
+| Vitest, Playwright, axe-core, ESLint | Pruebas y calidad | Gratis | En uso (desarrollo) |
+| Blender | Renders futuros de pista y producto | Gratis | Fase 2 |
+| ffmpeg | Codificar clips para scrub | Gratis | Fase 2 |
+| Fotografía real del producto | Producto fiel | Según fotógrafo | Pendiente de Xavi |
+| Hosting, base de datos, email, pasarela, dominio | Publicación y operación | Ver §14 | **No contratados**, fase posterior |
 
 ## 14. Servicios que implican coste
 
-| Servicio | Tipo de coste | Estimación | Notas |
-|---|---|---|---|
-| **Generación IA (Monid / Higgsfield)** | Por generación | Ver §15: ~45–75 USD para la versión completa | El mayor gasto puntual. Requiere tu autorización. |
-| **Hosting** | Mensual | Vercel Hobby es gratis pero **no permite uso comercial**; para una web que vende habría que ir a Pro (~20 USD/mes por miembro) [VERIFICAR]. Alternativas: Cloudflare Pages / Netlify con planes gratuitos que admiten uso comercial [VERIFICAR]. | Decidir antes de publicar. |
-| **Base de datos** | Mensual | Plan gratuito para desarrollo; Supabase gratuito pausa proyectos inactivos; Pro ~25 USD/mes [VERIFICAR]. Neon tiene plan gratuito sin pausa de datos [VERIFICAR]. | Para producción conviene plan de pago o uno gratuito sin pausas. |
-| **Pasarela de pago** | % por operación | Depende del proveedor | Sin cuota en Stripe; Redsys según banco. |
-| **Financiación** | % por operación | Depende del proveedor | Opcional. |
-| **Email** | Mensual por volumen | 0 € con poco volumen [VERIFICAR] | — |
-| **Dominio** | Anual | ~10–20 €/año | — |
-| **Fotografía / 3D del producto** | Puntual | Variable | Muy recomendable (ver riesgo 1). |
+Ninguno en Fase 1. Para publicar (con aprobación) habrá que decidir: hosting con uso comercial, base de datos de producción, email transaccional, pasarela de pago y dominio (análisis en §9.2 y v0.1). La generación de vídeo con IA de pago queda **descartada** como dependencia.
 
----
+## 15. Producción audiovisual: Blender y fotografía real
 
-## 15. Estimación de generaciones para Scroll World
+Sustituye a la estimación de generaciones de pago de la v0.1.
 
-Fórmula de la skill: **N imágenes + (2N − 1) vídeos por formato**, +~15 % de repeticiones. Precios de la skill **verificados por su autor el 25/07/2026** (hace casi 4 meses, hay que re-verificarlos).
+| Escena | Recurso provisional (Fase 1, gratis) | Recurso definitivo (Fase 2) |
+|---|---|---|
+| 1 La pista | Pista esquemática SVG en perspectiva, focos que se encienden | Render Blender por capas (fondo, pista, cristal, primer plano) para `parallax`/`pin`, o foto nocturna real de una pista con permiso |
+| 2 Entrenamiento | Pista SVG + trazas de bola dibujadas por el scroll | Mismas trazas sobre una foto o render de pista; opcional vídeo real de sesión con jugador a contraluz |
+| 3 Producto | Hueco "fotografía real pendiente" | Fotografía de estudio sobre fondo grafito, o render Blender **a partir de CAD/medidas reales** |
+| 4 Recogebolas | Hueco + bolas | Fotografía real del recogebolas en pista |
+| 5 Alquiler | Clip esquemático pista → mapa (Chrome + ffmpeg, local) | Clip Blender con la misma cámara, mapa estilizado |
+| 6 Reserva | Tipografía | Plano fijo de la máquina en pista |
 
-### 15.1 Recuento (N = 6, arquitectura B)
-| Paso | Escritorio 16:9 | Móvil 9:16 | Total |
-|---|---|---|---|
-| Imágenes (stills) | 6 | 6 | 12 |
-| Vídeos de escena | 6 | 6 | 12 |
-| Conectores | 5 | 5 | 10 |
-| **Subtotal** | 6 img + 11 vídeos | 6 img + 11 vídeos | **12 img + 22 vídeos** |
-| Repeticiones (~15–30 %) | | | +2–4 img, +4–7 vídeos |
-| Borradores previos baratos (480p) | | | +11 vídeos |
-| **Total estimado** | | | **~14–16 imágenes y ~37–40 vídeos** |
-
-### 15.2 Coste estimado (Monid, Seedance 2.0, precios de la skill)
-- Borradores 480p: 11 × ~0,30 $ ≈ **3–4 USD**
-- Escritorio 1080p: 6 × 2,99 + 5 × 1,87 ≈ **27 USD**
-- Móvil 720p: 6 × 1,21 + 5 × 0,76 ≈ **11 USD**
-- Repeticiones: **+6–15 USD**
-- Imágenes: según proveedor (en Higgsfield ~15 créditos/imagen)
-- **Total orientativo: ~45–75 USD**. En créditos Higgsfield: ~40–55 créditos por vídeo y ~15 por imagen → ~1.700–2.400 créditos.
-
-### 15.3 Propuesta de gasto escalonado (cada paso con tu autorización)
-1. **Prueba de viabilidad** (< 5 USD): 1–2 stills + 1 vídeo borrador de la escena 3 con fotos reales del producto como referencia. Sirve para ver si el modelo respeta el diseño de la máquina.
-2. **Cadena de borrador** 480p completa (escritorio) para validar ritmo y storyboard.
-3. **Cadena final escritorio**.
-4. **Cadena final móvil**.
-
----
+Requisitos para la Fase 2: fotos/CAD/medidas reales, decidir si renderiza alguien del equipo o un freelance, y codificar con los parámetros de scrub de Scroll Craft (GOP denso, sin audio, versión 9:16 propia).
 
 ## 16. Riesgos técnicos
 
@@ -519,7 +515,7 @@ Portal de clientes y clubes, historial de alquileres, registro de máquinas y ga
 Incluye:
 - Landing con la estructura narrativa de las 6 escenas en versión estática (stills/fotos reales + tipografía grande + animaciones CSS ligeras). Cuando llegue el Scroll World, se monta encima sin rehacer nada.
 - Páginas `/comprar` y `/recogebolas` con precio y botón **"Solicitar compra"** (formulario que os llega por email) en lugar de pago online.
-- `/alquiler` con el flujo de 4 pasos real, disponibilidad desde base de datos, prevención de dobles reservas y confirmación por email. Estado "pendiente de confirmación"; el pago se acuerda aparte hasta fase 2.
+- `/alquiler` con el flujo de 4 pasos. **v0.2:** en el prototipo no hay base de datos ni reservas reales; el paso 3 recoge una franja preferida y nada se envía. La lógica de disponibilidad (con traslados) está programada y probada, lista para conectarse a un backend cuando Xavi lo apruebe.
 - `/contacto`, `/clubes` (formulario), legales, SEO técnico completo, accesibilidad AA, móvil primero.
 - Coste mensual: 0 € en desarrollo; al publicar, el que elijas de hosting/BD (§14).
 
