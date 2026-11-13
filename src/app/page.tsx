@@ -7,6 +7,13 @@ import { alquiler, lemas, localidades, maquina, recogebolas } from "@/content/ca
 import { HORIZONTAL, VERTICAL, golpes, proyectar } from "@/lib/pista";
 import { mediosPista } from "@/content/medios";
 
+/** Focos de la foto iluminada (en % del encuadre 1671x941), de fondo a primer plano. */
+const LAMPARAS = [
+  { x: 38.6, y: 45.8, orden: 0 }, { x: 61.3, y: 45.8, orden: 0 },
+  { x: 29.8, y: 28.5, orden: 1 }, { x: 69.9, y: 28.5, orden: 1 },
+  { x: 16.2, y: 5.8, orden: 2 }, { x: 83.4, y: 5.8, orden: 2 },
+];
+
 const pct = (v: number, t: number) => `${((v / t) * 100).toFixed(2)}%`;
 
 export default function Inicio() {
@@ -23,7 +30,17 @@ export default function Inicio() {
         aria-labelledby="t-hero"
       >
         <div data-sc-stage className="stage">
-          {medios.foto ? (
+          {medios.foto && medios.fotoOscura && !medios.video ? (
+            <div className="pista__frame">
+              <img className="pista__layer" src={medios.fotoOscura} alt="" fetchPriority="high" />
+              {LAMPARAS.map((l, i) => (
+                <span key={i} className="pista__lamp" aria-hidden="true"
+                  style={{ left: `${l.x}%`, top: `${l.y}%`, ["--n" as string]: l.orden }} />
+              ))}
+              <img className="pista__layer pista__layer--lit" src={medios.foto}
+                alt="Máquina Hammer Padel en una pista de pádel azul iluminada" />
+            </div>
+          ) : medios.foto ? (
             <>
               <picture>
                 {medios.fotoMovil ? <source media="(max-width: 860px)" srcSet={medios.fotoMovil} /> : null}
@@ -56,9 +73,11 @@ export default function Inicio() {
           )}
           <div className="pista__haze" aria-hidden="true" />
           <div className="sc-scrim sc-scrim--lead only-wide" aria-hidden="true" />
-          <div className="pista__product">
-            <ProductSlot producto="Máquina Hammer Padel" variante="pista" />
-          </div>
+          {medios.fotoIncluyeMaquina ? null : (
+            <div className="pista__product">
+              <ProductSlot producto="Máquina Hammer Padel" variante="pista" />
+            </div>
+          )}
           <div className="pista__copy" data-sc-cue="0 1 0 0">
             <h1 id="t-hero" className="hero-title">
               <span className="hero-title__brand">Hammer Padel</span>

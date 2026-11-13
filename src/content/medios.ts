@@ -16,6 +16,10 @@ const url = (f: string) => (existe(f) ? `/medios/pista/${f}` : null);
 export function mediosPista() {
   return {
     foto: url("pista.webp"),
+    /** Misma toma con las luces apagadas, alineada con la iluminada. */
+    fotoOscura: url("pista-oscura.webp"),
+    /** Las fotos actuales ya muestran la máquina: no se superpone el hueco de producto. */
+    fotoIncluyeMaquina: existe("pista.webp"),
     fotoMovil: url("pista-m.webp") ?? url("pista.webp"),
     video: url("pista.mp4"),
     videoMovil: url("pista-m.mp4"),
