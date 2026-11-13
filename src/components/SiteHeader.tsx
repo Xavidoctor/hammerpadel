@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { navegacion } from "@/content/catalogo";
+import { Logo } from "./Logo";
 
 export function SiteHeader() {
   const [abierto, setAbierto] = useState(false);
@@ -34,7 +35,8 @@ export function SiteHeader() {
   return (
     <header className="bar" data-open={abierto || undefined}>
       <Link href="/" className="bar__mark" aria-label="Hammer Padel, inicio">
-        HAMMER<span>PADEL</span>
+        <Logo className="bar__logo" />
+        <span>PADEL</span>
       </Link>
       <nav aria-label="Principal" className="bar__nav" id="menu-principal">
         <ul>

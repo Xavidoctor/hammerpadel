@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { alquiler, localidades, navegacion } from "@/content/catalogo";
+import { Logo } from "./Logo";
 
 export function SiteFooter() {
   return (
     <footer className="foot">
       <div className="foot__inner">
         <div>
-          <p className="foot__mark">HAMMER PADEL</p>
+          <p className="foot__mark">
+            <Logo className="foot__logo" />
+            <span className="sr-only">Hammer Padel</span>
+          </p>
           <p className="foot__soft">
             Alquiler en {localidades.map((l) => l.nombre).join(", ")} ({alquiler.comarca}).
           </p>

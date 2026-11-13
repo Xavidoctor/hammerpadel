@@ -92,7 +92,10 @@ main { flex: 1; }
   font-family: var(--sc-font-display); font-variation-settings: "wdth" 70; font-weight: 800;
   letter-spacing: 0.02em; text-decoration: none; font-size: 1.15rem; white-space: nowrap;
 }
-.bar__mark span { color: var(--sc-accent); margin-left: 0.3em; }
+.bar__mark { display: inline-flex; align-items: flex-start; gap: 0.45em; color: var(--sc-ink); }
+.bar__logo { display: block; height: 2.15rem; width: auto; }
+.bar__mark span { color: var(--sc-accent); font-size: 0.8rem; letter-spacing: 0.18em; line-height: 1; margin-top: 0.3rem; }
+.logo { display: block; }
 .bar__nav { margin-left: auto; }
 .bar__nav ul { display: flex; gap: var(--sc-5); list-style: none; margin: 0; padding: 0; }
 .bar__nav a { text-decoration: none; font-size: var(--sc-t-sm); color: var(--sc-ink-soft); padding: var(--sc-2) 0; }
@@ -121,6 +124,7 @@ main { flex: 1; }
 /* ------------------------------------------------------------- pie */
 .foot { border-top: 1px solid var(--sc-hairline); padding: var(--sc-8) var(--sc-gutter) var(--sc-6); background: var(--sc-canvas); position: relative; z-index: 2; }
 .foot__inner { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--sc-6); max-width: var(--sc-maxw); margin: 0 auto; }
+.foot__logo { height: 3rem; width: auto; color: var(--sc-ink); }
 .foot__mark { font-family: var(--sc-font-display); font-variation-settings: "wdth" 70; font-weight: 800; margin: 0 0 var(--sc-2); font-size: var(--sc-t-lg); }
 .foot__soft { color: var(--sc-ink-soft); margin: 0; font-size: var(--sc-t-sm); max-width: 36ch; }
 .foot__links { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, auto); gap: var(--sc-2) var(--sc-6); font-size: var(--sc-t-sm); }
