@@ -31,6 +31,7 @@ export function ScrollCraftStage({ children }: { children: React.ReactNode }) {
     };
     const ligero =
       root.classList.contains("hp-static") ||
+      leerPreferencia() ||
       nav.connection?.saveData === true ||
       /(^|-)2g$|^3g$/.test(nav.connection?.effectiveType ?? "") ||
       (typeof nav.deviceMemory === "number" && nav.deviceMemory <= 2);

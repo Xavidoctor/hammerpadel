@@ -116,7 +116,6 @@ main { flex: 1; }
   .bar[data-open] .bar__nav { display: block; }
   .bar__nav ul { flex-direction: column; gap: 0; }
   .bar__nav a { display: block; padding: var(--sc-3) 0; font-size: var(--sc-t-lg); color: var(--sc-ink); border-bottom: 1px solid var(--sc-hairline); }
-  html:not(.js) .bar__nav { position: static; display: block; background: none; border: 0; padding: 0; }
 }
 
 /* ------------------------------------------------------------- pie */
@@ -160,14 +159,15 @@ main { flex: 1; }
 .world { position: relative; }
 /* :where() = especificidad 0, para no pisar el position: sticky de .sc-stage. */
 :where(.stage) { position: relative; min-height: 100svh; overflow: clip; }
-/* Antes de montar el motor, la progresión empieza en 0. Sin JS o en modo
-   estático no hay --sc-p y los var(--sc-p, 1) muestran el estado final. */
-html.js:not(.hp-static) .world [data-sc-act] { --sc-p: 0; }
+/* Antes de montar el motor, la progresión empieza en 0. En modo estático no
+   hay --sc-p y los var(--sc-p, 1) muestran el estado final. Sin JS, ver el
+   <noscript> de layout.tsx. */
+html:not(.hp-static) .world [data-sc-act] { --sc-p: 0; }
 
 /* Ninguna animación oculta contenido si el motor no corre. */
-html:not(.js) [data-sc-cue], html.hp-static [data-sc-cue],
-html:not(.js) [data-sc-in], html.hp-static [data-sc-in],
-html:not(.js) [data-sc-stagger] > *, html.hp-static [data-sc-stagger] > * {
+html.hp-static [data-sc-cue],
+html.hp-static [data-sc-in],
+html.hp-static [data-sc-stagger] > * {
   opacity: 1 !important; transform: none !important;
 }
 
@@ -313,8 +313,8 @@ html:not(.js) [data-sc-stagger] > *, html.hp-static [data-sc-stagger] > * {
   .train__lede { top: calc(var(--bar-h) + 1.25rem); right: var(--sc-gutter); font-size: var(--sc-t-lg); }
   .train__punch { top: calc(var(--bar-h) + 1.25rem); font-size: clamp(2.4rem, 12vw, 4.2rem); }
 }
-html:not(.js) .train__punch, html.hp-static .train__punch { position: relative; top: auto; padding-top: 60vh; }
-html:not(.js) .train__lede, html.hp-static .train__lede { position: relative; top: auto; padding-top: var(--sc-8); }
+html.hp-static .train__punch { position: relative; top: auto; padding-top: 60vh; }
+html.hp-static .train__lede { position: relative; top: auto; padding-top: var(--sc-8); }
 
 /* ---- secciones de flujo (escenas 3, 4, 6) */
 .flow { position: relative; padding: var(--sc-section) var(--sc-gutter); z-index: 2; }
@@ -360,7 +360,7 @@ html:not(.js) .train__lede, html.hp-static .train__lede { position: relative; to
   .rent__copy { right: var(--sc-gutter); max-width: none; }
   .rent__note { top: calc(var(--bar-h) + var(--sc-3)); bottom: auto; }
 }
-html:not(.js) .rent__copy, html.hp-static .rent__copy { position: relative; left: auto; bottom: auto; padding: 40vh var(--sc-gutter) var(--sc-8); }
+html.hp-static .rent__copy { position: relative; left: auto; bottom: auto; padding: 40vh var(--sc-gutter) var(--sc-8); }
 
 /* ---- botón de preferencia de movimiento */
 .motion-toggle {
@@ -369,7 +369,6 @@ html:not(.js) .rent__copy, html.hp-static .rent__copy { position: relative; left
   min-height: 32px;
 }
 .motion-toggle:hover { color: var(--sc-ink); }
-html:not(.js) .motion-toggle { display: none; }
 
 /* ========================================================= PÁGINAS */
 .page { padding: clamp(3rem, 8vw, 7rem) var(--sc-gutter) var(--sc-section); }

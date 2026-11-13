@@ -9,11 +9,26 @@ export function SiteHeader() {
   const [abierto, setAbierto] = useState(false);
   const ruta = usePathname();
 
+  // El menú se cierra con Escape, al tocar fuera, al hacer scroll o al ensanchar la ventana.
   useEffect(() => {
     if (!abierto) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setAbierto(false);
+    const cerrar = () => setAbierto(false);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && cerrar();
+    const onFuera = (e: PointerEvent) => {
+      if (!(e.target as Element).closest(".bar")) cerrar();
+    };
+    const y0 = scrollY;
+    const onScroll = () => Math.abs(scrollY - y0) > 40 && cerrar();
     addEventListener("keydown", onKey);
-    return () => removeEventListener("keydown", onKey);
+    addEventListener("pointerdown", onFuera);
+    addEventListener("scroll", onScroll, { passive: true });
+    addEventListener("resize", cerrar);
+    return () => {
+      removeEventListener("keydown", onKey);
+      removeEventListener("pointerdown", onFuera);
+      removeEventListener("scroll", onScroll);
+      removeEventListener("resize", cerrar);
+    };
   }, [abierto]);
 
   return (

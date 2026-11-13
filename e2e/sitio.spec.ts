@@ -97,3 +97,32 @@ test.describe("solicitud de alquiler (prototipo)", () => {
     await expect(page.getByRole("status")).toContainText("no se envía nada");
   });
 });
+
+test.describe("menú en pantallas estrechas", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+  test("empieza cerrado, se abre, y se cierra con Escape", async ({ page }) => {
+    await page.goto("/");
+    const nav = page.getByRole("navigation", { name: "Principal" });
+    await expect(nav).toBeHidden();
+    await page.getByRole("button", { name: "Menú" }).click();
+    await expect(nav).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(nav).toBeHidden();
+  });
+});
+
+test.describe("menú: cierre automático", () => {
+  test.use({ viewport: { width: 390, height: 844 } });
+  test("se cierra al tocar fuera y al hacer scroll", async ({ page }) => {
+    await page.goto("/alquiler");
+    const nav = page.getByRole("navigation", { name: "Principal" });
+    await page.getByRole("button", { name: "Menú" }).click();
+    await expect(nav).toBeVisible();
+    await page.mouse.click(200, 800);
+    await expect(nav).toBeHidden();
+    await page.getByRole("button", { name: "Menú" }).click();
+    await expect(nav).toBeVisible();
+    await page.evaluate(() => scrollBy(0, 300));
+    await expect(nav).toBeHidden();
+  });
+});
