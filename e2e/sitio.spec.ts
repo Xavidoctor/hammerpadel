@@ -74,6 +74,8 @@ test.describe("la landing nunca bloquea la compra", () => {
     await p1.goto("/recogebolas");
     const video = p1.locator("video.pvideo__media");
     await expect(video).toHaveAttribute("poster", /recogebolas-poster\.webp$/);
+    await expect(p1.locator("img[src$='completo.webp']")).toBeVisible();
+    await video.scrollIntoViewIfNeeded();
     await p1.waitForFunction(() => {
       const v = document.querySelector<HTMLVideoElement>("video.pvideo__media");
       return !!v && !v.paused;

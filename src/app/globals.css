@@ -449,3 +449,15 @@ html.hp-static .rent__copy { position: relative; left: auto; bottom: auto; paddi
 .result { border: 1px solid var(--sc-accent); border-radius: var(--sc-r-md); padding: var(--sc-5); display: grid; gap: var(--sc-3); }
 .result h2 { margin: 0; font-size: var(--sc-t-xl); }
 .result p { margin: 0; color: var(--sc-ink-soft); }
+
+/* Fotografía real de producto */
+.photo { margin: 0; display: grid; gap: var(--sc-2, 0.5rem); }
+.photo img { display: block; width: 100%; height: auto; border-radius: 14px; background: #202126; }
+.photo--claro img { background: #fff; padding: clamp(0.75rem, 3vw, 2rem); box-sizing: border-box; }
+.photo figcaption { font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+.photo--hero { max-width: 30rem; }
+.uso { max-width: var(--sc-maxw); margin: clamp(3rem, 8vw, 6rem) auto 0; display: grid; gap: var(--sc-5); }
+.uso__grid { display: grid; grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); gap: clamp(1.5rem, 5vw, 4rem); align-items: center; }
+.uso__grid .photo { max-width: 34rem; }
+@media (max-width: 860px) { .uso__grid { grid-template-columns: 1fr; } .uso__grid .photo { max-width: 22rem; margin-inline: auto; } }
+.flow--balls > .wrap { position: relative; z-index: 1; }
