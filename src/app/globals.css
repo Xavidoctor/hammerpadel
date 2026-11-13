@@ -129,6 +129,14 @@ main { flex: 1; }
 .foot__proto { max-width: var(--sc-maxw); margin: var(--sc-7) auto 0; font-size: var(--sc-t-xs); color: var(--sc-ink-soft); border-top: 1px solid var(--sc-hairline); padding-top: var(--sc-4); }
 @media (max-width: 600px) { .foot__links { grid-template-columns: repeat(2, auto); } }
 
+/* ------------------------------------------------- vídeo real de producto */
+.pvideo { margin: 0; width: 100%; max-width: 24rem; }
+.pvideo__media {
+  display: block; width: 100%; aspect-ratio: 9 / 16; object-fit: cover;
+  border-radius: var(--sc-r-md); background: var(--hp-graphite); box-shadow: var(--sc-e3);
+}
+@media (max-width: 860px) { .pvideo { max-width: 22rem; margin-inline: auto; } }
+
 /* ------------------------------------------------- hueco de producto */
 .slot { margin: 0; display: grid; gap: var(--sc-3); }
 .slot__frame {

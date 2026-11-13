@@ -21,7 +21,7 @@ export const escenas: Escena[] = [
   { id: "producto", numero: 3, titulo: "Hammer Padel", dispositivo: "flow", animadaEnPrototipo: false,
     recursoFuturo: "Fotografía de estudio o render Blender a partir de CAD/medidas reales" },
   { id: "recogebolas", numero: 4, titulo: "Recogebolas", dispositivo: "flow", animadaEnPrototipo: false,
-    recursoFuturo: "Fotografía real del recogebolas sobre pista con bolas" },
+    recursoFuturo: "Vídeo real del recogebolas ya integrado; falta la toma de escena para Scroll World" },
   { id: "alquiler", numero: 5, titulo: "Alquiler en la Marina Alta", dispositivo: "scrub", animadaEnPrototipo: true,
     recursoFuturo: "Clip Blender de la pista al mapa (el actual es un esquema provisional)" },
   { id: "reserva", numero: 6, titulo: "Cierre hacia la reserva", dispositivo: "flow", animadaEnPrototipo: false,

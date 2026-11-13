@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Price } from "@/components/Price";
 import { ProductJsonLd } from "@/components/ProductJsonLd";
-import { ProductSlot } from "@/components/ProductSlot";
+import { ProductVideo } from "@/components/ProductVideo";
 import { lemas, recogebolas } from "@/content/catalogo";
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export default function Recogebolas() {
     <div className="page">
       <ProductJsonLd p={recogebolas} />
       <div className="product-page">
-        <ProductSlot producto="Recogebolas Hammer" />
+        <ProductVideo base="/medios/recogebolas/recogebolas" descripcion="Recogebolas Hammer recogiendo pelotas en pista y vaciándolas en la máquina" />
         <div className="stack">
           <p className="kicker">Accesorio</p>
           <h1 className="display">Recogebolas Hammer</h1>

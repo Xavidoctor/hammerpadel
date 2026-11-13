@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CourtSvg } from "@/components/CourtSvg";
 import { ProductSlot } from "@/components/ProductSlot";
+import { ProductVideo } from "@/components/ProductVideo";
 import { Price } from "@/components/Price";
 import { MotionToggle, ScrollCraftStage } from "@/components/ScrollCraftStage";
 import { alquiler, lemas, localidades, maquina, recogebolas } from "@/content/catalogo";
@@ -172,7 +173,7 @@ export default function Inicio() {
               <Link className="btn btn--accent" href={recogebolas.ruta}>Comprar recogebolas</Link>
             </div>
           </div>
-          <ProductSlot producto="Recogebolas Hammer" />
+          <ProductVideo base="/medios/recogebolas/recogebolas" descripcion="Recogebolas Hammer recogiendo pelotas en pista y vaciándolas en la máquina" />
         </div>
       </section>
 

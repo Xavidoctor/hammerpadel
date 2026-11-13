@@ -68,6 +68,29 @@ test.describe("la landing nunca bloquea la compra", () => {
     for (const t of r.inicios) expect(t).toBeGreaterThanOrEqual(r.load);
   });
 
+  test("el vídeo del recogebolas se reproduce y con movimiento reducido solo muestra el póster", async ({ browser }) => {
+    const normal = await browser.newContext();
+    const p1 = await normal.newPage();
+    await p1.goto("/recogebolas");
+    const video = p1.locator("video.pvideo__media");
+    await expect(video).toHaveAttribute("poster", /recogebolas-poster\.webp$/);
+    await p1.waitForFunction(() => {
+      const v = document.querySelector<HTMLVideoElement>("video.pvideo__media");
+      return !!v && !v.paused;
+    });
+    await normal.close();
+
+    const reducido = await browser.newContext({ reducedMotion: "reduce" });
+    const p2 = await reducido.newPage();
+    await p2.goto("/recogebolas");
+    await p2.waitForLoadState("networkidle");
+    const pidioVideo = await p2.evaluate(() =>
+      performance.getEntriesByType("resource").some((r) => /\.(mp4|webm)$/.test(r.name)),
+    );
+    expect(pidioVideo).toBe(false);
+    await reducido.close();
+  });
+
   test("las páginas de compra y alquiler no cargan el motor", async ({ page }) => {
     for (const r of ["/comprar", "/alquiler"]) {
       await page.goto(r);
