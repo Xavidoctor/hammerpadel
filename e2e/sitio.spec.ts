@@ -26,7 +26,7 @@ test.describe("precios confirmados", () => {
     const html = await page.content();
     expect(html).toContain("2.499 €");
     expect(html).toContain("65 €");
-    expect(html).toContain("20 €");
+    expect(html).toContain("25 €");
     for (const l of ["Dénia", "Ondara", "La Xara", "Pedreguer"]) expect(html).toContain(l);
   });
 });

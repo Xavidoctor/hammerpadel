@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Dato, LegalPage, Pendiente } from "@/components/Legal";
-import { alquiler, localidades, NOTA_IVA } from "@/content/catalogo";
+import { alquiler, localidades } from "@/content/catalogo";
 import { titular } from "@/content/legal";
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default function CondicionesAlquiler() {
 
       <h2>1. El servicio</h2>
       <ul>
-        <li>Alquiler de una máquina lanzapelotas Hammer Padel durante una sesión de {alquiler.duracionTexto}.</li>
+        <li>Alquiler de una máquina lanzapelotas Hammer Padel durante una sesión de {alquiler.duracionTexto}, con {alquiler.pelotas} pelotas.</li>
         <li>Hammer Padel lleva la máquina a la pista que indiques y la recoge al terminar.</li>
         <li>Zona de servicio: {zona} ({alquiler.comarca}).</li>
         <li>Servicio de lunes a domingo. Horario de inicio de las sesiones: de 8:00 a 20:30 (la última sesión empieza a las 20:30).</li>
@@ -40,10 +40,10 @@ export default function CondicionesAlquiler() {
 
       <h2>3. Precio y pago</h2>
       <ul>
-        <li>Precio: {alquiler.resumen}.</li>
+        <li>Precio: {alquiler.resumen}, IVA incluido.</li>
         <li>De momento, el pago se hace en efectivo al comienzo de la sesión. Más adelante se podrá pagar online al reservar.</li>
       </ul>
-      <Pendiente>{NOTA_IVA} Si se entrega factura o justificante y en qué momento.</Pendiente>
+      <Pendiente>Si se entrega factura o justificante y en qué momento.</Pendiente>
 
       <h2>4. Reserva y confirmación</h2>
       <p>
@@ -63,7 +63,7 @@ export default function CondicionesAlquiler() {
         <li>Usa la máquina siguiendo las indicaciones que te dé Hammer Padel al entregarla.</li>
         <li>No la desmontes, no la mojes ni la uses fuera de la pista indicada.</li>
         <li>Avisa en cuanto notes cualquier fallo.</li>
-        <li>Cada pelota de Hammer Padel que se pierda durante la sesión se cobra a 1 €.</li>
+        <li>Las {alquiler.pelotas} pelotas son de Hammer Padel: cada pelota que se pierda durante la sesión se cobra a 1 €.</li>
       </ul>
       <Pendiente>
         Responsabilidad por daños causados por mal uso, si se pide fianza, edad mínima y supervisión de menores, y

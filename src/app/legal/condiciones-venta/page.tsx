@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Dato, LegalPage, Pendiente } from "@/components/Legal";
-import { maquina, NOTA_IVA, recogebolas } from "@/content/catalogo";
+import { envio, maquina, recogebolas } from "@/content/catalogo";
 import { titular } from "@/content/legal";
 
 export const metadata: Metadata = {
@@ -21,11 +21,13 @@ export default function CondicionesVenta() {
 
       <h2>1. Productos y precios</h2>
       <dl className="spec">
-        <div><dt>{maquina.nombre}</dt><dd>{maquina.precioTexto}</dd></div>
-        <div><dt>{recogebolas.nombre}</dt><dd>{recogebolas.precioTexto}</dd></div>
+        <div><dt>{maquina.nombre}</dt><dd>{maquina.precioTexto} · {envio.maquina}</dd></div>
+        <div><dt>{recogebolas.nombre}</dt><dd>{recogebolas.precioTexto} · {envio.recogebolas}</dd></div>
       </dl>
-      <p>Ambos productos se venden por separado. El precio aplicable es el que figura en la web al hacer el pedido.</p>
-      <Pendiente>{NOTA_IVA} Gastos de envío, si los hay.</Pendiente>
+      <p>
+        Todos los precios llevan el IVA incluido. Ambos productos se venden por separado. El precio aplicable es el
+        que figura en la web al hacer el pedido.
+      </p>
 
       <h2>2. Cómo comprar</h2>
       <p>
@@ -35,8 +37,12 @@ export default function CondicionesVenta() {
       </p>
       <Pendiente>Formas de pago aceptadas y si habrá financiación.</Pendiente>
 
-      <h2>3. Entrega</h2>
-      <Pendiente>Zonas de envío, plazos, transportista o entrega en mano, y qué hacer si el producto llega dañado.</Pendiente>
+      <h2>3. Envío y entrega</h2>
+      <ul>
+        <li>Máquina Hammer Padel: el envío está incluido en el precio.</li>
+        <li>Recogebolas Hammer: 6,99 € de envío si compras uno; envío gratis a partir de dos unidades.</li>
+      </ul>
+      <Pendiente>Zonas de envío, plazos, transportista y qué hacer si el producto llega dañado.</Pendiente>
 
       <h2>4. Derecho de desistimiento</h2>
       <p>
@@ -45,11 +51,9 @@ export default function CondicionesVenta() {
         la Ley General para la Defensa de los Consumidores y Usuarios. Para ejercerlo, comunícalo a{" "}
         <Dato valor={titular.email} falta="email de contacto" />. Te devolveremos lo pagado, incluido el envío
         ordinario, en un máximo de 14 días desde que nos lo comuniques; podemos esperar a recibir el producto de vuelta.
+        Los gastos de envío de la devolución corren a cargo del cliente.
       </p>
-      <Pendiente>
-        Quién paga los costes de devolución, dirección a la que devolver el producto y modelo de formulario de
-        desistimiento.
-      </Pendiente>
+      <Pendiente>Dirección a la que devolver el producto y modelo de formulario de desistimiento.</Pendiente>
 
       <h2>5. Garantía</h2>
       <p>
