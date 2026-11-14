@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
+import { URL_SITIO } from "@/lib/sitio";
 
-const BASE = "http://localhost:3000"; // Sustituir por el dominio definitivo.
+const BASE = URL_SITIO;
 const rutas = ["", "/comprar", "/recogebolas", "/alquiler", "/como-funciona", "/entrenamientos", "/clubes", "/soporte", "/contacto"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
