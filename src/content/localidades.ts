@@ -2,7 +2,7 @@
  * Contenido de las páginas locales de alquiler (/alquiler/[localidad]).
  *
  * [CONFIRMADO] por Hammer Padel (2026-11-14): el alquiler se hace en la pista
- * del cliente (Hammer Padel lleva la máquina), 20 € / 90 min, reservas con
+ * del cliente (Hammer Padel lleva la máquina), 25 € / 90 min con 60 pelotas, reservas con
  * inicio entre las 8:00 y las 20:30, de lunes a domingo, con 6 h de antelación
  * mínima, confirmadas a mano por el equipo, solo desde la web; se atienden
  * urbanizaciones y pistas privadas; 1 € por pelota perdida; al principio, pago

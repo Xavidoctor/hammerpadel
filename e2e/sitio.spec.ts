@@ -26,7 +26,7 @@ test.describe("precios confirmados", () => {
     const html = await page.content();
     expect(html).toContain("2.499 €");
     expect(html).toContain("65 €");
-    expect(html).toContain("20 €");
+    expect(html).toContain("25 €");
     for (const l of ["Dénia", "Ondara", "La Xara", "Pedreguer"]) expect(html).toContain(l);
   });
 });
@@ -161,7 +161,8 @@ test.describe("alquiler por localidad", () => {
       const ld = JSON.parse((await page.locator('script[type="application/ld+json"]').first().textContent()) ?? "[]");
       const servicio = ld.find((x: { "@type": string }) => x["@type"] === "Service");
       expect(servicio.areaServed.name).toBe(nombre);
-      expect(servicio.offers.price).toBe("20.00");
+      expect(servicio.offers.price).toBe("25.00");
+      expect(servicio.offers.description).toContain("60 pelotas");
       expect(ld.some((x: { "@type": string }) => x["@type"] === "LocalBusiness")).toBe(false);
       await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
       await page.getByRole("link", { name: `Reservar en ${nombre}` }).first().click();

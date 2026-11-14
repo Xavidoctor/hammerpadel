@@ -26,6 +26,7 @@ export function RentalJsonLd({ p, base }: { p: PaginaLocalidad; base: string }) 
         "@type": "Offer",
         price: (alquiler.precioCentimos / 100).toFixed(2),
         priceCurrency: "EUR",
+        description: `Sesión de ${alquiler.duracionMinutos} minutos con ${alquiler.pelotasIncluidas} pelotas incluidas.`,
         eligibleDuration: { "@type": "QuantitativeValue", value: alquiler.duracionMinutos, unitCode: "MIN" },
       },
     },

@@ -38,11 +38,12 @@ export const recogebolas: Producto = {
 export const productos = [maquina, recogebolas] as const;
 
 export const alquiler = {
-  precioCentimos: 2000,
-  precioTexto: "20 €",
+  precioCentimos: 2500,
+  precioTexto: "25 €",
   duracionMinutos: 90,
+  pelotasIncluidas: 60,
   duracionTexto: "90 minutos",
-  resumen: "20 € por sesión de 90 minutos",
+  resumen: "25 € por sesión de 90 minutos",
   ruta: "/alquiler",
   comarca: "Marina Alta, Alicante",
 } as const;
