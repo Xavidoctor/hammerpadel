@@ -169,7 +169,7 @@ export default function Inicio() {
             aria-hidden="true"
           />
           <div className="sc-scrim sc-scrim--lead" aria-hidden="true" />
-          <div className="rent__copy" data-sc-cue="0.12 1 0.18 0.06">
+          <div className="rent__copy" data-sc-cue="0 1 0.03 0.06">
             <p className="kicker">Entrena sin comprarla</p>
             <h2 id="t-rent" className="display display--md">Alquila Hammer Padel</h2>
             <p className="rent__price">

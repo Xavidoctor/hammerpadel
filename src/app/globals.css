@@ -408,7 +408,13 @@ html.hp-static .train__lede { position: relative; top: auto; padding-top: var(--
 .rent__towns { list-style: none; margin: 0 0 var(--sc-2); padding: 0; display: flex; flex-wrap: wrap; gap: var(--sc-2) var(--sc-5); font-size: var(--sc-t-lg); font-weight: 600; }
 .rent__note { position: absolute; right: var(--sc-gutter); bottom: var(--sc-4); margin: 0; font-size: var(--sc-t-xs); color: var(--sc-ink-soft); z-index: var(--sc-z-copy); }
 @media (max-width: 860px) {
-  .rent__copy { right: var(--sc-gutter); max-width: none; }
+  /* en móvil el texto va abajo sobre un degradado, para que el mapa no le pase por encima */
+  .rent__copy { left: 0; right: 0; bottom: 0; max-width: none; gap: var(--sc-3);
+    padding: 5rem var(--sc-gutter) clamp(1.5rem, 5vh, 3rem);
+    background: linear-gradient(to top, #0b0d10 55%, color-mix(in oklab, #0b0d10 80%, transparent) 80%, transparent); }
+  .rent__copy .display--md { font-size: clamp(2.2rem, 10vw, 3.2rem); }
+  .rent__price .price__num { font-size: clamp(3rem, 15vw, 4.4rem); }
+  .rent__towns { font-size: 1.1rem; }
   .rent__note { top: calc(var(--bar-h) + var(--sc-3)); bottom: auto; }
 }
 html.hp-static .rent__copy { position: relative; left: auto; bottom: auto; padding: 40vh var(--sc-gutter) var(--sc-8); }
