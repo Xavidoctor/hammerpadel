@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CtaAlquiler } from "@/components/CtaAlquiler";
+import { AppBloque } from "@/components/AppBloque";
 import { BreadcrumbJsonLd } from "@/components/JsonLd";
 import { PageHead } from "@/components/PageHead";
 import { ProductPhoto } from "@/components/ProductPhoto";
 import { ProductVideo } from "@/components/ProductVideo";
 import { alquiler, lemas, localidades, maquina, recogebolas } from "@/content/catalogo";
+import { app } from "@/content/app";
 import { servicio } from "@/content/servicio";
 
 export const metadata: Metadata = {
@@ -17,7 +19,7 @@ export const metadata: Metadata = {
 const pasos = [
   {
     t: "Reserva tu sesión",
-    d: `Elige localidad, día y hora, con al menos 6 horas de antelación. ${servicio.confirmacionTexto}.`,
+    d: `Elige localidad, día y hora, con al menos 6 horas de antelación. ${servicio.confirmacionTexto}. Descarga la app gratis y prepara tu entrenamiento.`,
   },
   { t: "Te la llevamos", d: `${servicio.entregaTexto}: de club, de urbanización o privada, en ${localidades.map((l) => l.nombre).join(", ")}.` },
   { t: "Entrena a tu ritmo", d: "Con 60 pelotas incluidas. Tú golpeas, la máquina repite, sin esperar a un compañero." },
@@ -50,6 +52,7 @@ export default function ComoFunciona() {
           <dl className="spec spec--compact">
             <div><dt>Precio</dt><dd>{alquiler.resumen}</dd></div>
             <div><dt>Pelotas</dt><dd>{servicio.pelotasTexto}</dd></div>
+            <div><dt>App</dt><dd>{app.nombre}, gratis (iPhone y Android). Con ella controlas la máquina</dd></div>
             <div><dt>Días</dt><dd>{servicio.diasTexto}</dd></div>
             <div><dt>Horario</dt><dd>{servicio.horarioTexto}</dd></div>
             <div><dt>Antelación</dt><dd>{servicio.antelacionTexto}</dd></div>
@@ -69,7 +72,7 @@ export default function ComoFunciona() {
         <section aria-labelledby="t-entrenar" className="split split--content">
           <ProductPhoto
             src="/medios/maquina/maquina.webp"
-            alt="Máquina lanzapelotas Hammer Padel, de color negro, con asa y ruedas"
+            alt="Máquina lanzapelotas Hammer X MAX, de color negro, con asa y ruedas"
             ancho={888}
             alto={1156}
             className="photo--estudio"
@@ -79,7 +82,7 @@ export default function ComoFunciona() {
             <p className="lede">{lemas.entrenar}</p>
             <div className="prose">
               <p>
-                Con una máquina lanzapelotas trabajas un golpe concreto muchas veces seguidas. La repetición
+                Con la Hammer X MAX trabajas un golpe concreto muchas veces seguidas. La repetición
                 fija el gesto, y como no dependes de un compañero, aprovechas cada minuto de pista.
               </p>
               <ul>
@@ -90,11 +93,13 @@ export default function ComoFunciona() {
               <p><Link href="/entrenamientos">Ideas de ejercicios por golpe</Link></p>
             </div>
             <p className="notice">
-              <strong>Pendiente.</strong> Modos, ajustes, carga de pelotas y batería se explicarán con la
+              <strong>Pendiente.</strong> Ajustes, carga de pelotas y batería se explicarán con la
               documentación técnica oficial. No publicamos datos sin verificar.
             </p>
           </div>
         </section>
+
+        <AppBloque intro="Con la app eliges un entrenamiento preparado, para ti solo o para un grupo de hasta 4 personas, o creas el tuyo. Lo dejas listo antes de llegar y en la pista solo entrenas." />
 
         <section aria-labelledby="t-recoger" className="uso uso--flush">
           <h2 id="t-recoger" className="section-title">Y al acabar la serie, recoge en segundos</h2>
