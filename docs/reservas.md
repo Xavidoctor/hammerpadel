@@ -13,7 +13,7 @@ Fase B programada: con `DATABASE_URL` configurada, las reservas se graban como *
 | Flota y repartidores | 5 máquinas; Xavi y Marc | Confirmado |
 | Localidades | Pedreguer, Ondara, El Verger, Els Poblets, La Xara, Dénia (y urbanizaciones y pistas privadas) | Confirmado |
 | Durante la sesión | se quedan en Ondara y Pedreguer; en Dénia y La Xara pueden irse y volver | Confirmado |
-| Durante la sesión en El Verger y Els Poblets | se cuenta como «deja y vuelve» | Propuesta |
+| Durante la sesión en El Verger y Els Poblets | según el momento se quedan o se van: se cuenta como «deja y vuelve» | Confirmado |
 | Montaje / recogida | 3 / 3 min | Confirmado |
 | Antelación mínima | 6 h | Confirmado |
 | Confirmación | manual, por Xavi o Marc | Confirmado |
