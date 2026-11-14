@@ -72,10 +72,10 @@ export default function ComoFunciona() {
         <section aria-labelledby="t-entrenar" className="split split--content">
           <ProductPhoto
             src="/medios/maquina/maquina.webp"
-            alt="Máquina lanzapelotas Hammer X MAX, de color negro, con asa y ruedas"
+            alt="Máquina lanzapelotas Hammer X MAX, negra, con el logotipo HAMMER en la tolva, asa y ruedas"
             ancho={888}
             alto={1156}
-            className="photo--estudio"
+            className="photo--recorte"
           />
           <div className="stack">
             <h2 id="t-entrenar" className="section-title">Entrenar con máquina</h2>
