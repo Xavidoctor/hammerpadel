@@ -27,18 +27,16 @@ export default function CondicionesAlquiler() {
         <li>Alquiler de una máquina lanzapelotas Hammer Padel durante una sesión de {alquiler.duracionTexto}.</li>
         <li>Hammer Padel lleva la máquina a la pista que indiques y la recoge al terminar.</li>
         <li>Zona de servicio: {zona} ({alquiler.comarca}).</li>
-        <li>Horario de inicio de las sesiones: de 8:00 a 20:30 (la última sesión empieza a las 20:30).</li>
+        <li>Servicio de lunes a domingo. Horario de inicio de las sesiones: de 8:00 a 20:30 (la última sesión empieza a las 20:30).</li>
+        <li>Se reserva con un mínimo de 6 horas de antelación, y solo desde esta web.</li>
       </ul>
-      <Pendiente>
-        Días de servicio, antelación mínima para reservar y margen entre sesiones por el traslado de la máquina.
-      </Pendiente>
 
       <h2>2. La pista</h2>
       <p>
-        Hammer Padel no dispone de instalaciones propias. La reserva y el pago de la pista corren a cargo del
-        cliente, que debe tener permiso del club o del titular de la pista para usar la máquina.
+        Hammer Padel no dispone de instalaciones propias. Llevamos la máquina a clubes, urbanizaciones y pistas
+        privadas de la zona de servicio. La reserva y el pago de la pista corren a cargo del cliente, que debe tener
+        permiso del club o del titular de la pista para usar la máquina.
       </p>
-      <Pendiente>Si las pelotas están incluidas en el alquiler o las aporta el cliente.</Pendiente>
 
       <h2>3. Precio y pago</h2>
       <ul>
@@ -49,8 +47,8 @@ export default function CondicionesAlquiler() {
 
       <h2>4. Reserva y confirmación</h2>
       <p>
-        Por ahora la web envía una <em>solicitud</em> de reserva. La reserva solo está confirmada cuando Hammer Padel te
-        lo comunica por email o teléfono con la fecha, la hora y la pista.
+        La web envía una <em>solicitud</em> de reserva. Cada solicitud la revisa y confirma a mano una persona del equipo
+        de Hammer Padel. La reserva solo está confirmada cuando te lo comunicamos con la fecha, la hora y la pista.
       </p>
 
       <h2>5. Cancelaciones, cambios y retrasos</h2>
@@ -65,6 +63,7 @@ export default function CondicionesAlquiler() {
         <li>Usa la máquina siguiendo las indicaciones que te dé Hammer Padel al entregarla.</li>
         <li>No la desmontes, no la mojes ni la uses fuera de la pista indicada.</li>
         <li>Avisa en cuanto notes cualquier fallo.</li>
+        <li>Cada pelota de Hammer Padel que se pierda durante la sesión se cobra a 1 €.</li>
       </ul>
       <Pendiente>
         Responsabilidad por daños causados por mal uso, si se pide fianza, edad mínima y supervisión de menores, y
