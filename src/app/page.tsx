@@ -101,7 +101,7 @@ export default function Inicio() {
                 Reservar sesión · {alquiler.precioTexto} / 90 min
               </Link>
               <Link className="btn btn--line" href={maquina.ruta}>
-                Comprar · {maquina.precioTexto}
+                Quiero mi propia {maquina.nombre}
               </Link>
             </div>
             <MotionToggle />
@@ -116,7 +116,7 @@ export default function Inicio() {
           <picture>
             <source media="(max-width: 860px)" srcSet="/medios/entrenamiento/poster-m.webp" />
             <img className="sc-stage__poster train__poster" src="/medios/entrenamiento/poster.webp" width={1920} height={1080} loading="lazy"
-              alt="Máquina lanzapelotas Hammer Padel en 3D lanzando una bola en una pista azul" />
+              alt="Máquina lanzapelotas Hammer X MAX en 3D lanzando una bola en una pista azul" />
           </picture>
           <video
             data-sc-scrub
@@ -207,18 +207,18 @@ export default function Inicio() {
         <div className="wrap split">
           <ProductPhoto
             src="/medios/maquina/maquina.webp"
-            alt="Máquina lanzapelotas Hammer Padel, de color negro, con el logotipo Hammer Padel, asa y ruedas"
+            alt="Máquina lanzapelotas Hammer X MAX, de color negro, con el logotipo Hammer Padel, asa y ruedas"
             ancho={888}
             alto={1156}
             className="photo--estudio"
           />
           <div className="stack" data-sc-in>
             <p className="kicker">¿Prefieres tenerla siempre?</p>
-            <h2 id="t-maquina" className="display">Hammer Padel</h2>
+            <h2 id="t-maquina" className="display">{maquina.nombre}</h2>
             <p className="lede">{maquina.descripcion} Para jugadores, entrenadores, clubes y academias. Pruébala antes con una sesión de alquiler.</p>
             <Price texto={maquina.precioTexto} />
             <div className="cta-row">
-              <Link className="btn btn--accent" href={maquina.ruta}>Comprar Hammer Padel</Link>
+              <Link className="btn btn--accent" href={maquina.ruta}>Comprar {maquina.nombre}</Link>
               <Link className="btn btn--ghost" href={alquiler.ruta}>Probarla antes</Link>
             </div>
           </div>

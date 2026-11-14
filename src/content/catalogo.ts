@@ -19,7 +19,8 @@ export type Producto = {
 
 export const maquina: Producto = {
   id: "maquina",
-  nombre: "Hammer Padel",
+  /** [CONFIRMADO] 14-11-2026: el modelo se llama Hammer X MAX. */
+  nombre: "Hammer X MAX",
   descripcion: "Máquina lanzapelotas para entrenar pádel de forma autónoma.",
   precioCentimos: 249900,
   precioTexto: "2.499 €",

@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useId, useState } from "react";
 
 const ASUNTOS = [
-  { id: "compra-maquina", texto: "Comprar la máquina Hammer Padel" },
+  { id: "compra-maquina", texto: "Comprar la máquina Hammer X MAX" },
   { id: "compra-recogebolas", texto: "Comprar el recogebolas" },
   { id: "alquiler", texto: "Alquiler" },
   { id: "clubes", texto: "Clubes y academias" },

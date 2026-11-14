@@ -3,13 +3,14 @@
 // Unidades: metros. Eje Y arriba, la boca de lanzamiento mira a +Z.
 // Sin marcas de terceros: solo el logotipo Hammer.
 import { DecalGeometry } from "three/addons/geometries/DecalGeometry.js";
+import { materialPelota } from "./comun.js";
 
 export function crearMaquina(THREE, { logo } = {}) {
   const g = new THREE.Group();
   g.name = "maquina";
 
   const plastico = new THREE.MeshPhysicalMaterial({
-    color: 0x1b1d21, roughness: 0.62, metalness: 0.0, clearcoat: 0.25, clearcoatRoughness: 0.55,
+    color: 0x2b2e34, roughness: 0.55, metalness: 0.0, clearcoat: 0.35, clearcoatRoughness: 0.45, envMapIntensity: 2.2,
   });
   plastico.onBeforeCompile = (s) => { // grano fino de plástico texturizado
     s.fragmentShader = s.fragmentShader.replace(
@@ -112,7 +113,7 @@ export function crearMaquina(THREE, { logo } = {}) {
   g.add(new THREE.Mesh(geoLab, plastico));
 
   // bolas en la tolva
-  const fieltro = new THREE.MeshStandardMaterial({ color: 0xc9f02a, roughness: 0.95, emissive: 0x1a2200 });
+  const fieltro = materialPelota(THREE);
   const bolaGeo = new THREE.SphereGeometry(0.0335, 20, 14);
   const rnd = mulberry(7);
   for (let i = 0; i < 42; i++) {
