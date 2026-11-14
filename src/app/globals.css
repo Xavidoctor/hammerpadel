@@ -536,6 +536,24 @@ html.hp-static .rent__copy { position: relative; left: auto; bottom: auto; paddi
   padding: clamp(1.25rem, 5vw, 3rem); box-sizing: border-box;
 }
 .split .photo--estudio, .product-page .photo--estudio { max-width: 28rem; }
+/* Fotos oficiales recortadas (fondo transparente) sobre un foco suave */
+.photo--recorte img {
+  background: radial-gradient(62% 52% at 50% 46%, #4a4f57 0%, #2a2d33 48%, #17181c 100%);
+  padding: clamp(1rem, 4vw, 2.5rem); box-sizing: border-box;
+}
+.split .photo--recorte, .product-page .photo--recorte { max-width: 28rem; }
+.galeria { display: grid; gap: 0.75rem; max-width: 28rem; }
+.galeria__miniaturas { display: flex; gap: 0.75rem; list-style: none; margin: 0; padding: 0; }
+.galeria__mini { display: grid; gap: 0.35rem; justify-items: center; width: 7.5rem; white-space: nowrap; padding: 0.4rem; border-radius: 12px;
+  background: #1c1d22; border: 1px solid var(--sc-line, #33353c); color: var(--sc-ink-soft); cursor: pointer;
+  font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); }
+.galeria__mini img { width: 100%; height: auto; border-radius: 8px; background: radial-gradient(70% 60% at 50% 46%, #4a4f57, #1c1d22); }
+.galeria__mini[aria-pressed="true"] { border-color: var(--sc-accent, #d4f03c); color: var(--sc-ink); }
+.galeria__mini:focus-visible { outline: 2px solid var(--sc-accent, #d4f03c); outline-offset: 2px; }
+@media (max-width: 860px) {
+  .photo--recorte img { max-height: 58svh; object-fit: contain; }
+  .photo--recorte, .galeria { justify-self: center; }
+}
 @media (max-width: 860px) {
   .photo--estudio img { max-height: 58svh; object-fit: contain; }
   .photo--estudio { justify-self: center; }

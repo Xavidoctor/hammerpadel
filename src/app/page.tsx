@@ -238,10 +238,10 @@ export default function Inicio() {
         <div className="wrap split">
           <ProductPhoto
             src="/medios/maquina/maquina.webp"
-            alt="Máquina lanzapelotas Hammer X MAX, de color negro, con el logotipo Hammer Padel, asa y ruedas"
+            alt="Máquina lanzapelotas Hammer X MAX, negra, con el logotipo HAMMER en la tolva llena de pelotas, la boca de lanzamiento y las ruedas"
             ancho={888}
             alto={1156}
-            className="photo--estudio"
+            className="photo--recorte"
           />
           <div className="stack" data-sc-in>
             <p className="kicker">¿Prefieres tenerla siempre?</p>
