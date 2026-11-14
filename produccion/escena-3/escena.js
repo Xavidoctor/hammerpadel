@@ -104,8 +104,8 @@ export async function montar(canvas, w, h) {
     const hm = new THREE.SpriteMaterial({ map: halo, color: ACENTO, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false });
     const hs = new THREE.Sprite(hm); hs.position.set(pos.x, 80, pos.z); hs.renderOrder = 9; mapa.add(hs);
     const et = etiqueta(q.nombre); et.position.set(pos.x, 100, pos.z); mapa.add(et);
-    // etiqueta a la derecha salvo Ondara (a la izquierda, para no pisar La Xara)
-    et.center.set(i === 1 ? 1.08 : -0.08, 0.5);
+    // etiqueta a la derecha salvo Ondara (a la izquierda, o encima en vertical, para no pisar La Xara)
+    if (i === 1) et.center.set(vertical ? 0.5 : 1.08, vertical ? -0.35 : 0.5); else et.center.set(-0.08, 0.5);
     return { q, d, dm, hs, hm, et };
   });
 
