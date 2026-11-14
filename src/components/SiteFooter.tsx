@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { alquiler, localidades, navegacion } from "@/content/catalogo";
+import { documentosLegales } from "@/content/legal";
 import { Logo } from "./Logo";
 
 export function SiteFooter() {
@@ -20,10 +21,16 @@ export function SiteFooter() {
             {navegacion.map((n) => (
               <li key={n.href}><Link href={n.href}>{n.texto}</Link></li>
             ))}
-            <li><Link href="/legal">Legal</Link></li>
           </ul>
         </nav>
       </div>
+      <nav className="foot__legal" aria-label="Textos legales">
+        <ul>
+          {documentosLegales.map((d) => (
+            <li key={d.href}><Link href={d.href}>{d.titulo}</Link></li>
+          ))}
+        </ul>
+      </nav>
       <p className="foot__proto">
         Prototipo local. Sin pagos, sin reservas reales y sin especificaciones técnicas hasta
         disponer de documentación verificada.
