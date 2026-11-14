@@ -11,7 +11,9 @@ Fase B programada: con `DATABASE_URL` configurada, las reservas se graban como *
 | Sesión | 90 min, 25 € con 60 pelotas (desde el 14-11-2026; antes 20 €) | Confirmado |
 | Horario | lunes a domingo, inicio entre 8:00 y 20:30 | Confirmado |
 | Flota y repartidores | 5 máquinas; Xavi y Marc | Confirmado |
+| Localidades | Pedreguer, Ondara, El Verger, Els Poblets, La Xara, Dénia (y urbanizaciones y pistas privadas) | Confirmado |
 | Durante la sesión | se quedan en Ondara y Pedreguer; en Dénia y La Xara pueden irse y volver | Confirmado |
+| Durante la sesión en El Verger y Els Poblets | se cuenta como «deja y vuelve» | Propuesta |
 | Montaje / recogida | 3 / 3 min | Confirmado |
 | Antelación mínima | 6 h | Confirmado |
 | Confirmación | manual, por Xavi o Marc | Confirmado |

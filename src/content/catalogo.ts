@@ -54,6 +54,8 @@ export const alquiler = {
 export const localidades = [
   { id: "pedreguer", nombre: "Pedreguer" },
   { id: "ondara", nombre: "Ondara" },
+  { id: "el-verger", nombre: "El Verger" }, // [CONFIRMADO] añadida 14-11-2026
+  { id: "els-poblets", nombre: "Els Poblets" }, // [CONFIRMADO] añadida 14-11-2026
   { id: "la-xara", nombre: "La Xara" },
   { id: "denia", nombre: "Dénia" },
 ] as const;

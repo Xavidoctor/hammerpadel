@@ -33,7 +33,7 @@ describe("esquema de reservas", () => {
     const n = await db.query<{ m: number; r: number; l: number }>(
       "select (select count(*) from maquinas)::int m, (select count(*) from repartidores)::int r, (select count(*) from localidades)::int l",
     );
-    expect(n.rows[0]).toEqual({ m: 5, r: 2, l: 4 });
+    expect(n.rows[0]).toEqual({ m: 5, r: 2, l: 6 });
   });
 
   it("una máquina no admite dos ciclos solapados, aunque lleguen a la vez", async () => {
