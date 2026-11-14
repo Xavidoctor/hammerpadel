@@ -14,7 +14,7 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { crearMaquina, mulberry } from "./maquina.js";
-import { texturaLogo } from "./comun.js";
+import { materialPelota, texturaLogo } from "./comun.js";
 
 // Cada golpe: una o varias bolas. "bote" = la bola bota en (x, z) y se golpea
 // al subir; "aire" = se golpea sin bote en (x, y, z). "alto" = altura máxima.
@@ -30,7 +30,7 @@ export const GOLPES = [
 export const SALIDAS = GOLPES.map((_, i) => 0.03 + i * 0.1); // instante normalizado de cada golpe
 const DURACION = 8; // segundos de "tiempo real" que representa la escena
 const G = 9.81;
-const MAQ_Z = 1.3;
+const MAQ_Z = 2.6; // la máquina, algo adelantada en su fondo de pista: la cámara la rodea sin salir del cerramiento
 const R_BOLA = 0.0335;
 const T_GOLPE = 0.36; // tras el bote, la bola sube hasta el punto de golpeo
 
@@ -138,11 +138,11 @@ export async function montar(canvas, w, h) {
   const salida = maq.userData.salida.clone().add(maq.position);
 
   // ---------- bolas ----------
-  const fieltro = new THREE.MeshStandardMaterial({ color: 0xd4f53a, roughness: 0.9, emissive: 0x6a8a00, emissiveIntensity: 0.6, map: texturaBola(THREE) });
+  const fieltro = materialPelota(THREE);
   const acento = 0xd8ff3a;
   const lanz = [];
   GOLPES.forEach((gp, i) => gp.bolas.forEach((d) => {
-    const b = new THREE.Mesh(new THREE.SphereGeometry(R_BOLA, 24, 16), fieltro);
+    const b = new THREE.Mesh(new THREE.SphereGeometry(R_BOLA, 32, 24), fieltro);
     b.castShadow = true; b.visible = false; sc.add(b);
     const estela = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color: acento, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false }));
     estela.frustumCulled = false; sc.add(estela);
@@ -277,15 +277,6 @@ function texturaMalla(THREE) {
     for (let i = 0; i < w; i += 32) { x.fillRect(i, 0, 3, h); x.fillRect(0, i, w, 3); }
   });
   const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 16; return t;
-}
-function texturaBola(THREE) {
-  const c = lienzo(256, 128, (x, w, h) => {
-    x.fillStyle = "#ffffff"; x.fillRect(0, 0, w, h);
-    x.strokeStyle = "rgba(255,255,255,1)"; x.fillStyle = "#e9f0d8"; x.lineWidth = 5; x.beginPath();
-    for (let i = 0; i <= w; i++) { const y = h / 2 + Math.sin((i / w) * Math.PI * 4) * h * 0.22; i ? x.lineTo(i, y) : x.moveTo(i, y); }
-    x.strokeStyle = "#f4f7ee"; x.stroke();
-  });
-  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
 
 function estelaGeo(THREE, pts, r) {

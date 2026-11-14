@@ -28,6 +28,7 @@ Estas decisiones de Xavi **prevalecen** sobre cualquier texto de la v0.1 que las
 | 16 | (14-11-2026) El alquiler es la actividad principal; la venta de la máquina y el recogebolas es secundaria | Portada y navegación empiezan por el alquiler: CTA principal "Reservar sesión", escenas Pista → Entrenamiento → Alquiler → Reserva → Compra → Recogebolas |
 | 17 | (14-11-2026) Escena 2 con la máquina en 3D | Modelo procedural propio en Three.js (sin marcas PUSUN/PADELSHOOTER/MAX, logo Hammer), medidas de referencia 76,4 × 53 × 37,3 cm. Render en el propio equipo (Chromium sin GPU), vídeo scrub. Fuente en `produccion/escena-2/` |
 | 18 | (14-11-2026) Alquiler: 25 € la sesión de 90 min, con 60 pelotas incluidas (antes 20 €) | `src/content/catalogo.ts` (alquiler) |
+| 19 | (14-11-2026) La máquina se llama Hammer X MAX | Nombre en `catalogo.ts` (maquina.nombre); CTA de portada «Quiero mi propia Hammer X MAX» → /comprar |
 
 ### 8.3 bis · Traslados entre ubicaciones [PROPUESTA, solo si el modelo operativo lo requiere]
 Si una misma máquina presta servicio en varias localidades, entre dos sesiones hace falta tiempo para recoger, trasladar y preparar. La lógica (`src/lib/reservas/disponibilidad.ts`, con pruebas) lo modela así:

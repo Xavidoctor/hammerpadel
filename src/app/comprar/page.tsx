@@ -6,8 +6,8 @@ import { ProductPhoto } from "@/components/ProductPhoto";
 import { alquiler, envio, maquina } from "@/content/catalogo";
 
 export const metadata: Metadata = {
-  title: "Comprar máquina lanzapelotas de pádel",
-  description: `Máquina lanzapelotas Hammer Padel para entrenar pádel de forma autónoma. ${maquina.precioTexto}.`,
+  title: "Hammer X MAX · Comprar máquina lanzapelotas de pádel",
+  description: `Máquina lanzapelotas ${maquina.nombre} de Hammer Padel para entrenar pádel de forma autónoma. ${maquina.precioTexto}.`,
   alternates: { canonical: "/comprar" },
 };
 
@@ -18,7 +18,7 @@ export default function Comprar() {
       <div className="product-page">
         <ProductPhoto
           src="/medios/maquina/maquina.webp"
-          alt="Máquina lanzapelotas Hammer Padel, de color negro, con el logotipo Hammer Padel, asa y ruedas"
+          alt="Máquina lanzapelotas Hammer X MAX, de color negro, con el logotipo Hammer Padel, asa y ruedas"
           ancho={888}
           alto={1156}
           className="photo--estudio"
@@ -26,7 +26,7 @@ export default function Comprar() {
         />
         <div className="stack">
           <p className="kicker">Máquina lanzapelotas de pádel</p>
-          <h1 className="display">Hammer Padel</h1>
+          <h1 className="display">{maquina.nombre}</h1>
           <p className="lede">
             {maquina.descripcion} Pensada para jugadores que quieren entrenar individualmente,
             entrenadores que repiten ejercicios técnicos, clubes y academias.
