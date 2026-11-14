@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CourtSvg } from "@/components/CourtSvg";
+import { ProductPhoto } from "@/components/ProductPhoto";
 import { ProductSlot } from "@/components/ProductSlot";
 import { ProductVideo } from "@/components/ProductVideo";
 import { Price } from "@/components/Price";
@@ -141,7 +142,13 @@ export default function Inicio() {
       {/* ESCENA 3 · HAMMER PADEL (estática en el prototipo) */}
       <section id="maquina" className="flow flow--product" aria-labelledby="t-maquina">
         <div className="wrap split">
-          <ProductSlot producto="Máquina Hammer Padel" />
+          <ProductPhoto
+            src="/medios/maquina/maquina.webp"
+            alt="Máquina lanzapelotas Hammer Padel, de color negro, con el logotipo Hammer Padel, asa y ruedas"
+            ancho={888}
+            alto={1156}
+            className="photo--estudio"
+          />
           <div className="stack" data-sc-in>
             <p className="kicker">La máquina</p>
             <h2 id="t-maquina" className="display">Hammer Padel</h2>

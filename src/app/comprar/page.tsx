@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Price } from "@/components/Price";
 import { ProductJsonLd } from "@/components/ProductJsonLd";
-import { ProductSlot } from "@/components/ProductSlot";
+import { ProductPhoto } from "@/components/ProductPhoto";
 import { alquiler, maquina } from "@/content/catalogo";
 
 export const metadata: Metadata = {
@@ -16,7 +16,14 @@ export default function Comprar() {
     <div className="page">
       <ProductJsonLd p={maquina} />
       <div className="product-page">
-        <ProductSlot producto="Máquina Hammer Padel" />
+        <ProductPhoto
+          src="/medios/maquina/maquina.webp"
+          alt="Máquina lanzapelotas Hammer Padel, de color negro, con el logotipo Hammer Padel, asa y ruedas"
+          ancho={888}
+          alto={1156}
+          className="photo--estudio"
+        prioridad
+        />
         <div className="stack">
           <p className="kicker">Máquina lanzapelotas de pádel</p>
           <h1 className="display">Hammer Padel</h1>

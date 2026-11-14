@@ -465,3 +465,13 @@ html.hp-static .rent__copy { position: relative; left: auto; bottom: auto; paddi
 .uso__grid .photo { max-width: 34rem; }
 @media (max-width: 860px) { .uso__grid { grid-template-columns: 1fr; } .uso__grid .photo { max-width: 22rem; margin-inline: auto; } }
 .flow--balls > .wrap { position: relative; z-index: 1; }
+
+.photo--estudio img {
+  background: radial-gradient(75% 60% at 50% 42%, #f1f2f3 0%, #d4d7db 55%, #aeb3b9 100%);
+  padding: clamp(1.25rem, 5vw, 3rem); box-sizing: border-box;
+}
+.split .photo--estudio, .product-page .photo--estudio { max-width: 28rem; }
+@media (max-width: 860px) {
+  .photo--estudio img { max-height: 58svh; object-fit: contain; }
+  .photo--estudio { justify-self: center; }
+}
