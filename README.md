@@ -58,6 +58,10 @@ Capturas de escritorio y móvil (con el servidor arrancado en otra ventana):
 npm run shots -- http://localhost:3000 lab/capturas
 ```
 
+## Publicar en Netlify
+
+Ver [docs/despliegue-netlify.md](docs/despliegue-netlify.md): conexión del repositorio, variables de entorno y dominio. Configuración en `netlify.toml`.
+
 ## Estructura
 
 ```
