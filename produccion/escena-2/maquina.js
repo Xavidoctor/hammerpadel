@@ -2,6 +2,7 @@
 // Medidas de referencia del fabricante: 76,4 cm alto, 53 cm fondo, 37,3 cm ancho.
 // Unidades: metros. Eje Y arriba, la boca de lanzamiento mira a +Z.
 // Sin marcas de terceros: solo el logotipo Hammer.
+import { DecalGeometry } from "three/addons/geometries/DecalGeometry.js";
 
 export function crearMaquina(THREE, { logo } = {}) {
   const g = new THREE.Group();
@@ -121,14 +122,16 @@ export function crearMaquina(THREE, { logo } = {}) {
     g.add(b);
   }
 
-  // ranuras laterales de la tolva (3), en el lateral izquierdo (-X) hacia delante
+  // ventanas frontales de la tolva (3), sobre la boca, con bolas a la vista (como la máquina real)
   for (let k = 0; k < 3; k++) {
-    const r = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.024, 0.095 - k * 0.012), negroMate);
-    const y = 0.655 - k * 0.048;
-    r.position.set(-0.181 + k * 0.006, y, 0.11 - k * 0.012);
-    g.add(r);
-    const bv = new THREE.Mesh(new THREE.SphereGeometry(0.03, 14, 10), fieltro);
-    bv.position.set(-0.142 + k * 0.006, y, 0.11 - k * 0.012); g.add(bv);
+    const y = 0.66 - k * 0.046;
+    const zf = 0.212 - k * 0.011; // la cara frontal se retrae hacia abajo
+    const r = new THREE.Mesh(new THREE.BoxGeometry(0.105 - k * 0.006, 0.026, 0.05), negroMate);
+    r.position.set(0.035, y, zf); r.rotation.x = 0.3; g.add(r);
+    for (const dx of [-0.028, 0.028]) {
+      const bv = new THREE.Mesh(new THREE.SphereGeometry(0.03, 14, 10), fieltro);
+      bv.position.set(0.035 + dx, y - 0.006, zf - 0.04); g.add(bv);
+    }
   }
 
   // ---------- boca de lanzamiento (frontal de la base) ----------
@@ -200,16 +203,17 @@ export function crearMaquina(THREE, { logo } = {}) {
     const abr = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.035, 0.03), asaMat); abr.position.set(0, y, -0.248); g.add(abr);
   }
 
-  // ---------- logotipo Hammer en el frontal de la tolva ----------
+  // ---------- logotipo Hammer en los dos laterales de la tolva ----------
+  // Calcomanía proyectada sobre la superficie curva (DecalGeometry), como un vinilo.
   if (logo) {
-    const plano = new THREE.Mesh(
-      new THREE.PlaneGeometry(0.2, 0.2 * logo.image.height / logo.image.width),
-      new THREE.MeshStandardMaterial({ map: logo, transparent: true, roughness: 0.5, metalness: 0.2, polygonOffset: true, polygonOffsetFactor: -2 }),
-    );
-    // la cara frontal de la tolva está inclinada hacia delante
-    plano.position.set(0, 0.615, 0.207);
-    plano.rotation.x = 0.44;
-    g.add(plano);
+    const mat = new THREE.MeshStandardMaterial({ map: logo, transparent: true, roughness: 0.5, metalness: 0.15, polygonOffset: true, polygonOffsetFactor: -4, depthWrite: false });
+    const ancho = 0.3, alto = ancho * logo.image.height / logo.image.width;
+    mTolva.updateMatrixWorld(true);
+    for (const s of [-1, 1]) {
+      const ori = new THREE.Euler(0, s * Math.PI / 2, 0, "YXZ");
+      const geo = new DecalGeometry(mTolva, new THREE.Vector3(s * 0.18, 0.6, -0.035), ori, new THREE.Vector3(ancho, alto, 0.12));
+      g.add(new THREE.Mesh(geo, mat));
+    }
   }
 
   g.traverse((o) => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });

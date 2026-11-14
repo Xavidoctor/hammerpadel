@@ -1,25 +1,38 @@
-// Escena 2 · Entrenamiento: pista nocturna, máquina Hammer al fondo lanzando
-// bolas, y cámara que arranca junto a la máquina y vuela hasta el lado del
-// jugador. Se renderiza fotograma a fotograma (render.mjs) a un vídeo que
-// Scroll Craft controla con el scroll. Sin servicios externos.
+// Escena 2 · Entrenamiento: pista nocturna de pádel con la máquina Hammer en
+// primer plano lanzando cada tipo de bola a su zona. La cámara arranca detrás de
+// la máquina (lado derecho) y la rodea hasta el mismo ángulo del lado opuesto.
+// Se renderiza fotograma a fotograma (secuencia.mjs) a un vídeo que Scroll Craft
+// controla con el scroll. Sin servicios externos.
+//
+// Ejes: X a lo ancho (10 m), Z a lo largo (20 m, red en z = 10), Y arriba.
+// La máquina está en su fondo de pista (z ≈ 1.3) y lanza hacia +Z. El jugador
+// está en la otra mitad mirando a la máquina: su derecha es +X.
 import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { crearMaquina, mulberry } from "./maquina.js";
 import { texturaLogo } from "./comun.js";
 
+// Cada golpe: una o varias bolas. "bote" = la bola bota en (x, z) y se golpea
+// al subir; "aire" = se golpea sin bote en (x, y, z). "alto" = altura máxima.
 export const GOLPES = [
-  { id: "derecha", x: 2.6, z: 16.2, alto: 3.4 },
-  { id: "reves", x: -2.7, z: 16.4, alto: 3.4 },
-  { id: "bandeja", x: 1.8, z: 18.6, alto: 4.6 },
-  { id: "vibora", x: -1.6, z: 18.8, alto: 4.4 },
-  { id: "volea", x: 1.1, z: 12.6, alto: 1.9 },
-  { id: "desplazamiento", x: -3.9, z: 13.4, alto: 2.8 },
-  { id: "repeticion", x: 2.4, z: 16.0, alto: 3.4 },
+  { id: "derecha", bolas: [{ bote: [2.4, 14.4], alto: 2.1 }] },
+  { id: "reves", bolas: [{ bote: [-2.4, 14.4], alto: 2.1 }] },
+  { id: "bandeja", bolas: [{ aire: [1.7, 2.5, 15.6], alto: 6.2 }] },          // globo alto, se golpea por encima del hombro
+  { id: "vibora", bolas: [{ aire: [-1.5, 2.6, 15.2], alto: 5.4 }] },          // globo algo más tenso
+  { id: "volea", bolas: [{ aire: [1.2, 1.05, 12.0], alto: 1.55 }] },          // bola tensa a la red, sin bote
+  { id: "desplazamiento", bolas: [{ bote: [3.7, 14.0], alto: 1.9 }, { bote: [-3.7, 14.0], alto: 1.9, dp: 0.045 }] },
+  { id: "repeticion", bolas: [{ bote: [2.4, 14.4], alto: 2.1 }, { bote: [2.4, 14.4], alto: 2.1, dp: 0.03 }, { bote: [2.4, 14.4], alto: 2.1, dp: 0.06 }] },
 ];
-export const SALIDAS = GOLPES.map((_, i) => 0.03 + i * 0.1); // instante normalizado de cada lanzamiento
-const DURACION = 6.5; // segundos de "tiempo real" que representa la escena
+export const SALIDAS = GOLPES.map((_, i) => 0.03 + i * 0.1); // instante normalizado de cada golpe
+const DURACION = 8; // segundos de "tiempo real" que representa la escena
 const G = 9.81;
 const MAQ_Z = 1.3;
+const R_BOLA = 0.0335;
+const T_GOLPE = 0.36; // tras el bote, la bola sube hasta el punto de golpeo
 
 export async function montar(canvas, w, h) {
   const r = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
@@ -28,64 +41,93 @@ export async function montar(canvas, w, h) {
   r.shadowMap.enabled = true;
   r.shadowMap.type = THREE.PCFSoftShadowMap;
   r.toneMapping = THREE.AgXToneMapping;
-  r.toneMappingExposure = 1.15;
+  r.toneMappingExposure = 1.05;
   r.outputColorSpace = THREE.SRGBColorSpace;
+  const vertical = h > w;
 
   const sc = new THREE.Scene();
-  sc.background = new THREE.Color(0x04060b);
-  sc.fog = new THREE.Fog(0x04060b, 26, 60);
+  sc.background = new THREE.Color(0x03050a);
+  sc.fog = new THREE.Fog(0x03050a, 24, 55);
   sc.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture;
-  sc.environmentIntensity = 0.18;
+  sc.environmentIntensity = 0.16;
 
-  // ---------- pista ----------
-  const sueloTex = texturaCesped(THREE);
-  const suelo = new THREE.Mesh(new THREE.PlaneGeometry(10, 20), new THREE.MeshStandardMaterial({ color: 0x2a62ff, map: sueloTex, roughness: 0.9 }));
+  // ---------- suelo: césped artificial azul con arena ----------
+  const [cesMap, cesBump] = texturaCesped(THREE);
+  const suelo = new THREE.Mesh(new THREE.PlaneGeometry(10, 20),
+    new THREE.MeshStandardMaterial({ color: 0xffffff, map: cesMap, bumpMap: cesBump, bumpScale: 1.4, roughness: 0.93 }));
   suelo.rotation.x = -Math.PI / 2; suelo.position.set(0, 0, 10); suelo.receiveShadow = true; sc.add(suelo);
-  const fuera = new THREE.Mesh(new THREE.PlaneGeometry(40, 50), new THREE.MeshStandardMaterial({ color: 0x0a1430, roughness: 1 }));
-  fuera.rotation.x = -Math.PI / 2; fuera.position.set(0, -0.003, 10); fuera.receiveShadow = true; sc.add(fuera);
-  const lineaMat = new THREE.MeshStandardMaterial({ color: 0xf2f4f8, roughness: 0.7 });
+  const fuera = new THREE.Mesh(new THREE.PlaneGeometry(60, 70), new THREE.MeshStandardMaterial({ color: 0x0b0d12, roughness: 0.95 }));
+  fuera.rotation.x = -Math.PI / 2; fuera.position.set(0, -0.004, 10); fuera.receiveShadow = true; sc.add(fuera);
+  // líneas de 5 cm: fondo, servicio (a 6,95 m de la red) y central
+  const lineaMat = new THREE.MeshStandardMaterial({ color: 0xf4f6fa, roughness: 0.75 });
   const linea = (x1, z1, x2, z2) => {
     const L = Math.hypot(x2 - x1, z2 - z1);
     const m = new THREE.Mesh(new THREE.PlaneGeometry(x1 === x2 ? 0.05 : L, x1 === x2 ? L : 0.05), lineaMat);
-    m.rotation.x = -Math.PI / 2; m.position.set((x1 + x2) / 2, 0.002, (z1 + z2) / 2); m.receiveShadow = true; sc.add(m);
+    m.rotation.x = -Math.PI / 2; m.position.set((x1 + x2) / 2, 0.003, (z1 + z2) / 2); m.receiveShadow = true; sc.add(m);
   };
-  linea(-5, 0, 5, 0); linea(-5, 20, 5, 20); linea(-5, 0, -5, 20); linea(5, 0, 5, 20);
   linea(-5, 3.05, 5, 3.05); linea(-5, 16.95, 5, 16.95); linea(0, 3.05, 0, 16.95);
+  linea(0, 0, 0, 0.2); linea(0, 19.8, 0, 20);
 
-  // red
+  // ---------- red: 0,88 m en el centro, 0,92 m en los postes ----------
   const redTex = texturaRed(THREE);
-  const red = new THREE.Mesh(new THREE.PlaneGeometry(10, 0.88), new THREE.MeshStandardMaterial({ map: redTex, transparent: true, alphaTest: 0.05, side: THREE.DoubleSide, roughness: 0.9 }));
-  red.position.set(0, 0.44, 10); red.castShadow = true; sc.add(red);
-  const cinta = new THREE.Mesh(new THREE.BoxGeometry(10.05, 0.05, 0.01), lineaMat); cinta.position.set(0, 0.88, 10); sc.add(cinta);
-  for (const s of [-1, 1]) { const p = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.95, 12), new THREE.MeshStandardMaterial({ color: 0x15171b })); p.position.set(s * 5.05, 0.47, 10); sc.add(p); }
+  const red = new THREE.Mesh(new THREE.PlaneGeometry(10, 0.8), new THREE.MeshStandardMaterial({ map: redTex, transparent: true, alphaTest: 0.04, side: THREE.DoubleSide, roughness: 0.9 }));
+  red.position.set(0, 0.47, 10); red.castShadow = true; sc.add(red);
+  const curvaCinta = new THREE.CatmullRomCurve3(Array.from({ length: 21 }, (_, k) => { const x = -5 + k * 0.5; return new THREE.Vector3(x, 0.88 + 0.04 * (x / 5) ** 2, 10); }));
+  const cinta = new THREE.Mesh(new THREE.TubeGeometry(curvaCinta, 80, 0.02, 8), lineaMat);
+  cinta.castShadow = true; sc.add(cinta);
+  const perfil = new THREE.MeshStandardMaterial({ color: 0x1a1d22, roughness: 0.45, metalness: 0.7 });
+  for (const sx of [-1, 1]) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.08, 1.0, 0.08), perfil); p.position.set(sx * 5.06, 0.5, 10); p.castShadow = true; sc.add(p); }
 
-  // cristales y malla
-  const cristal = new THREE.MeshPhysicalMaterial({ color: 0x9fb4d8, transparent: true, opacity: 0.08, roughness: 0.05, metalness: 0, envMapIntensity: 2, side: THREE.DoubleSide });
-  const perfil = new THREE.MeshStandardMaterial({ color: 0x15181d, roughness: 0.5, metalness: 0.6 });
-  const pared = (w, h, x, y, z, ry) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), cristal); m.position.set(x, y, z); m.rotation.y = ry; sc.add(m); };
-  pared(10, 3, 0, 1.5, 0, 0); pared(10, 3, 0, 1.5, 20, 0);
-  for (const s of [-1, 1]) { pared(4, 3, s * 5, 1.5, 2, Math.PI / 2); pared(4, 3, s * 5, 1.5, 18, Math.PI / 2); }
+  // ---------- cerramiento: cristal templado + malla electrosoldada ----------
+  const cristal = new THREE.MeshPhysicalMaterial({ color: 0xa9bbd9, transparent: true, opacity: 0.1, roughness: 0.04, metalness: 0, envMapIntensity: 3, specularIntensity: 1, side: THREE.DoubleSide, depthWrite: false });
+  const canto = new THREE.MeshStandardMaterial({ color: 0x7f9bb5, transparent: true, opacity: 0.35, roughness: 0.2 });
+  const panel = (ancho, alto, x, z, ry) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(ancho - 0.02, alto), cristal); m.position.set(x, alto / 2, z); m.rotation.y = ry; m.renderOrder = 2; sc.add(m);
+    const c = new THREE.Mesh(new THREE.BoxGeometry(ancho - 0.02, 0.012, 0.012), canto); c.position.set(x, alto, z); c.rotation.y = ry; sc.add(c); // canto superior del vidrio
+    for (const dy of [0.35, alto - 0.35]) for (const dx of [-1, 1]) { // herrajes
+      const t = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.03, 10), perfil);
+      const off = (ancho / 2 - 0.12) * dx;
+      t.position.set(x + (ry ? 0 : off), dy, z + (ry ? off : 0)); t.rotation[ry ? "z" : "x"] = Math.PI / 2; sc.add(t);
+    }
+  };
   const mallaTex = texturaMalla(THREE);
-  for (const s of [-1, 1]) {
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(12, 4), new THREE.MeshStandardMaterial({ map: mallaTex, transparent: true, opacity: 0.35, depthWrite: false, side: THREE.DoubleSide, color: 0x6b7280 }));
-    m.rotation.y = Math.PI / 2; m.position.set(s * 5, 2, 10); sc.add(m);
+  const malla = (ancho, alto, x, y0, z, ry) => {
+    const t = mallaTex.clone(); t.needsUpdate = true; t.repeat.set(ancho * 1.25, alto * 1.25);
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), new THREE.MeshStandardMaterial({ map: t, transparent: true, alphaTest: 0.2, side: THREE.DoubleSide, color: 0x8b93a1, roughness: 0.5, metalness: 0.6 }));
+    m.position.set(x, y0 + alto / 2, z); m.rotation.y = ry; sc.add(m);
+  };
+  // fondos: 4 paños de cristal de 3 m + malla hasta 4 m
+  for (const z of [0, 20]) {
+    for (const x of [-3.75, -1.25, 1.25, 3.75]) panel(2.5, 3, x, z, 0);
+    malla(10, 1, 0, 3, z, 0);
   }
-  for (const z of [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20]) for (const s of [-1, 1]) {
-    const p = new THREE.Mesh(new THREE.BoxGeometry(0.06, 4, 0.06), perfil); p.position.set(s * 5.03, 2, z); sc.add(p);
+  // laterales: 2 m de cristal de 3 m, 2 m escalonados de 2 m, malla en el centro (4 m)
+  for (const sx of [-1, 1]) for (const [z0, z1, alto] of [[0, 2, 3], [2, 4, 2], [16, 18, 2], [18, 20, 3]]) {
+    panel(z1 - z0, alto, sx * 5, (z0 + z1) / 2, Math.PI / 2);
+    malla(z1 - z0, 4 - alto, sx * 5, alto, (z0 + z1) / 2, Math.PI / 2);
   }
-  for (const x of [-5, -2.5, 2.5, 5]) for (const z of [0, 20]) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.06, 3, 0.06), perfil); p.position.set(x, 1.5, z); sc.add(p); }
+  for (const sx of [-1, 1]) { malla(5, 4, sx * 5, 0, 6.5, Math.PI / 2); malla(5, 4, sx * 5, 0, 13.5, Math.PI / 2); } // dejando las puertas junto a la red
+  for (const z of [0, 2, 4, 9, 11, 16, 18, 20]) for (const sx of [-1, 1]) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.08, 4, 0.08), perfil); p.position.set(sx * 5.04, 2, z); p.castShadow = true; sc.add(p); }
+  // los paños de los fondos van unidos con herrajes, sin postes intermedios (la cámara pasa por detrás)
+  for (const sx of [-1, 1]) { const v = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 20.1), perfil); v.position.set(sx * 5.04, 4, 10); sc.add(v); }
+  for (const z of [0, 20]) { const v = new THREE.Mesh(new THREE.BoxGeometry(10.1, 0.06, 0.06), perfil); v.position.set(0, 4, z); sc.add(v); }
 
-  // focos: 4 postes con proyector, dos proyectan sombra
-  sc.add(new THREE.HemisphereLight(0x9fb6ff, 0x0b1020, 0.25));
-  const focos = [[-5.7, 4], [5.7, 4], [-5.7, 16], [5.7, 16]];
-  focos.forEach(([x, z], i) => {
-    const poste = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.06, 6.2, 10), perfil); poste.position.set(x, 3.1, z); sc.add(poste);
-    const cab = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.08, 0.35), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xeef3ff, emissiveIntensity: 4 }));
-    cab.position.set(x * 0.95, 6.2, z); cab.rotation.z = Math.sign(x) * 0.5; sc.add(cab);
-    const L = new THREE.SpotLight(0xf3f6ff, 95, 32, 0.95, 0.7, 1.5);
-    L.position.set(x * 0.95, 6.2, z); L.target.position.set(-x * 0.15, 0, z + (z < 10 ? 2 : -2));
+  // ---------- iluminación: 4 postes laterales con 2 proyectores LED ----------
+  sc.add(new THREE.HemisphereLight(0x9fb6ff, 0x0b1020, 0.22));
+  const ledMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xf4f7ff, emissiveIntensity: 6 });
+  const carcasa = new THREE.MeshStandardMaterial({ color: 0x22252b, roughness: 0.4, metalness: 0.8 });
+  [[-5.35, 5], [5.35, 5], [-5.35, 15], [5.35, 15]].forEach(([x, z], i) => {
+    const poste = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 6.6, 12), carcasa); poste.position.set(x, 3.3, z); sc.add(poste);
+    for (const dz of [-0.35, 0.35]) {
+      const g = new THREE.Group(); g.position.set(x * 0.97, 6.55, z + dz); g.rotation.z = Math.sign(x) * 0.6;
+      const caja = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.07, 0.42), carcasa); g.add(caja);
+      const led = new THREE.Mesh(new THREE.PlaneGeometry(0.44, 0.36), ledMat); led.rotation.x = Math.PI / 2; led.position.y = -0.037; g.add(led);
+      sc.add(g);
+    }
+    const L = new THREE.SpotLight(0xf3f6ff, 80, 34, 1.0, 0.75, 1.5);
+    L.position.set(x * 0.97, 6.5, z); L.target.position.set(-x * 0.2, 0, z + (z < 10 ? 1.5 : -1.5));
     sc.add(L, L.target);
-    if (i < 2 || i === 3) { L.castShadow = true; L.shadow.mapSize.set(1024, 1024); L.shadow.bias = -0.0004; L.shadow.radius = 4; }
+    L.castShadow = true; L.shadow.mapSize.set(1024, 1024); L.shadow.bias = -0.0004; L.shadow.normalBias = 0.02; L.shadow.radius = 4;
   });
 
   // ---------- máquina ----------
@@ -96,97 +138,129 @@ export async function montar(canvas, w, h) {
   const salida = maq.userData.salida.clone().add(maq.position);
 
   // ---------- bolas ----------
-  const fieltro = new THREE.MeshStandardMaterial({ color: 0xd4f53a, roughness: 0.9, emissive: 0x6a8a00, emissiveIntensity: 0.55 });
-  const costura = texturaBola(THREE); fieltro.map = costura;
-  const bolas = GOLPES.map((gp, i) => {
-    const b = new THREE.Mesh(new THREE.SphereGeometry(0.0335, 24, 16), fieltro);
+  const fieltro = new THREE.MeshStandardMaterial({ color: 0xd4f53a, roughness: 0.9, emissive: 0x6a8a00, emissiveIntensity: 0.6, map: texturaBola(THREE) });
+  const acento = 0xd8ff3a;
+  const lanz = [];
+  GOLPES.forEach((gp, i) => gp.bolas.forEach((d) => {
+    const b = new THREE.Mesh(new THREE.SphereGeometry(R_BOLA, 24, 16), fieltro);
     b.castShadow = true; b.visible = false; sc.add(b);
-    // estela: cinta luminosa que se reconstruye en cada fotograma
-    const n = 24;
-    const estela = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color: 0xd8ff3a, transparent: true, opacity: 0.55, blending: THREE.AdditiveBlending, depthWrite: false }));
+    const estela = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial({ color: acento, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending, depthWrite: false }));
     estela.frustumCulled = false; sc.add(estela);
-    const marca = new THREE.Mesh(new THREE.CircleGeometry(0.16, 32), new THREE.MeshBasicMaterial({ color: 0xd8ff3a, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
-    marca.rotation.x = -Math.PI / 2; marca.position.set(gp.x, 0.004, gp.z); sc.add(marca);
-    const vuelo = planificar(salida, gp);
-    return { b, estela, n, vuelo, marca, tBote: vuelo.T };
-  });
+    const vuelo = planificar(salida, d);
+    // marca de bote (solo golpes con bote) y zona de golpeo en el suelo
+    const marca = new THREE.Mesh(new THREE.RingGeometry(0.06, 0.15, 40), new THREE.MeshBasicMaterial({ color: acento, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+    marca.rotation.x = -Math.PI / 2; marca.position.set(vuelo.bote.x, 0.005, vuelo.bote.z); marca.visible = !!d.bote; sc.add(marca);
+    const zona = new THREE.Mesh(new THREE.CircleGeometry(0.42, 48), new THREE.MeshBasicMaterial({ color: acento, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+    zona.rotation.x = -Math.PI / 2; zona.position.set(vuelo.golpe.x, 0.004, vuelo.golpe.z); sc.add(zona);
+    // destello en el punto de golpeo (anillo orientado a cámara)
+    const destello = new THREE.Mesh(new THREE.RingGeometry(0.07, 0.1, 40), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+    destello.position.copy(vuelo.golpe); sc.add(destello);
+    lanz.push({ b, estela, vuelo, marca, zona, destello, t0: SALIDAS[i] + (d.dp || 0) });
+  }));
 
-  // ---------- cámara: de la máquina al lado del jugador ----------
-  const cam = new THREE.PerspectiveCamera(36, w / h, 0.05, 120);
-  const vertical = h > w;
-  // 1) primer plano 3/4 de la máquina; 2) rodea por detrás y sube (las bolas
-  // salen hacia la pista); 3) vista alta desde detrás de la máquina con todos los botes.
-  const Z = MAQ_Z;
-  // La cámara rodea la máquina a cierta distancia y no deja de mirarla hasta
-  // quedar detrás; solo entonces el punto de mira avanza hacia la pista.
-  const ruta = new THREE.CatmullRomCurve3(vertical ? [
-    new THREE.Vector3(0.95, 0.55, Z + 1.9), new THREE.Vector3(2.0, 1.0, Z + 0.3),
-    new THREE.Vector3(0.8, 1.35, Z - 1.5), new THREE.Vector3(0.5, 1.6, Z - 2.1), new THREE.Vector3(0.22, 1.75, Z - 2.4),
-  ] : [
-    new THREE.Vector3(1.05, 0.5, Z + 2.1), new THREE.Vector3(1.8, 0.8, Z + 0.35),
-    new THREE.Vector3(0.85, 1.1, Z - 1.4), new THREE.Vector3(0.5, 1.25, Z - 1.8), new THREE.Vector3(0.28, 1.4, Z - 2.3),
-  ], false, "centripetal");
-  const mira = new THREE.CatmullRomCurve3(vertical ? [
-    new THREE.Vector3(0, 0.42, Z), new THREE.Vector3(0, 0.42, Z + 0.25),
-    new THREE.Vector3(0, 0.4, Z + 1.8), new THREE.Vector3(0, 0.2, 5), new THREE.Vector3(0, 0.0, 6.5),
-  ] : [
-    new THREE.Vector3(0, 0.42, Z), new THREE.Vector3(0, 0.45, Z + 0.4),
-    new THREE.Vector3(0, 0.45, Z + 2.2), new THREE.Vector3(0, 0.15, 6), new THREE.Vector3(0, 0.0, 6.5),
-  ], false, "centripetal");
-  cam.fov = vertical ? 62 : 46;
-
+  // ---------- cámara ----------
+  // Arranca detrás de la máquina, a su derecha (la máquina en primer plano abajo a la
+  // derecha y la pista al fondo) y la rodea hasta el ángulo simétrico del otro lado.
+  const cam = new THREE.PerspectiveCamera(vertical ? 62 : 50, w / h, 0.05, 120);
+  const A0 = vertical ? 0.5 : 0.62;            // ángulo inicial respecto al eje de la pista
+  const RADIO = vertical ? 1.3 : 2.1;          // distancia horizontal a la máquina
   const suave = (t) => t * t * (3 - 2 * t);
+
+  // ---------- postproceso: brillo suave en focos y estelas ----------
+  const rt = new THREE.WebGLRenderTarget(w, h, { type: THREE.HalfFloatType, samples: 4 });
+  const comp = new EffectComposer(r, rt);
+  comp.setPixelRatio(1); comp.setSize(w, h);
+  comp.addPass(new RenderPass(sc, cam));
+  comp.addPass(new UnrealBloomPass(new THREE.Vector2(w, h), 0.35, 0.5, 2.5));
+  comp.addPass(new OutputPass());
+
+  const tmp = new THREE.Vector3();
   function fotograma(p) {
     const tc = suave(Math.min(1, Math.max(0, p)));
-    cam.position.copy(ruta.getPoint(tc));
-    cam.lookAt(mira.getPoint(tc));
+    const a = A0 * (1 - 2 * tc);                       // +A0 -> -A0
+    const k = 1 - Math.abs(1 - 2 * tc);                // 0 en los extremos, 1 en el centro
+    const rad = RADIO + 0.35 * k;
+    cam.position.set(Math.sin(a) * rad, (vertical ? 1.42 : 1.45) + 0.75 * k, MAQ_Z - Math.cos(a) * rad);
+    if (vertical) cam.lookAt(-Math.sin(a) * 0.9, 0.25, MAQ_Z + 3.2);
+    else cam.lookAt(-Math.sin(a) * 1.4, 0.3, MAQ_Z + 4);
     cam.aspect = w / h; cam.updateProjectionMatrix();
-    bolas.forEach((o, i) => {
-      const ts = (p - SALIDAS[i]) * DURACION;
-      const tb = ts - o.tBote;
-      o.marca.material.opacity = tb < 0 ? 0 : 0.5 * Math.min(1, tb * 6) * (0.55 + 0.45 * Math.exp(-tb * 3));
-      o.marca.scale.setScalar(tb < 0 ? 0.01 : 0.6 + 0.4 * Math.min(1, tb * 4));
-      if (ts < 0) { o.b.visible = false; o.estela.visible = false; return; }
-      const pos = o.vuelo(ts);
-      o.b.visible = !!pos; o.estela.visible = !!pos;
-      if (!pos) return;
+
+    for (const o of lanz) {
+      const ts = (p - o.t0) * DURACION;
+      const f = o.vuelo;
+      // marca de bote y zona: aparecen y se quedan tenues
+      const tb = ts - f.T;
+      o.marca.material.opacity = tb < 0 ? 0 : 0.75 * Math.min(1, tb * 8) * (0.35 + 0.65 * Math.exp(-tb * 2.5));
+      o.marca.scale.setScalar(tb < 0 ? 0.01 : 0.7 + 0.5 * Math.min(1, tb * 3));
+      const tg = ts - f.TG;
+      o.zona.material.opacity = ts < 0 ? 0 : Math.min(0.16, ts * 0.12) * (tg > 0 ? 0.5 + 0.5 * Math.exp(-tg * 2) : 1);
+      o.destello.material.opacity = tg < 0 ? 0 : 0.9 * Math.exp(-tg * 8);
+      o.destello.scale.setScalar(tg < 0 ? 0.01 : 1 + tg * 4);
+      o.destello.lookAt(cam.position);
+      if (ts < 0 || tg > 0) { o.b.visible = false; o.estela.visible = false; continue; }
+      const pos = f(ts);
+      o.b.visible = true; o.estela.visible = true;
       o.b.position.copy(pos);
       o.b.rotation.x = -ts * 25; o.b.rotation.z = ts * 6;
       const pts = [];
-      for (let k = 0; k < o.n; k++) pts.push(o.vuelo(Math.max(0, ts - (o.n - 1 - k) * 0.009)) || pos);
+      for (let j = 0; j < 20; j++) pts.push(f(Math.max(0, ts - (19 - j) * 0.008)));
       o.estela.geometry.dispose();
-      o.estela.geometry = estelaGeo(THREE, pts, vertical ? 0.012 : 0.0075);
-    });
-    r.render(sc, cam);
+      o.estela.geometry = estelaGeo(THREE, pts, vertical ? 0.012 : 0.0085);
+    }
+    comp.render();
   }
   return { fotograma };
 }
 
-// Trayectoria con un bote: sale de la boca, alcanza "alto", bota en (x, z) y sigue.
-function planificar(o, { x, z, alto }) {
-  const vy = Math.sqrt(2 * G * Math.max(0.3, alto - o.y));
-  const T = (vy + Math.sqrt(vy * vy + 2 * G * o.y)) / G;
+// Trayectoria desde la boca. Con bote: alcanza "alto", bota en (x, z), sube y se
+// golpea T_GOLPE s después. Sin bote: llega al punto de golpeo (x, y, z) bajando.
+function planificar(o, d) {
+  const alto = Math.max(d.alto, o.y + 0.3);
+  const vy = Math.sqrt(2 * G * (alto - o.y));
+  let x, z, yF;
+  if (d.bote) { [x, z] = d.bote; yF = R_BOLA; } else { [x, , z] = d.aire; yF = d.aire[1]; }
+  const T = (vy + Math.sqrt(Math.max(0, vy * vy - 2 * G * (yF - o.y)))) / G;
   const vx = (x - o.x) / T, vz = (z - o.z) / T;
-  const vyImp = vy - G * T;
-  const vy2 = -vyImp * 0.62, vx2 = vx * 0.78, vz2 = vz * 0.78;
+  const vy2 = -(vy - G * T) * 0.6, vx2 = vx * 0.75, vz2 = vz * 0.75;
   const f = (t) => {
-    if (t < T) return new THREE.Vector3(o.x + vx * t, o.y + vy * t - 0.5 * G * t * t, o.z + vz * t);
+    if (t <= T || !d.bote) return new THREE.Vector3(o.x + vx * t, o.y + vy * t - 0.5 * G * t * t, o.z + vz * t);
     const u = t - T;
-    if (u > 1.0) return null;
-    return new THREE.Vector3(x + vx2 * u, Math.max(0.0335, vy2 * u - 0.5 * G * u * u), z + vz2 * u);
+    return new THREE.Vector3(x + vx2 * u, Math.max(R_BOLA, R_BOLA + vy2 * u - 0.5 * G * u * u), z + vz2 * u);
   };
-  f.T = T;
+  f.T = d.bote ? T : Infinity;
+  f.TG = d.bote ? T + T_GOLPE : T;
+  f.bote = new THREE.Vector3(x, 0, z);
+  f.golpe = f(f.TG);
   return f;
 }
 
 function lienzo(w, h, f) { const c = document.createElement("canvas"); c.width = w; c.height = h; f(c.getContext("2d"), w, h); return c; }
 function texturaCesped(THREE) {
-  const rnd = mulberry(3);
+  // fibras azules con brillo variable + granos de arena; el relieve sale de la misma semilla
+  const rnd = mulberry(3), rb = mulberry(3);
+  const fibras = (x, w, h, color) => {
+    for (let i = 0; i < 160000; i++) {
+      const px = rnd() * w, py = rnd() * h, l = 2 + rnd() * 4, a = (rnd() - 0.5) * 0.9;
+      x.strokeStyle = color(rnd()); x.lineWidth = 1;
+      x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.sin(a) * l, py + Math.cos(a) * l); x.stroke();
+    }
+  };
   const c = lienzo(1024, 1024, (x, w, h) => {
-    x.fillStyle = "#2f5fd6"; x.fillRect(0, 0, w, h);
-    for (let i = 0; i < 90000; i++) { const v = 150 + rnd() * 105; x.fillStyle = `rgba(${v * 0.35},${v * 0.55},${v},${0.08 + rnd() * 0.08})`; x.fillRect(rnd() * w, rnd() * h, 1 + rnd() * 2, 1 + rnd() * 3); }
+    x.fillStyle = "#2251c4"; x.fillRect(0, 0, w, h);
+    fibras(x, w, h, (v) => `rgba(${40 + v * 40},${85 + v * 60},${200 + v * 55},${0.25 + v * 0.25})`);
+    for (let i = 0; i < 9000; i++) { x.fillStyle = `rgba(210,200,170,${0.08 + rnd() * 0.12})`; x.fillRect(rnd() * w, rnd() * h, 1.2, 1.2); }
   });
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(5, 10); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+  const b = lienzo(1024, 1024, (x, w, h) => {
+    x.fillStyle = "#808080"; x.fillRect(0, 0, w, h);
+    for (let i = 0; i < 160000; i++) {
+      const px = rb() * w, py = rb() * h, l = 2 + rb() * 4, a = (rb() - 0.5) * 0.9, v = rb();
+      x.strokeStyle = `rgb(${120 + v * 135},${120 + v * 135},${120 + v * 135})`; x.lineWidth = 1;
+      x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.sin(a) * l, py + Math.cos(a) * l); x.stroke();
+    }
+  });
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(6, 12); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 16;
+  const tb = new THREE.CanvasTexture(b); tb.wrapS = tb.wrapT = THREE.RepeatWrapping; tb.repeat.set(6, 12); tb.anisotropy = 16;
+  return [t, tb];
 }
 function texturaRed(THREE) {
   const c = lienzo(1024, 96, (x, w, h) => {
@@ -197,11 +271,12 @@ function texturaRed(THREE) {
   const t = new THREE.CanvasTexture(c); t.anisotropy = 8; return t;
 }
 function texturaMalla(THREE) {
+  // malla electrosoldada cuadrada (~5 cm)
   const c = lienzo(512, 512, (x, w, h) => {
-    x.clearRect(0, 0, w, h); x.strokeStyle = "rgba(200,205,215,0.55)"; x.lineWidth = 1;
-    for (let i = -h; i <= w; i += 16) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i + h, h); x.stroke(); x.beginPath(); x.moveTo(i + h, 0); x.lineTo(i, h); x.stroke(); }
+    x.clearRect(0, 0, w, h); x.fillStyle = "rgba(225,230,238,1)";
+    for (let i = 0; i < w; i += 32) { x.fillRect(i, 0, 3, h); x.fillRect(0, i, w, 3); }
   });
-  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(12, 4); return t;
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = 16; return t;
 }
 function texturaBola(THREE) {
   const c = lienzo(256, 128, (x, w, h) => {
