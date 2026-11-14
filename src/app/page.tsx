@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AppMockup } from "@/components/AppMockup";
 import { CourtSvg } from "@/components/CourtSvg";
 import { ProductPhoto } from "@/components/ProductPhoto";
 import { ProductSlot } from "@/components/ProductSlot";
@@ -204,20 +205,7 @@ export default function Inicio() {
               ))}
             </ul>
           </div>
-          <figure className="app__movil" aria-hidden="true">
-            <div className="app__pantalla">
-              <p className="app__cab">{app.nombre}</p>
-              <p className="app__tit">Mi sesión</p>
-              <ul>
-                <li><span>Jugadores</span><b>1 · 2 · 3 · 4</b></li>
-                <li><span>Ejercicio 1</span><b>Derecha</b></li>
-                <li><span>Ejercicio 2</span><b>Revés</b></li>
-                <li><span>Ejercicio 3</span><b>Bandeja</b></li>
-              </ul>
-              <p className="app__boton">Lista para la pista</p>
-            </div>
-            <figcaption>Ilustración. No es una captura de la app.</figcaption>
-          </figure>
+          <AppMockup />
         </div>
       </section>
 
