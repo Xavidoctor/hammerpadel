@@ -49,6 +49,8 @@ export const AJUSTES: Ajustes = {
   // [CONFIRMADO] En Ondara y Pedreguer el repartidor se queda en la pista; en
   // Dénia y La Xara puede volver a casa u oficina, así que se cuenta como
   // "deja y vuelve" (si le conviene, igualmente puede quedarse).
+  // [CONFIRMADO] El Verger y Els Poblets: igual que Dénia y La Xara (según el
+  // momento se quedan o se van), así que también "deja y vuelve".
   modo: "deja_y_vuelve",
   modoPorLocalidad: { ondara: "se_queda", pedreguer: "se_queda" },
 };

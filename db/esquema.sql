@@ -7,7 +7,7 @@
 create extension if not exists btree_gist;
 
 create table localidades (
-  id      text primary key,            -- 'denia', 'ondara', 'la-xara', 'pedreguer'
+  id      text primary key,            -- 'denia', 'ondara', 'el-verger', 'els-poblets', 'la-xara', 'pedreguer'
   nombre  text not null,
   activa  boolean not null default true
 );
@@ -94,7 +94,8 @@ create table historial_reservas (
 
 -- Datos iniciales [CONFIRMADOS por Xavi].
 insert into localidades (id, nombre) values
-  ('pedreguer', 'Pedreguer'), ('ondara', 'Ondara'), ('la-xara', 'La Xara'), ('denia', 'Dénia');
+  ('pedreguer', 'Pedreguer'), ('ondara', 'Ondara'), ('el-verger', 'El Verger'),
+  ('els-poblets', 'Els Poblets'), ('la-xara', 'La Xara'), ('denia', 'Dénia');
 insert into maquinas (id) values ('hp-1'), ('hp-2'), ('hp-3'), ('hp-4'), ('hp-5');
 insert into repartidores (id, nombre) values ('xavi', 'Xavi'), ('marc', 'Marc');
 insert into tarifas (id, duracion_min, precio_centimos) values ('sesion-90', 90, 2500);
