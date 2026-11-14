@@ -12,7 +12,8 @@ fs.mkdirSync(dir, { recursive: true });
 const b = await chromium.launch({ args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
 const p = await b.newPage({ viewport: { width: w, height: h } });
 p.on("pageerror", (e) => console.error("ERR", e.message));
-await p.goto(`http://localhost:4700/produccion/escena-2/render.html?w=${w}&h=${h}`);
+const escena = process.env.ESCENA || "escena-2"; // ESCENA=escena-3 para el alquiler
+await p.goto(`http://localhost:4700/produccion/${escena}/render.html?w=${w}&h=${h}`);
 await p.waitForFunction(() => window.listo, null, { timeout: 120000 });
 const lienzo = p.locator("canvas");
 for (let i = desde; i < hasta; i++) {

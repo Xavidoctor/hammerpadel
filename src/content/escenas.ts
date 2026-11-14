@@ -19,7 +19,7 @@ export const escenas: Escena[] = [
   { id: "entrenamiento", numero: 2, titulo: "Entrenamiento", dispositivo: "scrub", animadaEnPrototipo: true,
     recursoFuturo: "Máquina 3D propia (Three.js, produccion/escena-2) lanzando bolas; más adelante render Blender con fotos reales de la máquina" },
   { id: "alquiler", numero: 3, titulo: "Alquiler en la Marina Alta (actividad principal)", dispositivo: "scrub", animadaEnPrototipo: true,
-    recursoFuturo: "Clip Blender de la pista al mapa (el actual es un esquema provisional)" },
+    recursoFuturo: "Render propio: mapa de la Marina Alta, bajada tipo dron a la pista y llegada de la Hammer X MAX (produccion/escena-3)" },
   { id: "reserva", numero: 4, titulo: "Reserva", dispositivo: "flow", animadaEnPrototipo: false,
     recursoFuturo: "Plano fijo de la máquina en pista, fotografía real" },
   { id: "producto", numero: 5, titulo: "Comprar la máquina", dispositivo: "flow", animadaEnPrototipo: false,

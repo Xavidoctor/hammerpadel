@@ -240,7 +240,7 @@ function planificar(o, d) {
 }
 
 function lienzo(w, h, f) { const c = document.createElement("canvas"); c.width = w; c.height = h; f(c.getContext("2d"), w, h); return c; }
-function texturaCesped(THREE) {
+export function texturaCesped(THREE) {
   // fibras azules con brillo variable + granos de arena; el relieve sale de la misma semilla
   const rnd = mulberry(3), rb = mulberry(3);
   const fibras = (x, w, h, color) => {
@@ -267,7 +267,7 @@ function texturaCesped(THREE) {
   const tb = new THREE.CanvasTexture(b); tb.wrapS = tb.wrapT = THREE.RepeatWrapping; tb.repeat.set(6, 12); tb.anisotropy = 16;
   return [t, tb];
 }
-function texturaRed(THREE) {
+export function texturaRed(THREE) {
   const c = lienzo(1024, 96, (x, w, h) => {
     x.clearRect(0, 0, w, h); x.strokeStyle = "rgba(20,22,26,0.95)"; x.lineWidth = 1.2;
     for (let i = 0; i <= w; i += 6) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, h); x.stroke(); }
@@ -275,7 +275,7 @@ function texturaRed(THREE) {
   });
   const t = new THREE.CanvasTexture(c); t.anisotropy = 8; return t;
 }
-function texturaMalla(THREE) {
+export function texturaMalla(THREE) {
   // malla electrosoldada cuadrada (~5 cm)
   const c = lienzo(512, 512, (x, w, h) => {
     x.clearRect(0, 0, w, h); x.fillStyle = "rgba(225,230,238,1)";

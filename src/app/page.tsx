@@ -154,37 +154,40 @@ export default function Inicio() {
         </div>
       </section>
 
-      {/* ESCENA 3 · ALQUILER, la actividad principal (animada: scrub de clip provisional) */}
-      <section id="alquiler" className="act act--rent" data-sc-act="scrub" data-sc-span="2.4" data-sc-dwell="0.3" data-sc-drift="#0b0d10" aria-labelledby="t-rent">
+      {/* ESCENA 3 · ALQUILER, la actividad principal: mapa de la Marina Alta → bajada tipo dron
+          a una pista → llega la Hammer X MAX (render propio, scrub por scroll). Fuente en produccion/escena-3. */}
+      <section id="alquiler" className="act act--rent" data-sc-act="scrub" data-sc-span="3" data-sc-dwell="0.3" data-sc-drift="#0b0d10" aria-labelledby="t-rent">
         <div data-sc-stage className="stage">
           <picture>
-            <source media="(max-width: 860px)" srcSet="/prototipo/prototipo-alquiler-m-final.webp" />
-            <img className="sc-stage__poster rent__poster" src="/prototipo/prototipo-alquiler-final.webp" alt="" width={1920} height={1080} loading="lazy" />
+            <source media="(max-width: 860px)" srcSet="/medios/alquiler/poster-m.webp" />
+            <img className="sc-stage__poster rent__poster" src="/medios/alquiler/poster.webp" alt="" width={1600} height={900} loading="lazy" />
           </picture>
           <video
             data-sc-scrub
-            data-sc-src="/prototipo/prototipo-alquiler.mp4"
-            data-sc-src-mobile="/prototipo/prototipo-alquiler-m.mp4"
+            data-sc-src="/medios/alquiler/alquiler-3d.mp4"
+            data-sc-src-mobile="/medios/alquiler/alquiler-3d-m.mp4"
             muted
             playsInline
             aria-hidden="true"
           />
           <div className="sc-scrim sc-scrim--lead" aria-hidden="true" />
-          <div className="rent__copy" data-sc-cue="0 1 0.03 0.06">
-            <p className="kicker">Entrena sin comprarla</p>
-            <h2 id="t-rent" className="display display--md">Alquila Hammer Padel</h2>
-            <p className="rent__price">
-              <span className="price__num">{alquiler.precioTexto}</span>
-              <span className="rent__dur">{alquiler.duracionTexto}</span>
-            </p>
-            <p className="rent__where">{alquiler.pelotasTexto}</p>
-            <p className="rent__where">Disponible inicialmente en</p>
-            <ul className="rent__towns">
+          <div className="rent__intro" data-sc-cue="0 0.4 0 0.15">
+            <p className="kicker">Alquiler en la Marina Alta</p>
+            <h2 id="t-rent" className="display display--md">Elige tu pueblo. Te la llevamos a tu pista.</h2>
+            <ul className="rent__towns" aria-label="Disponible inicialmente en">
               {localidades.map((l) => <li key={l.id}>{l.nombre}</li>)}
             </ul>
+          </div>
+          <div className="rent__copy" data-sc-cue="0.7 1 0.12 0.04">
+            <p className="kicker">Entrena sin comprarla</p>
+            <p className="rent__price">
+              <span className="price__num">{alquiler.precioTexto}</span>
+              <span className="rent__dur">{alquiler.duracionMinutos} min · {alquiler.pelotasTexto}</span>
+            </p>
+            <p className="rent__where">La llevamos a tu pista, también en urbanizaciones y pistas privadas.</p>
             <Link className="btn btn--accent" href={alquiler.ruta}>Reservar entrenamiento</Link>
           </div>
-          <p className="rent__note">Mapa esquemático, no a escala.</p>
+          <p className="rent__note">Mapa: Natural Earth. Ubicaciones aproximadas.</p>
         </div>
       </section>
 
