@@ -12,11 +12,13 @@ export const faqAlquiler: Pregunta[] = [
   { p: "¿Cuánto cuesta alquilar la máquina?", r: `${alquiler.precioTexto} por sesión de ${alquiler.duracionTexto}.` },
   { p: "¿Dónde está disponible el alquiler?", r: `De momento en ${pueblos} (${alquiler.comarca}).` },
   { p: "¿Tengo que ir a recoger la máquina?", r: `No. ${servicio.entregaTexto} y la recogemos al terminar.` },
-  { p: "¿A qué horas puedo reservar?", r: `${servicio.horarioTexto}. Cada sesión dura ${alquiler.duracionTexto}.` },
+  { p: "¿Qué días y a qué horas puedo reservar?", r: `${servicio.diasTexto}. ${servicio.horarioTexto}. Cada sesión dura ${alquiler.duracionTexto}.` },
+  { p: "¿Cómo reservo?", r: `${servicio.canalTexto}. ${servicio.confirmacionTexto} (Xavi o Marc).` },
   { p: "¿Cómo se paga?", r: `${servicio.pagoTexto}. ${servicio.pagoNota}` },
-  { p: "¿Necesito tener reservada la pista?", r: "Pendiente de confirmar qué pistas admiten la máquina y cómo se coordina la reserva de pista.", pendiente: true },
+  { p: "¿En qué pistas se puede usar?", r: `La pista la pones tú. ${servicio.pistasTexto}: también vamos a urbanizaciones y pistas particulares.` },
+  { p: "¿Qué pasa si se pierde alguna pelota?", r: `Se cobra ${servicio.pelotaPerdidaTexto}.` },
   { p: "¿Puedo cancelar o cambiar mi reserva?", r: "La política de cancelaciones y cambios está pendiente de publicar.", pendiente: true },
-  { p: "¿Con cuánta antelación tengo que reservar?", r: "Pendiente de confirmar.", pendiente: true },
+  { p: "¿Con cuánta antelación tengo que reservar?", r: `${servicio.antelacionTexto}.` },
 ];
 
 export const faqProducto: Pregunta[] = [

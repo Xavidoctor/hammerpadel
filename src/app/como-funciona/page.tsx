@@ -17,9 +17,9 @@ export const metadata: Metadata = {
 const pasos = [
   {
     t: "Reserva tu sesión",
-    d: `Elige localidad, día y hora. Cada sesión dura ${alquiler.duracionTexto} y cuesta ${alquiler.precioTexto}.`,
+    d: `Elige localidad, día y hora, con al menos 6 horas de antelación. ${servicio.confirmacionTexto}.`,
   },
-  { t: "Te la llevamos", d: `${servicio.entregaTexto}, en ${localidades.map((l) => l.nombre).join(", ")}.` },
+  { t: "Te la llevamos", d: `${servicio.entregaTexto}: de club, de urbanización o privada, en ${localidades.map((l) => l.nombre).join(", ")}.` },
   { t: "Entrena a tu ritmo", d: "Tú golpeas, la máquina repite. Sin esperar a un compañero." },
   { t: "Paga en la pista", d: `${servicio.pagoTexto}. ${servicio.pagoNota}` },
 ];
@@ -49,15 +49,19 @@ export default function ComoFunciona() {
           </ol>
           <dl className="spec spec--compact">
             <div><dt>Precio</dt><dd>{alquiler.resumen}</dd></div>
+            <div><dt>Días</dt><dd>{servicio.diasTexto}</dd></div>
             <div><dt>Horario</dt><dd>{servicio.horarioTexto}</dd></div>
+            <div><dt>Antelación</dt><dd>{servicio.antelacionTexto}</dd></div>
+            <div><dt>Confirmación</dt><dd>{servicio.confirmacionTexto}</dd></div>
+            <div><dt>Pistas</dt><dd>{servicio.pistasTexto}</dd></div>
             <div><dt>Dónde</dt><dd>{localidades.map((l) => l.nombre).join(", ")} ({alquiler.comarca})</dd></div>
             <div><dt>Pago</dt><dd>En efectivo, en la sesión</dd></div>
-            <div><dt>Días de servicio y antelación</dt><dd className="pending">Pendiente de confirmar</dd></div>
+            <div><dt>Pelotas perdidas</dt><dd>{servicio.pelotaPerdidaTexto}</dd></div>
             <div><dt>Cancelaciones</dt><dd className="pending">Pendiente de confirmar</dd></div>
           </dl>
           <p className="notice">
-            <strong>A tener en cuenta.</strong> La sesión se hace en una pista que tú eliges. Qué pistas
-            admiten la máquina y quién reserva la pista se confirmarán al publicar las condiciones de alquiler.
+            <strong>A tener en cuenta.</strong> La pista la pones tú: puede ser de club, de urbanización o
+            privada. {servicio.canalTexto}.
           </p>
         </section>
 
