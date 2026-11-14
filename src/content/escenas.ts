@@ -15,15 +15,15 @@ export type Escena = {
 
 export const escenas: Escena[] = [
   { id: "pista", numero: 1, titulo: "La pista", dispositivo: "pin", animadaEnPrototipo: true,
-    recursoFuturo: "Render Blender de pista nocturna por capas + fotografía real de la máquina recortada" },
+    recursoFuturo: "Foto real apagada con capas de luz calculadas; más adelante render Blender por capas" },
   { id: "entrenamiento", numero: 2, titulo: "Entrenamiento", dispositivo: "pin", animadaEnPrototipo: true,
     recursoFuturo: "Vídeo real de sesión (jugador a contraluz) o render Blender; trazas en SVG" },
-  { id: "producto", numero: 3, titulo: "Hammer Padel", dispositivo: "flow", animadaEnPrototipo: false,
-    recursoFuturo: "Fotografía de estudio o render Blender a partir de CAD/medidas reales" },
-  { id: "recogebolas", numero: 4, titulo: "Recogebolas", dispositivo: "flow", animadaEnPrototipo: false,
-    recursoFuturo: "Vídeo real del recogebolas ya integrado; falta la toma de escena para Scroll World" },
-  { id: "alquiler", numero: 5, titulo: "Alquiler en la Marina Alta", dispositivo: "scrub", animadaEnPrototipo: true,
+  { id: "alquiler", numero: 3, titulo: "Alquiler en la Marina Alta (actividad principal)", dispositivo: "scrub", animadaEnPrototipo: true,
     recursoFuturo: "Clip Blender de la pista al mapa (el actual es un esquema provisional)" },
-  { id: "reserva", numero: 6, titulo: "Cierre hacia la reserva", dispositivo: "flow", animadaEnPrototipo: false,
+  { id: "reserva", numero: 4, titulo: "Reserva", dispositivo: "flow", animadaEnPrototipo: false,
     recursoFuturo: "Plano fijo de la máquina en pista, fotografía real" },
+  { id: "producto", numero: 5, titulo: "Comprar la máquina", dispositivo: "flow", animadaEnPrototipo: false,
+    recursoFuturo: "Fotografía de estudio o render Blender a partir de CAD/medidas reales" },
+  { id: "recogebolas", numero: 6, titulo: "Recogebolas", dispositivo: "flow", animadaEnPrototipo: false,
+    recursoFuturo: "Vídeo real del recogebolas ya integrado" },
 ];

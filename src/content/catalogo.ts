@@ -21,8 +21,8 @@ export const maquina: Producto = {
   id: "maquina",
   nombre: "Hammer Padel",
   descripcion: "Máquina lanzapelotas para entrenar pádel de forma autónoma.",
-  precioCentimos: 230000,
-  precioTexto: "2.300 €",
+  precioCentimos: 249900,
+  precioTexto: "2.499 €",
   ruta: "/comprar",
 };
 
@@ -30,8 +30,8 @@ export const recogebolas: Producto = {
   id: "recogebolas",
   nombre: "Recogebolas Hammer",
   descripcion: "Accesorio para recoger pelotas de forma cómoda y rápida.",
-  precioCentimos: 8500,
-  precioTexto: "85 €",
+  precioCentimos: 6500,
+  precioTexto: "65 €",
   ruta: "/recogebolas",
 };
 
@@ -65,9 +65,9 @@ export const lemas = {
 } as const;
 
 export const navegacion = [
-  { href: "/comprar", texto: "Máquina" },
-  { href: "/recogebolas", texto: "Recogebolas" },
   { href: "/alquiler", texto: "Alquiler" },
+  { href: "/comprar", texto: "Comprar máquina" },
+  { href: "/recogebolas", texto: "Recogebolas" },
   { href: "/como-funciona", texto: "Cómo funciona" },
   { href: "/entrenamientos", texto: "Entrenamientos" },
   { href: "/clubes", texto: "Clubes" },

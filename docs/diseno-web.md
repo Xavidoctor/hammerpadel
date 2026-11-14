@@ -23,8 +23,9 @@ Estas decisiones de Xavi **prevalecen** sobre cualquier texto de la v0.1 que las
 | 11 | Sin pasarela de pago | Botones "Solicitar compra" y "Solicitar reserva" sin cobro |
 | 12 | No publicar horarios ficticios | El paso 3 pide una franja **preferida**; los huecos reales solo saldrán de reglas reales |
 | 13 | Sin características técnicas no verificadas | Fichas técnicas con "Pendiente de documentación oficial" |
-| 14 | Precios: 2.300 €, 85 €, 20 €/90 min. IVA pendiente | Fuente única `src/content/catalogo.ts`; nota "Tratamiento del IVA pendiente de confirmar" |
+| 14 | Precios (actualizados 14-11-2026): 2.499 €, 65 €, 20 €/90 min. IVA pendiente | Fuente única `src/content/catalogo.ts`; nota "Tratamiento del IVA pendiente de confirmar" |
 | 15 | Web funcional, rápida y visualmente excelente | Sin vídeo en la carga inicial; motor diferido; niveles de degradación |
+| 16 | (14-11-2026) El alquiler es la actividad principal; la venta de la máquina y el recogebolas es secundaria | Portada y navegación empiezan por el alquiler: CTA principal "Reservar sesión", escenas Pista → Entrenamiento → Alquiler → Reserva → Compra → Recogebolas |
 
 ### 8.3 bis · Traslados entre ubicaciones [PROPUESTA, solo si el modelo operativo lo requiere]
 Si una misma máquina presta servicio en varias localidades, entre dos sesiones hace falta tiempo para recoger, trasladar y preparar. La lógica (`src/lib/reservas/disponibilidad.ts`, con pruebas) lo modela así:
@@ -70,8 +71,8 @@ Dos capas separadas que nunca dependen la una de la otra:
 | Ruta | Contenido | Tipo de render |
 |---|---|---|
 | `/` | Landing: Scroll World + bloque HTML de conversión + resumen indexable | Estático + mejora progresiva |
-| `/comprar` | Máquina Hammer Padel, 2.300 € | Estático |
-| `/recogebolas` | Recogebolas Hammer, 85 € | Estático |
+| `/comprar` | Máquina Hammer Padel, 2.499 € | Estático |
+| `/recogebolas` | Recogebolas Hammer, 65 € | Estático |
 | `/alquiler` | Reserva en 4 pasos, 20 € / 90 min | Estático + interactivo (cliente) |
 | `/alquiler/[localidad]` | Solo cuando haya contenido real por localidad (ver SEO) | Estático |
 | `/como-funciona` | Funcionamiento de la máquina (con documentación real) | Estático |
@@ -120,7 +121,7 @@ Mantengo tu historia y la ajusto en tres puntos [PROPUESTA]:
 ### Escena 1 — La pista
 - **Visual**: noche, pista de pádel azul vacía, cristales con reflejos, focos encendiéndose uno a uno. La cámara avanza desde fuera del cristal hacia el centro. Al llegar, la máquina Hammer Padel aparece en el fondo de pista, iluminada como un objeto de exposición.
 - **Texto (HTML)**: HAMMER PADEL · Tu entrenamiento. Tu ritmo. Tu pista.
-- **CTA (HTML)**: Comprar máquina — 2.300 € · Alquilar — 20 € / 90 min
+- **CTA (HTML)**: Comprar máquina — 2.499 € · Alquilar — 20 € / 90 min
 - **Póster/LCP**: still de la pista con la máquina ya visible (para que el primer impacto incluya el producto aunque no cargue el vídeo).
 
 ### Escena 2 — Entrenamiento
@@ -130,12 +131,12 @@ Mantengo tu historia y la ajusto en tres puntos [PROPUESTA]:
 
 ### Escena 3 — Hammer Padel (hero de producto)
 - **Visual**: la pista se apaga, queda la máquina sola sobre fondo grafito, luz cenital y luz lateral rasante, giro lento de cámara a su alrededor.
-- **Texto**: HAMMER PADEL · 2.300 € · CTA COMPRAR HAMMER PADEL (+ enlace secundario "Cómo funciona").
+- **Texto**: HAMMER PADEL · 2.499 € · CTA COMPRAR HAMMER PADEL (+ enlace secundario "Cómo funciona").
 - **Nota crítica**: esta escena es la que más exige fidelidad al producto real. Ver §16 (riesgo 1): propongo que se haga a partir de fotografía o render 3D real, no generada libremente.
 
 ### Escena 4 — Recogebolas
 - **Visual**: vuelve la luz; el suelo de la pista está lleno de bolas. La cámara baja a ras de suelo, entre las bolas, y aparece el recogebolas Hammer recogiéndolas.
-- **Texto**: MENOS TIEMPO RECOGIENDO. MÁS TIEMPO ENTRENANDO. · RECOGEBOLAS HAMMER · 85 € · CTA COMPRAR RECOGEBOLAS.
+- **Texto**: MENOS TIEMPO RECOGIENDO. MÁS TIEMPO ENTRENANDO. · RECOGEBOLAS HAMMER · 65 € · CTA COMPRAR RECOGEBOLAS.
 
 ### Escena 5 — Alquiler en la Marina Alta
 - **Visual**: la cámara sube por encima del cristal y se eleva hasta una vista aérea nocturna estilizada de la costa de la Marina Alta; cuatro puntos de luz amarilla se encienden.
@@ -349,7 +350,7 @@ Franjas = reglas de disponibilidad de las máquinas asignadas a esa ubicación �
 ```
 products        id, slug, name, type (machine|accessory|spare|pack), active
 product_variants id, product_id, sku, name, price_cents, currency, tax_rate, stock_policy
-                  -- Hammer Padel 230000 · Recogebolas 8500 [CONFIRMADO, IVA incluido: VERIFICAR]
+                  -- Hammer Padel 249900 · Recogebolas 6500 [CONFIRMADO, IVA incluido: VERIFICAR]
 bundles          bundle_id, variant_id, qty                -- packs (futuro)
 coupons          code, type, value, valid_from/to, limits  -- futuro, sin activar
 orders           id, customer_id, status, subtotal, discount, shipping, tax, total, currency
@@ -365,7 +366,7 @@ Precios en céntimos y en una sola fuente (`content/products.ts` → BD). El ser
 | **Stripe Checkout** | Sin cuota mensual, integración rápida, página de pago alojada (menos carga legal PCI), admite métodos como Klarna para pagar a plazos | Comisión por transacción; Bizum no nativo |
 | **Redsys (TPV de tu banco)** | Comisiones normalmente negociables y bajas en España, admite **Bizum**, confianza del comprador español | Contrato con banco, integración más antigua y laboriosa |
 | **PayPal** | Confianza, pago rápido | Comisiones más altas, no aporta mucho como único método |
-| **Financiación (SeQura, Aplazame, Klarna)** | Muy relevante para un producto de 2.300 € | Coste por operación al comercio; requiere alta y aprobación |
+| **Financiación (SeQura, Aplazame, Klarna)** | Muy relevante para un producto de 2.499 € | Coste por operación al comercio; requiere alta y aprobación |
 | **Transferencia bancaria** | Coste cero, habitual en compras de clubes | Manual, confirmación lenta |
 
 **Recomendación preliminar**: diseñar una capa `PaymentProvider` común para poder empezar con un proveedor y añadir otro. Decidir entre Stripe y Redsys según las condiciones que te ofrezca tu banco. **No se integra nada hasta tu decisión.**
@@ -392,7 +393,7 @@ Gastos y plazos de envío, IVA y facturación, garantía, derecho de desistimien
 
 ### 10.3 Técnica
 - Metadatos únicos por página, `canonical`, `sitemap.xml`, `robots.txt`, Open Graph con stills de Scroll World.
-- Datos estructurados: `Organization`, `Product` + `Offer` (2.300 € / 85 €, EUR), `Service` de alquiler con `areaServed` = las 4 localidades (no `LocalBusiness` con dirección mientras no haya instalación propia), `FAQPage` donde haya FAQ real, `BreadcrumbList`.
+- Datos estructurados: `Organization`, `Product` + `Offer` (2.499 € / 65 €, EUR), `Service` de alquiler con `areaServed` = las 4 localidades (no `LocalBusiness` con dirección mientras no haya instalación propia), `FAQPage` donde haya FAQ real, `BreadcrumbList`.
 - En la landing, el texto de cada escena es HTML real; además un bloque final "Qué es Hammer Padel" con texto útil (no relleno).
 - Idiomas: español por defecto en la raíz; estructura preparada para `/en/` (y otros) con `hreflang`. Sugerencia: el inglés tiene sentido pronto en Dénia por la población residente extranjera; el valenciano es otra opción a valorar.
 - Sin keyword stuffing: cada término aparece donde aporta información.

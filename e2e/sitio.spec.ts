@@ -24,22 +24,23 @@ test.describe("precios confirmados", () => {
   test("los precios aparecen como texto HTML", async ({ page }) => {
     await page.goto("/");
     const html = await page.content();
-    expect(html).toContain("2.300 €");
-    expect(html).toContain("85 €");
+    expect(html).toContain("2.499 €");
+    expect(html).toContain("65 €");
     expect(html).toContain("20 €");
     for (const l of ["Dénia", "Ondara", "La Xara", "Pedreguer"]) expect(html).toContain(l);
   });
 });
 
-test.describe("la landing nunca bloquea la compra", () => {
+test.describe("la landing nunca bloquea la reserva ni la compra", () => {
   test("sin JavaScript se ven el titular y los CTA", async ({ browser }) => {
     const ctx = await browser.newContext({ javaScriptEnabled: false });
     const page = await ctx.newPage();
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    const comprar = page.getByRole("link", { name: /Comprar máquina/ });
-    await expect(comprar).toBeVisible();
-    expect(await comprar.evaluate((el) => getComputedStyle(el.closest("[data-sc-cue]")!).opacity)).toBe("1");
+    const reservar = page.getByRole("link", { name: /^Reservar sesión/ });
+    await expect(reservar).toBeVisible();
+    expect(await reservar.evaluate((el) => getComputedStyle(el.closest("[data-sc-cue]")!).opacity)).toBe("1");
+    await expect(page.getByRole("link", { name: /^Comprar · / })).toBeVisible();
     await expect(page.getByRole("link", { name: "Reservar entrenamiento" })).toBeVisible();
     await ctx.close();
   });
@@ -48,7 +49,7 @@ test.describe("la landing nunca bloquea la compra", () => {
     const ctx = await browser.newContext({ reducedMotion: "reduce" });
     const page = await ctx.newPage();
     await page.goto("/");
-    await expect(page.getByRole("link", { name: /Comprar máquina/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: /^Reservar sesión/ })).toBeVisible();
     // El clip de alquiler no se descarga con movimiento reducido.
     const pidioVideo = await page.evaluate(() => performance.getEntriesByType("resource").some((r) => r.name.endsWith(".mp4")));
     expect(pidioVideo).toBe(false);

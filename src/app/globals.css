@@ -319,6 +319,7 @@ html.sc-ready:not(.hp-static) .pista__frame { animation: hp-luces 3.2s linear 0.
 }
 .hero-title { margin: 0; display: grid; gap: var(--sc-4); }
 .hero-title__brand { font-size: clamp(3.6rem, 1.5rem + 8.5vw, 10rem); }
+.hero-sub { margin: 0; font-size: var(--sc-t-md, 1.05rem); color: var(--sc-ink-soft); max-width: 44ch; line-height: 1.45; }
 .hero-title__claim { font-size: var(--sc-t-xl); font-weight: 500; color: var(--sc-ink); letter-spacing: var(--sc-track-snug); max-width: 34ch; line-height: 1.2; }
 
 @media (max-width: 700px), (max-aspect-ratio: 4/5) {

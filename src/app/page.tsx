@@ -91,12 +91,16 @@ export default function Inicio() {
               <span className="hero-title__brand">Hammer Padel</span>
               <span className="hero-title__claim">Tu entrenamiento. Tu ritmo. Tu pista.</span>
             </h1>
+            <p className="hero-sub">
+              Alquila la máquina lanzapelotas por {alquiler.precioTexto} la sesión de 90 minutos en{" "}
+              {localidades.map((l) => l.nombre).join(", ").replace(/, ([^,]*)$/, " y $1")}.
+            </p>
             <div className="cta-row">
-              <Link className="btn btn--accent" href={maquina.ruta}>
-                Comprar máquina · {maquina.precioTexto}
+              <Link className="btn btn--accent" href={alquiler.ruta}>
+                Reservar sesión · {alquiler.precioTexto} / 90 min
               </Link>
-              <Link className="btn btn--line" href={alquiler.ruta}>
-                Alquilar · {alquiler.precioTexto} / 90 min
+              <Link className="btn btn--line" href={maquina.ruta}>
+                Comprar · {maquina.precioTexto}
               </Link>
             </div>
             <MotionToggle />
@@ -145,7 +149,55 @@ export default function Inicio() {
         </div>
       </section>
 
-      {/* ESCENA 3 · HAMMER PADEL (estática en el prototipo) */}
+      {/* ESCENA 3 · ALQUILER, la actividad principal (animada: scrub de clip provisional) */}
+      <section id="alquiler" className="act act--rent" data-sc-act="scrub" data-sc-span="2.4" data-sc-dwell="0.3" data-sc-drift="#0b0d10" aria-labelledby="t-rent">
+        <div data-sc-stage className="stage">
+          <picture>
+            <source media="(max-width: 860px)" srcSet="/prototipo/prototipo-alquiler-m-final.webp" />
+            <img className="sc-stage__poster rent__poster" src="/prototipo/prototipo-alquiler-final.webp" alt="" width={1920} height={1080} loading="lazy" />
+          </picture>
+          <video
+            data-sc-scrub
+            data-sc-src="/prototipo/prototipo-alquiler.mp4"
+            data-sc-src-mobile="/prototipo/prototipo-alquiler-m.mp4"
+            muted
+            playsInline
+            aria-hidden="true"
+          />
+          <div className="sc-scrim sc-scrim--lead" aria-hidden="true" />
+          <div className="rent__copy" data-sc-cue="0.12 1 0.18 0.06">
+            <p className="kicker">Entrena sin comprarla</p>
+            <h2 id="t-rent" className="display display--md">Alquila Hammer Padel</h2>
+            <p className="rent__price">
+              <span className="price__num">{alquiler.precioTexto}</span>
+              <span className="rent__dur">{alquiler.duracionTexto}</span>
+            </p>
+            <p className="rent__where">Disponible inicialmente en</p>
+            <ul className="rent__towns">
+              {localidades.map((l) => <li key={l.id}>{l.nombre}</li>)}
+            </ul>
+            <Link className="btn btn--accent" href={alquiler.ruta}>Reservar entrenamiento</Link>
+          </div>
+          <p className="rent__note">Mapa esquemático, no a escala.</p>
+        </div>
+      </section>
+
+      {/* ESCENA 4 · RESERVA */}
+      <section id="reservar" className="flow flow--close" aria-labelledby="t-close">
+        <div className="wrap close">
+          <h2 id="t-close" className="display">Reservar entrenamiento</h2>
+          <ol className="steps" data-sc-stagger="80">
+            <li><span>1</span>Elige localidad</li>
+            <li><span>2</span>Elige fecha</li>
+            <li><span>3</span>Elige horario</li>
+            <li><span>4</span>Reserva</li>
+          </ol>
+          <p className="lede">{alquiler.resumen}. {lemas.repetir}</p>
+          <Link className="btn btn--accent btn--lg" href={alquiler.ruta}>Empezar reserva</Link>
+        </div>
+      </section>
+
+      {/* ESCENA 5 · COMPRA DE LA MÁQUINA (venta, secundaria al alquiler) */}
       <section id="maquina" className="flow flow--product" aria-labelledby="t-maquina">
         <div className="wrap split">
           <ProductPhoto
@@ -156,19 +208,19 @@ export default function Inicio() {
             className="photo--estudio"
           />
           <div className="stack" data-sc-in>
-            <p className="kicker">La máquina</p>
+            <p className="kicker">¿Prefieres tenerla siempre?</p>
             <h2 id="t-maquina" className="display">Hammer Padel</h2>
-            <p className="lede">{maquina.descripcion} Para jugadores, entrenadores, clubes y academias.</p>
+            <p className="lede">{maquina.descripcion} Para jugadores, entrenadores, clubes y academias. Pruébala antes con una sesión de alquiler.</p>
             <Price texto={maquina.precioTexto} />
             <div className="cta-row">
               <Link className="btn btn--accent" href={maquina.ruta}>Comprar Hammer Padel</Link>
-              <Link className="btn btn--ghost" href="/como-funciona">Cómo funciona</Link>
+              <Link className="btn btn--ghost" href={alquiler.ruta}>Probarla antes</Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ESCENA 4 · RECOGEBOLAS (estática en el prototipo) */}
+      {/* ESCENA 6 · RECOGEBOLAS (venta) */}
       <section id="recogebolas" className="flow flow--balls" aria-labelledby="t-recoge">
         <div className="balls" aria-hidden="true">
           {Array.from({ length: 28 }, (_, i) => (
@@ -190,68 +242,20 @@ export default function Inicio() {
         </div>
       </section>
 
-      {/* ESCENA 5 · ALQUILER (animada: scrub de clip provisional) */}
-      <section id="alquiler" className="act act--rent" data-sc-act="scrub" data-sc-span="2.4" data-sc-dwell="0.3" data-sc-drift="#0b0d10" aria-labelledby="t-rent">
-        <div data-sc-stage className="stage">
-          <picture>
-            <source media="(max-width: 860px)" srcSet="/prototipo/prototipo-alquiler-m-final.webp" />
-            <img className="sc-stage__poster rent__poster" src="/prototipo/prototipo-alquiler-final.webp" alt="" width={1920} height={1080} loading="lazy" />
-          </picture>
-          <video
-            data-sc-scrub
-            data-sc-src="/prototipo/prototipo-alquiler.mp4"
-            data-sc-src-mobile="/prototipo/prototipo-alquiler-m.mp4"
-            muted
-            playsInline
-            aria-hidden="true"
-          />
-          <div className="sc-scrim sc-scrim--lead" aria-hidden="true" />
-          <div className="rent__copy" data-sc-cue="0.12 1 0.18 0.06">
-            <p className="kicker">¿Quieres probarla?</p>
-            <h2 id="t-rent" className="display display--md">Alquila Hammer Padel</h2>
-            <p className="rent__price">
-              <span className="price__num">{alquiler.precioTexto}</span>
-              <span className="rent__dur">{alquiler.duracionTexto}</span>
-            </p>
-            <p className="rent__where">Disponible inicialmente en</p>
-            <ul className="rent__towns">
-              {localidades.map((l) => <li key={l.id}>{l.nombre}</li>)}
-            </ul>
-            <Link className="btn btn--accent" href={alquiler.ruta}>Reservar entrenamiento</Link>
-          </div>
-          <p className="rent__note">Mapa esquemático, no a escala.</p>
-        </div>
-      </section>
-
-      {/* ESCENA 6 · CIERRE HACIA LA RESERVA */}
-      <section id="reservar" className="flow flow--close" aria-labelledby="t-close">
-        <div className="wrap close">
-          <h2 id="t-close" className="display">Reservar entrenamiento</h2>
-          <ol className="steps" data-sc-stagger="80">
-            <li><span>1</span>Elige localidad</li>
-            <li><span>2</span>Elige fecha</li>
-            <li><span>3</span>Elige horario</li>
-            <li><span>4</span>Reserva</li>
-          </ol>
-          <p className="lede">{alquiler.resumen}. {lemas.repetir}</p>
-          <Link className="btn btn--accent btn--lg" href={alquiler.ruta}>Empezar reserva</Link>
-        </div>
-      </section>
-
       {/* Resumen indexable, útil también sin animación */}
       <section className="flow flow--about" aria-labelledby="t-about">
         <div className="wrap about">
           <h2 id="t-about" className="display display--sm">Qué es Hammer Padel</h2>
           <div className="about__cols">
             <p>
-              Hammer Padel desarrolla, vende y alquila equipamiento para entrenar pádel. Su producto
-              principal es una máquina lanzapelotas que permite entrenar de forma autónoma, repetir
-              golpes y aprovechar mejor el tiempo en pista.
+              Hammer Padel alquila una máquina lanzapelotas para entrenar pádel de forma autónoma:
+              repetir golpes, trabajar situaciones de juego y aprovechar mejor el tiempo en pista.
+              El alquiler de máquina de pádel está disponible en Dénia, Ondara, La Xara y Pedreguer
+              por {alquiler.resumen}.
             </p>
             <p>
-              Puedes comprar la máquina de entrenamiento de pádel por {maquina.precioTexto}, el
-              recogebolas Hammer por {recogebolas.precioTexto}, o probarla con el alquiler de máquina
-              de pádel en Dénia, Ondara, La Xara y Pedreguer por {alquiler.resumen}.
+              Si prefieres tenerla siempre, puedes comprar la máquina de entrenamiento de pádel por{" "}
+              {maquina.precioTexto} y el recogebolas Hammer por {recogebolas.precioTexto}.
             </p>
           </div>
         </div>

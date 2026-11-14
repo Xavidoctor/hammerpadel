@@ -12,11 +12,11 @@ export const PROTOTIPO = true;
 export const metadata: Metadata = {
   metadataBase: new URL("http://localhost:3000"),
   title: {
-    default: "Hammer Padel · Máquina lanzapelotas de pádel",
+    default: "Hammer Padel · Alquiler de máquina lanzapelotas de pádel",
     template: "%s · Hammer Padel",
   },
   description:
-    "Hammer Padel: máquina lanzapelotas para entrenar pádel de forma autónoma, recogebolas y alquiler por sesiones en la Marina Alta.",
+    "Alquila la máquina lanzapelotas Hammer Padel por sesiones de 90 minutos en Dénia, Ondara, La Xara y Pedreguer. También a la venta, con su recogebolas.",
   robots: PROTOTIPO ? { index: false, follow: false } : undefined,
   openGraph: { locale: "es_ES", type: "website", siteName: "Hammer Padel" },
 };
