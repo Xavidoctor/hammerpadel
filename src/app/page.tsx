@@ -6,7 +6,7 @@ import { ProductVideo } from "@/components/ProductVideo";
 import { Price } from "@/components/Price";
 import { MotionToggle, ScrollCraftStage } from "@/components/ScrollCraftStage";
 import { alquiler, lemas, localidades, maquina, recogebolas } from "@/content/catalogo";
-import { HORIZONTAL, VERTICAL, golpes, proyectar } from "@/lib/pista";
+import { HORIZONTAL, VERTICAL, golpes } from "@/lib/pista";
 import { mediosPista } from "@/content/medios";
 
 /** Focos de la foto iluminada (en % del encuadre 1671x941), de fondo a primer plano. */
@@ -16,7 +16,8 @@ const LAMPARAS = [
   { x: 18.3, y: 6.5, orden: 2 }, { x: 81.7, y: 6.5, orden: 2 },
 ];
 
-const pct = (v: number, t: number) => `${((v / t) * 100).toFixed(2)}%`;
+/** Instante (0..1 del scroll de la escena 2) en que la máquina lanza cada bola; igual que SALIDAS en produccion/escena-2/escena.js. */
+const SALIDAS = golpes.map((_, i) => 0.03 + i * 0.1);
 
 export default function Inicio() {
   const medios = mediosPista();
@@ -108,31 +109,34 @@ export default function Inicio() {
         </div>
       </section>
 
-      {/* ESCENA 2 · ENTRENAMIENTO (animada: pin + trazas, movimiento propio) */}
-      <section id="entrenamiento" className="act act--train" data-sc-act="pin" data-sc-span="3.4" data-sc-drift="#0a1020" aria-labelledby="t-train">
+      {/* ESCENA 2 · ENTRENAMIENTO: la máquina Hammer en 3D lanzando bolas (render propio, scrub por scroll).
+          Fuente del render: produccion/escena-2. Los rótulos siguen los instantes de lanzamiento (SALIDAS). */}
+      <section id="entrenamiento" className="act act--train" data-sc-act="scrub" data-sc-span="3.4" data-sc-dwell="0.2" data-sc-drift="#0a1020" aria-labelledby="t-train">
         <div data-sc-stage className="stage">
-          <div className="train__court">
-            <CourtSvg e={HORIZONTAL} className="only-wide" conFocos={false} conTrazas />
-            <CourtSvg e={VERTICAL} className="only-tall" conFocos={false} conTrazas />
-            {[HORIZONTAL, VERTICAL].map((e) => (
-              <ul key={e.w} className={`train__labels ${e.w > e.h ? "only-wide" : "only-tall"}`} aria-hidden="true">
-                {golpes.map((s, i) => {
-                  const [x, y] = proyectar(e, s.x, 0, s.z);
-                  const a = 0.06 + i * 0.1;
-                  return (
-                    <li
-                      key={s.id}
-                      className={`train__label train__label--${s.x < 0 ? "l" : "r"}`}
-                      style={{ left: pct(x, e.w), top: pct(y, e.h) }}
-                      data-sc-cue={`${a.toFixed(2)} ${(a + 0.2).toFixed(2)}`}
-                    >
-                      {s.texto}
-                    </li>
-                  );
-                })}
-              </ul>
-            ))}
-          </div>
+          <picture>
+            <source media="(max-width: 860px)" srcSet="/medios/entrenamiento/poster-m.webp" />
+            <img className="sc-stage__poster train__poster" src="/medios/entrenamiento/poster.webp" width={1920} height={1080} loading="lazy"
+              alt="Máquina lanzapelotas Hammer Padel en 3D lanzando una bola en una pista azul" />
+          </picture>
+          <video
+            data-sc-scrub
+            data-sc-src="/medios/entrenamiento/maquina-3d.mp4"
+            data-sc-src-mobile="/medios/entrenamiento/maquina-3d-m.mp4"
+            muted
+            playsInline
+            aria-hidden="true"
+          />
+          <div className="sc-scrim sc-scrim--lead" aria-hidden="true" />
+          <ul className="train__ticker" aria-hidden="true">
+            {golpes.map((s, i) => {
+              const a = SALIDAS[i];
+              return (
+                <li key={s.id} className="train__label" data-sc-cue={`${a.toFixed(2)} ${(a + 0.1).toFixed(2)} 0.15 0.2`}>
+                  <span className="train__num">{String(i + 1).padStart(2, "0")}</span> {s.texto}
+                </li>
+              );
+            })}
+          </ul>
           <div className="train__copy">
             <h2 id="t-train" className="sr-only">Entrenamiento autónomo</h2>
             <p className="train__lede" data-sc-cue="0 0.22 0">
@@ -142,7 +146,7 @@ export default function Inicio() {
               {golpes.slice(0, 6).map((s) => <li key={s.id}>{s.texto}</li>)}
               <li>Repetición</li>
             </ul>
-            <p className="train__punch" data-sc-cue="0.7 1 0.15 0.05">
+            <p className="train__punch" data-sc-cue="0.72 1 0.15 0.05">
               No esperes a tu compañero. <em>Entrena.</em>
             </p>
           </div>

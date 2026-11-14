@@ -16,8 +16,8 @@ export type Escena = {
 export const escenas: Escena[] = [
   { id: "pista", numero: 1, titulo: "La pista", dispositivo: "pin", animadaEnPrototipo: true,
     recursoFuturo: "Foto real apagada con capas de luz calculadas; más adelante render Blender por capas" },
-  { id: "entrenamiento", numero: 2, titulo: "Entrenamiento", dispositivo: "pin", animadaEnPrototipo: true,
-    recursoFuturo: "Vídeo real de sesión (jugador a contraluz) o render Blender; trazas en SVG" },
+  { id: "entrenamiento", numero: 2, titulo: "Entrenamiento", dispositivo: "scrub", animadaEnPrototipo: true,
+    recursoFuturo: "Máquina 3D propia (Three.js, produccion/escena-2) lanzando bolas; más adelante render Blender con fotos reales de la máquina" },
   { id: "alquiler", numero: 3, titulo: "Alquiler en la Marina Alta (actividad principal)", dispositivo: "scrub", animadaEnPrototipo: true,
     recursoFuturo: "Clip Blender de la pista al mapa (el actual es un esquema provisional)" },
   { id: "reserva", numero: 4, titulo: "Reserva", dispositivo: "flow", animadaEnPrototipo: false,
