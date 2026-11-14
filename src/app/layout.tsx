@@ -1,3 +1,4 @@
+import { localidadesTexto } from "@/content/catalogo";
 import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 import "@fontsource-variable/archivo/wdth.css";
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
     template: "%s · Hammer Padel",
   },
   description:
-    "Alquila la máquina lanzapelotas Hammer Padel por sesiones de 90 minutos en Dénia, Ondara, La Xara y Pedreguer. También a la venta, con su recogebolas.",
+    `Alquila la máquina lanzapelotas Hammer Padel por sesiones de 90 minutos en ${localidadesTexto}. También a la venta, con su recogebolas.`,
   robots: PROTOTIPO ? { index: false, follow: false } : undefined,
   openGraph: { locale: "es_ES", type: "website", siteName: "Hammer Padel" },
 };
