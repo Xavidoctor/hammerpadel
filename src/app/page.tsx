@@ -156,7 +156,7 @@ export default function Inicio() {
 
       {/* ESCENA 3 · ALQUILER, la actividad principal: mapa de la Marina Alta → bajada tipo dron
           a una pista → llega la Hammer X MAX (render propio, scrub por scroll). Fuente en produccion/escena-3. */}
-      <section id="alquiler" className="act act--rent" data-sc-act="scrub" data-sc-span="3" data-sc-dwell="0.3" data-sc-drift="#0b0d10" aria-labelledby="t-rent">
+      <section id="alquiler" className="act act--rent" data-sc-act="scrub" data-sc-span="3" data-sc-dwell="0.3" data-sc-clip-map="travel" data-sc-drift="#0b0d10" aria-labelledby="t-rent">
         <div data-sc-stage className="stage">
           <picture>
             <source media="(max-width: 860px)" srcSet="/medios/alquiler/poster-m.webp" />

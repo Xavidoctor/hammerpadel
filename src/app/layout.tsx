@@ -8,6 +8,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { URL_SITIO } from "@/lib/sitio";
 import { listaLocalidades } from "@/content/catalogo";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 /** PROTOTIPO LOCAL: no indexar hasta aprobar la publicación. */
 export const PROTOTIPO = true;
@@ -46,13 +47,14 @@ const sinJs = `
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={GeistSans.variable} suppressHydrationWarning>
+    <html lang="es" className={GeistSans.variable} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <noscript>
           <style>{sinJs}</style>
         </noscript>
       </head>
       <body>
+        <ScrollToTop />
         <a className="skip" href="#contenido">Saltar al contenido</a>
         <SiteHeader />
         <main id="contenido">{children}</main>
