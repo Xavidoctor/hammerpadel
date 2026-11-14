@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AppBloque } from "@/components/AppBloque";
 import { Price } from "@/components/Price";
+import { app } from "@/content/app";
 import { ProductJsonLd } from "@/components/ProductJsonLd";
 import { ProductGallery } from "@/components/ProductGallery";
-import { alquiler, maquina } from "@/content/catalogo";
+import { alquiler, envio, maquina } from "@/content/catalogo";
 
 export const metadata: Metadata = {
   title: "Hammer X MAX · Comprar máquina lanzapelotas de pádel",
@@ -26,13 +28,13 @@ export default function Comprar() {
           ]}
         />
         <div className="stack">
-          <p className="kicker">Máquina lanzapelotas de pádel</p>
+          <p className="kicker">Máquina lanzapelotas de pádel · Hammer Padel</p>
           <h1 className="display">{maquina.nombre}</h1>
           <p className="lede">
             {maquina.descripcion} Pensada para jugadores que quieren entrenar individualmente,
             entrenadores que repiten ejercicios técnicos, clubes y academias.
           </p>
-          <Price texto={maquina.precioTexto} />
+          <Price texto={maquina.precioTexto} envio={envio.maquina} />
           <div className="cta-row">
             <Link className="btn btn--accent btn--lg" href="/contacto?asunto=compra-maquina">Solicitar compra</Link>
             <Link className="btn btn--ghost" href={alquiler.ruta}>Pruébala antes: {alquiler.precioTexto} / 90 min</Link>
@@ -46,11 +48,16 @@ export default function Comprar() {
             <h2>Por qué entrenar con máquina</h2>
             <p>
               Entrenar con una máquina lanzapelotas permite repetir el mismo golpe muchas veces seguidas,
-              sin depender de un compañero y aprovechando mejor el tiempo de pista.
+              sin depender de un compañero y aprovechando mejor el tiempo de pista. Con su app eliges
+              entrenamientos preparados, para ti solo o para grupos de hasta 4 personas, o los personalizas.
             </p>
             <h2>Especificaciones técnicas</h2>
             <dl className="spec">
-              {["Velocidad", "Capacidad de bolas", "Autonomía", "Dimensiones y peso", "Conectividad", "Garantía"].map((k) => (
+              <div>
+                <dt>Control</dt>
+                <dd>App {app.nombre} por Bluetooth (iPhone y Android, gratis)</dd>
+              </div>
+              {["Velocidad", "Capacidad de bolas", "Autonomía", "Dimensiones y peso", "Garantía"].map((k) => (
                 <div key={k}>
                   <dt>{k}</dt>
                   <dd className="pending">Pendiente de documentación oficial</dd>
@@ -59,6 +66,9 @@ export default function Comprar() {
             </dl>
           </div>
         </div>
+      </div>
+      <div className="page__body" style={{ marginTop: "clamp(3rem, 8vw, 6rem)" }}>
+        <AppBloque />
       </div>
     </div>
   );

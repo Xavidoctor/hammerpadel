@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const PAGINAS = ["/", "/comprar", "/recogebolas", "/alquiler", "/como-funciona", "/entrenamientos", "/clubes", "/soporte", "/contacto", "/legal"];
+const PAGINAS = ["/", "/comprar", "/recogebolas", "/alquiler", "/alquiler/denia", "/alquiler/ondara", "/alquiler/la-xara", "/alquiler/pedreguer", "/alquiler/el-verger", "/alquiler/els-poblets", "/como-funciona", "/entrenamientos", "/clubes", "/soporte", "/contacto", "/legal", "/legal/aviso-legal", "/legal/privacidad", "/legal/cookies", "/legal/condiciones-alquiler", "/legal/condiciones-venta"];
 
 test.describe("páginas", () => {
   for (const ruta of PAGINAS) {
@@ -28,7 +28,7 @@ test.describe("precios confirmados", () => {
     expect(html).toContain("65 €");
     expect(html).toContain("25 €");
     expect(html).toContain("60 pelotas");
-    for (const l of ["Dénia", "Ondara", "La Xara", "Pedreguer"]) expect(html).toContain(l);
+    for (const l of ["Dénia", "Ondara", "La Xara", "Pedreguer", "El Verger", "Els Poblets"]) expect(html).toContain(l);
   });
 });
 
@@ -104,24 +104,42 @@ test.describe("la landing nunca bloquea la reserva ni la compra", () => {
   });
 });
 
-test.describe("solicitud de alquiler (prototipo)", () => {
-  test("valida y no muestra horarios como disponibles", async ({ page }) => {
+test.describe("reserva de alquiler (prototipo)", () => {
+  test("valida los pasos", async ({ page }) => {
     await page.goto("/alquiler");
-    await expect(page.getByText(/no mostramos horarios/)).toBeVisible();
+    await expect(page.getByText(/todavía no\s+se guardan reservas/)).toBeVisible();
     await page.getByRole("button", { name: "Solicitar reserva" }).click();
     await expect(page.locator("form [role=alert]")).toContainText("Elige una localidad");
   });
 
-  test("se completa con teclado y no envía nada", async ({ page }) => {
+  test("muestra horas reales de 90 min dentro del horario y no envía nada", async ({ page }) => {
     await page.goto("/alquiler");
     await page.getByLabel("Dénia").check();
-    await page.locator('input[name="fecha"]').first().check();
-    await page.getByLabel(/Tarde/).check();
+    const dia = page.locator('input[name="fecha"]:not([disabled])').first();
+    await expect(dia).toBeVisible();
+    await dia.check();
+    const horas = page.locator('input[name="hora"]');
+    await expect(horas.first()).toBeAttached();
+    const valores = await horas.evaluateAll((els) => els.map((e) => (e as HTMLInputElement).value));
+    expect(valores.every((v) => v >= "08:00" && v <= "20:30")).toBe(true);
+    await horas.first().check();
+    await expect(page.locator(".summary")).toContainText(/\d\d:\d\d–\d\d:\d\d/);
     await page.getByLabel("Nombre").fill("Prueba");
+    await page.getByLabel("Teléfono").fill("600 000 000");
     await page.getByLabel("Email").fill("prueba@example.com");
+    await page.getByLabel("Club o pista").fill("Club de prueba, pista 2");
     await page.getByLabel(/Acepto/).check();
     await page.getByRole("button", { name: "Solicitar reserva" }).press("Enter");
     await expect(page.getByRole("status")).toContainText("no se envía nada");
+  });
+
+  test("la API solo acepta localidades conocidas y no expone máquinas", async ({ request }) => {
+    expect((await request.get("/api/disponibilidad?localidad=madrid")).status()).toBe(400);
+    const r = await request.get("/api/disponibilidad?localidad=ondara");
+    expect(r.ok()).toBe(true);
+    const texto = await r.text();
+    expect(texto).not.toMatch(/hp-\d|xavi|marc/i);
+    expect(JSON.parse(texto).dias).toHaveLength(14);
   });
 });
 
@@ -151,5 +169,93 @@ test.describe("menú: cierre automático", () => {
     await expect(nav).toBeVisible();
     await page.evaluate(() => scrollBy(0, 300));
     await expect(nav).toBeHidden();
+  });
+});
+
+test.describe("alquiler por localidad", () => {
+  for (const [id, nombre] of [["denia", "Dénia"], ["ondara", "Ondara"], ["la-xara", "La Xara"], ["pedreguer", "Pedreguer"], ["el-verger", "El Verger"], ["els-poblets", "Els Poblets"]]) {
+    test(`/alquiler/${id}: H1 propio, datos estructurados, enlace a reserva y noindex sin datos locales`, async ({ page }) => {
+      await page.goto(`/alquiler/${id}`);
+      await expect(page.locator("h1")).toContainText(nombre);
+      const ld = JSON.parse((await page.locator('script[type="application/ld+json"]').first().textContent()) ?? "[]");
+      const servicio = ld.find((x: { "@type": string }) => x["@type"] === "Service");
+      expect(servicio.areaServed.name).toBe(nombre);
+      expect(servicio.offers.price).toBe("25.00");
+      expect(servicio.offers.description).toContain("60 pelotas");
+      expect(ld.some((x: { "@type": string }) => x["@type"] === "LocalBusiness")).toBe(false);
+      await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+      await page.getByRole("link", { name: `Reservar en ${nombre}` }).first().click();
+      await expect(page).toHaveURL(/\/alquiler#reservar$/);
+    });
+  }
+
+  test("una localidad inexistente da 404", async ({ page }) => {
+    const res = await page.goto("/alquiler/valencia");
+    expect(res?.status()).toBe(404);
+  });
+
+  test("/alquiler enlaza a todas las localidades", async ({ page }) => {
+    await page.goto("/alquiler");
+    for (const nombre of ["Dénia", "Ondara", "La Xara", "Pedreguer", "El Verger", "Els Poblets"]) {
+      await expect(page.getByRole("link", { name: `Alquiler de máquina de pádel en ${nombre}` })).toBeVisible();
+    }
+  });
+});
+
+test.describe("páginas de contenido", () => {
+  test("soporte publica FAQ estructurada solo con respuestas confirmadas", async ({ page }) => {
+    await page.goto("/soporte");
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faqs = bloques.map((b) => JSON.parse(b)).filter((d) => d["@type"] === "FAQPage");
+    expect(faqs.length).toBe(2);
+    const texto = JSON.stringify(faqs);
+    expect(texto).toContain("25 €");
+    expect(texto).not.toMatch(/pendiente/i);
+    await page.getByText("¿Tengo que ir a recoger la máquina?").click();
+    await expect(page.getByText(/Llevamos la máquina a tu pista/).first()).toBeVisible();
+  });
+
+  for (const ruta of ["/como-funciona", "/entrenamientos", "/clubes", "/soporte", "/contacto"]) {
+    test(`${ruta} tiene migas de pan y no se desborda en horizontal`, async ({ page }) => {
+      await page.goto(ruta);
+      const html = await page.content();
+      expect(html).toContain('"BreadcrumbList"');
+      const desborde = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      expect(desborde).toBeLessThanOrEqual(1);
+    });
+  }
+});
+
+test.describe("formulario de contacto", () => {
+  test("marca los errores y conserva lo escrito", async ({ page }) => {
+    await page.goto("/contacto?asunto=soporte");
+    await expect(page.getByLabel("Asunto")).toHaveValue("soporte");
+    await page.getByLabel("Nombre").fill("Ana");
+    await page.getByLabel("Email").fill("mal");
+    await page.getByRole("button", { name: "Enviar mensaje" }).click();
+    await expect(page.locator(".error--box")).toContainText("Revisa los campos");
+    await expect(page.getByLabel("Email")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByLabel("Nombre")).toHaveValue("Ana");
+  });
+
+  test("sin envío configurado no finge haber enviado", async ({ page }) => {
+    await page.goto("/contacto");
+    await page.getByLabel("Nombre").fill("Ana");
+    await page.getByLabel("Email").fill("ana@correo.com");
+    await page.getByLabel("Mensaje").fill("Quiero reservar una sesión el sábado.");
+    await page.getByLabel(/Acepto que Hammer Padel/).check();
+    await page.getByRole("button", { name: "Enviar mensaje" }).click();
+    await expect(page.getByRole("status")).toContainText(/no se ha enviado|Abrir mi correo/);
+    await expect(page.getByText("Mensaje enviado")).toHaveCount(0);
+  });
+
+  test("funciona sin JavaScript", async ({ browser }) => {
+    const ctx = await browser.newContext({ javaScriptEnabled: false });
+    const page = await ctx.newPage();
+    await page.goto("/clubes");
+    await page.getByLabel("Nombre").fill("Club de prueba");
+    await page.getByLabel("Nombre").press("Enter");
+    await expect(page.getByText("Revisa los campos marcados.")).toBeVisible();
+    await ctx.close();
   });
 });

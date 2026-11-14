@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { alquiler, localidades, navegacion } from "@/content/catalogo";
+import { rutaLocalidad } from "@/content/localidades";
+import { documentosLegales } from "@/content/legal";
 import { Logo } from "./Logo";
 
 export function SiteFooter() {
@@ -12,7 +14,14 @@ export function SiteFooter() {
             <span className="sr-only">Hammer Padel</span>
           </p>
           <p className="foot__soft">
-            Alquiler en {localidades.map((l) => l.nombre).join(", ")} ({alquiler.comarca}).
+            Alquiler en{" "}
+            {localidades.map((l, i) => (
+              <span key={l.id}>
+                {i > 0 ? (i === localidades.length - 1 ? " y " : ", ") : null}
+                <Link href={rutaLocalidad(l.id)}>{l.nombre}</Link>
+              </span>
+            ))}{" "}
+            ({alquiler.comarca}).
           </p>
         </div>
         <nav aria-label="Pie de página">
@@ -20,10 +29,16 @@ export function SiteFooter() {
             {navegacion.map((n) => (
               <li key={n.href}><Link href={n.href}>{n.texto}</Link></li>
             ))}
-            <li><Link href="/legal">Legal</Link></li>
           </ul>
         </nav>
       </div>
+      <nav className="foot__legal" aria-label="Textos legales">
+        <ul>
+          {documentosLegales.map((d) => (
+            <li key={d.href}><Link href={d.href}>{d.titulo}</Link></li>
+          ))}
+        </ul>
+      </nav>
       <p className="foot__proto">
         Prototipo local. Sin pagos, sin reservas reales y sin especificaciones técnicas hasta
         disponer de documentación verificada.

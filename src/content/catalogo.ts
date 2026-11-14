@@ -1,12 +1,19 @@
 /**
  * Fuente única de precios y datos comerciales del prototipo.
  * [CONFIRMADO] por Hammer Padel: precios y localidades de alquiler.
- * [PENDIENTE] tratamiento del IVA: no se indica "IVA incluido" hasta confirmarlo.
+ * [CONFIRMADO] 14/11/2026: precios con IVA incluido; envío de la máquina incluido;
+ * recogebolas 6,99 € de envío por 1 unidad, gratis desde 2; devoluciones con envío a cargo del cliente.
  * Nada de especificaciones técnicas: están pendientes de documentación oficial.
  */
 
-export const IVA_PENDIENTE = true;
-export const NOTA_IVA = "Tratamiento del IVA pendiente de confirmar.";
+export const NOTA_IVA = "IVA incluido.";
+
+/** Envío y devoluciones de la venta (confirmado por Xavi, 14/11/2026). */
+export const envio = {
+  maquina: "Envío incluido.",
+  recogebolas: "Envío 6,99 € por un recogebolas. Gratis a partir de 2.",
+  devoluciones: "En las devoluciones, el envío corre a cargo del cliente.",
+} as const;
 
 export type Producto = {
   id: "maquina" | "recogebolas";
@@ -19,7 +26,7 @@ export type Producto = {
 
 export const maquina: Producto = {
   id: "maquina",
-  /** [CONFIRMADO] 14-11-2026: el modelo se llama Hammer X MAX. */
+  /** [CONFIRMADO] 14/11/2026: el modelo se llama Hammer X MAX. */
   nombre: "Hammer X MAX",
   descripcion: "Máquina lanzapelotas para entrenar pádel de forma autónoma.",
   precioCentimos: 249900,
@@ -43,9 +50,17 @@ export const alquiler = {
   precioTexto: "25 €",
   duracionMinutos: 90,
   duracionTexto: "90 minutos",
-  pelotas: 60,
   pelotasTexto: "60 pelotas incluidas",
-  resumen: "25 € por sesión de 90 minutos con 60 pelotas",
+  resumen: "25 € por sesión de 90 minutos",
+  pelotas: 60,
+  pelotasIncluidas: 60,
+  incluyeTexto: "60 pelotas y 1 recogebolas incluidos",
+  /** [CONFIRMADO] Xavi 14-11-2026: cada sesión incluye 1 recogebolas; un segundo cuesta 2,50 € más por sesión. */
+  recogebolasIncluidos: 1,
+  recogebolasTexto: "1 recogebolas incluido",
+  recogebolasExtraCentimos: 250,
+  recogebolasExtraTexto: "2,50 €",
+  recogebolasExtraFrase: "Si queréis un segundo recogebolas, son 2,50 € más por sesión",
   ruta: "/alquiler",
   comarca: "Marina Alta, Alicante",
 } as const;
@@ -53,17 +68,22 @@ export const alquiler = {
 /** Orden de oeste a este. Ubicaciones exactas pendientes de definir. */
 export const localidades = [
   { id: "pedreguer", nombre: "Pedreguer" },
-  { id: "ondara", nombre: "Ondara" },
   { id: "el-verger", nombre: "El Verger" },
+  { id: "ondara", nombre: "Ondara" },
   { id: "els-poblets", nombre: "Els Poblets" },
   { id: "la-xara", nombre: "La Xara" },
   { id: "denia", nombre: "Dénia" },
 ] as const;
 
-/** «Pedreguer, Ondara, … y Dénia», para textos. El Verger y Els Poblets: Xavi, 14-11-2026. */
-export const localidadesTexto = localidades.map((l) => l.nombre).join(", ").replace(/, ([^,]*)$/, " y $1");
-
 export type LocalidadId = (typeof localidades)[number]["id"];
+
+/** "Pedreguer, El Verger, … y Dénia" */
+export const listaLocalidades = localidades
+  .map((l) => l.nombre)
+  .join(", ")
+  .replace(/, ([^,]*)$/, " y $1");
+/** Alias usado por la portada del prototipo. */
+export const localidadesTexto = listaLocalidades;
 
 export const lemas = {
   principal: "Tu entrenamiento. Tu ritmo. Tu pista.",

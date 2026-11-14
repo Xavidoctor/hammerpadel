@@ -6,7 +6,7 @@ import { ProductSlot } from "@/components/ProductSlot";
 import { ProductVideo } from "@/components/ProductVideo";
 import { Price } from "@/components/Price";
 import { MotionToggle, ScrollCraftStage } from "@/components/ScrollCraftStage";
-import { alquiler, localidades, localidadesTexto, maquina, recogebolas } from "@/content/catalogo";
+import { alquiler, listaLocalidades, localidades, maquina, recogebolas } from "@/content/catalogo";
 import { app } from "@/content/app";
 import { HORIZONTAL, VERTICAL, golpes } from "@/lib/pista";
 import { mediosPista } from "@/content/medios";
@@ -96,7 +96,7 @@ export default function Inicio() {
             </h1>
             <p className="hero-sub">
               Alquila la máquina lanzapelotas por {alquiler.precioTexto} la sesión de 90 minutos en{" "}
-              {localidadesTexto}.
+              {listaLocalidades}.
             </p>
             <div className="cta-row">
               <Link className="btn btn--accent" href={alquiler.ruta}>
@@ -185,7 +185,7 @@ export default function Inicio() {
               <span className="price__num">{alquiler.precioTexto}</span>
               <span className="rent__dur">{alquiler.duracionMinutos} min · {alquiler.pelotasTexto}</span>
             </p>
-            <p className="rent__where">La llevamos a tu pista, también en urbanizaciones y pistas privadas.</p>
+            <p className="rent__where">La llevamos a tu pista, también en urbanizaciones y pistas privadas. Con un recogebolas incluido (el segundo, {alquiler.recogebolasExtraTexto} más).</p>
             <Link className="btn btn--accent" href={alquiler.ruta}>Reservar entrenamiento</Link>
           </div>
         </div>
@@ -262,7 +262,7 @@ export default function Inicio() {
             <p>
               Hammer Padel alquila una máquina lanzapelotas para entrenar pádel de forma autónoma:
               repetir golpes, trabajar situaciones de juego y aprovechar mejor el tiempo en pista.
-              El alquiler de máquina de pádel está disponible en {localidadesTexto}{" "}
+              El alquiler de máquina de pádel está disponible en {listaLocalidades}{" "}
               por {alquiler.resumen}.
             </p>
             <p>

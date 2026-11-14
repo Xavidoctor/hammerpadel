@@ -23,7 +23,7 @@ Estas decisiones de Xavi **prevalecen** sobre cualquier texto de la v0.1 que las
 | 11 | Sin pasarela de pago | Botones "Solicitar compra" y "Solicitar reserva" sin cobro |
 | 12 | No publicar horarios ficticios | El paso 3 pide una franja **preferida**; los huecos reales solo saldrán de reglas reales |
 | 13 | Sin características técnicas no verificadas | Fichas técnicas con "Pendiente de documentación oficial" |
-| 14 | Precios (actualizados 14-11-2026): 2.499 €, 65 €, 20 €/90 min. IVA pendiente | Fuente única `src/content/catalogo.ts`; nota "Tratamiento del IVA pendiente de confirmar" |
+| 14 | Precios (actualizados 14-11-2026): 2.499 €, 65 €, 25 €/90 min con 60 pelotas (cambiado el 14-11-2026). IVA incluido | Fuente única `src/content/catalogo.ts`; nota "Tratamiento del IVA pendiente de confirmar" |
 | 15 | Web funcional, rápida y visualmente excelente | Sin vídeo en la carga inicial; motor diferido; niveles de degradación |
 | 16 | (14-11-2026) El alquiler es la actividad principal; la venta de la máquina y el recogebolas es secundaria | Portada y navegación empiezan por el alquiler: CTA principal "Reservar sesión", escenas Pista → Entrenamiento → Alquiler → Reserva → Compra → Recogebolas |
 | 17 | (14-11-2026) Escena 2 con la máquina en 3D | Modelo procedural propio en Three.js (sin marcas PUSUN/PADELSHOOTER/MAX, logo Hammer), medidas de referencia 76,4 × 53 × 37,3 cm. Render en el propio equipo (Chromium sin GPU), vídeo scrub. Fuente en `produccion/escena-2/` |
@@ -294,6 +294,8 @@ Siempre: un botón visible "Ver sin animación" que fija el nivel Reducido (y se
 ---
 
 ## 8. Sistema de reservas
+
+> **14-11-2026:** el diseño vigente del sistema de reservas (2 repartidores, 5 máquinas, horario 8:00–20:30) está en [`docs/reservas.md`](reservas.md). Lo que sigue es el planteamiento inicial.
 
 ### 8.1 Flujo de usuario (4 pasos) [CONFIRMADO el flujo, PROPUESTA el detalle]
 1. **Ubicación**: 4 botones grandes (Dénia, Ondara, La Xara, Pedreguer).
