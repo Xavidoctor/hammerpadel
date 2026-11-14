@@ -5,7 +5,7 @@ import path from "node:path";
  * Medios reales de la escena 1 (La pista). Basta con dejar los archivos en
  * public/medios/pista/ (los genera produccion/codificar-pista.mjs) y la escena
  * los usa automáticamente al compilar:
- *   - solo foto  -> la foto con el efecto de encendido y avance en CSS
+ *   - solo foto  -> encendido de focos y acercamiento tipo dron en CSS sobre la foto
  *   - foto+vídeo -> el vídeo se controla con el scroll (Scroll Craft scrub)
  *   - nada       -> pista esquemática SVG provisional
  */
@@ -16,8 +16,6 @@ const url = (f: string) => (existe(f) ? `/medios/pista/${f}` : null);
 export function mediosPista() {
   return {
     foto: url("pista.webp"),
-    /** Misma toma con las luces apagadas, alineada con la iluminada. */
-    fotoOscura: url("pista-oscura.webp"),
     /** Las fotos actuales ya muestran la máquina: no se superpone el hueco de producto. */
     fotoIncluyeMaquina: existe("pista.webp"),
     fotoMovil: url("pista-m.webp") ?? url("pista.webp"),

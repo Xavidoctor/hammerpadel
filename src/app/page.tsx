@@ -32,15 +32,17 @@ export default function Inicio() {
         aria-labelledby="t-hero"
       >
         <div data-sc-stage className="stage">
-          {medios.foto && medios.fotoOscura && !medios.video ? (
+          {medios.foto && !medios.video ? (
             <div className="pista__frame">
-              <img className="pista__layer" src={medios.fotoOscura} alt="" fetchPriority="high" />
+              <img className="pista__layer pista__foto" src={medios.foto} width={2400} height={1352}
+                alt="Máquina Hammer Padel en una pista de pádel azul iluminada" fetchPriority="high" />
+              <div className="pista__suelo" aria-hidden="true" />
               {LAMPARAS.map((l, i) => (
                 <span key={i} className="pista__lamp" aria-hidden="true"
-                  style={{ left: `${l.x}%`, top: `${l.y}%`, ["--n" as string]: l.orden }} />
+                  style={{ left: `${l.x}%`, top: `${l.y}%`, ["--n" as string]: l.orden }}>
+                  <span className="pista__beam" />
+                </span>
               ))}
-              <img className="pista__layer pista__layer--lit" src={medios.foto}
-                alt="Máquina Hammer Padel en una pista de pádel azul iluminada" />
             </div>
           ) : medios.foto ? (
             <>
