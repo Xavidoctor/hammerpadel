@@ -378,6 +378,8 @@ html.hp-static .train__lede { position: relative; top: auto; padding-top: var(--
 /* ---- la app */
 .flow--app { background: var(--sc-canvas); border-top: 1px solid var(--sc-hairline); }
 .split--app { grid-template-columns: minmax(0, 6fr) minmax(0, 4fr); }
+.app__datos { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sc-2); }
+.app__datos li { font-size: var(--sc-t-sm); font-weight: 600; color: var(--sc-accent); border: 1px solid color-mix(in oklab, var(--sc-accent) 50%, transparent); border-radius: 999px; padding: 4px 12px; }
 .app__puntos { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sc-4); max-width: 34rem; }
 .app__puntos li { position: relative; padding-left: 1.4rem; color: var(--sc-ink-soft); font-size: var(--sc-t-lg); line-height: 1.4; }
 .app__puntos li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--sc-accent); }

@@ -209,6 +209,7 @@ export default function Inicio() {
           <div className="stack" data-sc-in>
             <p className="kicker">La app {app.nombre}</p>
             <h2 id="t-app" className="display display--md">Prepara el entrenamiento antes de llegar a la pista</h2>
+            <ul className="app__datos">{app.datos.map((d) => <li key={d}>{d}</li>)}</ul>
             <ul className="app__puntos">
               {app.puntos.map((pt) => (
                 <li key={pt.t}><strong>{pt.t}.</strong> {pt.d}</li>
