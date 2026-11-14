@@ -20,7 +20,7 @@ const pasos = [
     d: `Elige localidad, día y hora, con al menos 6 horas de antelación. ${servicio.confirmacionTexto}.`,
   },
   { t: "Te la llevamos", d: `${servicio.entregaTexto}: de club, de urbanización o privada, en ${localidades.map((l) => l.nombre).join(", ")}.` },
-  { t: "Entrena a tu ritmo", d: "Tú golpeas, la máquina repite. Sin esperar a un compañero." },
+  { t: "Entrena a tu ritmo", d: "Con 60 pelotas incluidas. Tú golpeas, la máquina repite, sin esperar a un compañero." },
   { t: "Paga en la pista", d: `${servicio.pagoTexto}. ${servicio.pagoNota}` },
 ];
 
@@ -49,6 +49,7 @@ export default function ComoFunciona() {
           </ol>
           <dl className="spec spec--compact">
             <div><dt>Precio</dt><dd>{alquiler.resumen}</dd></div>
+            <div><dt>Pelotas</dt><dd>{servicio.pelotasTexto}</dd></div>
             <div><dt>Días</dt><dd>{servicio.diasTexto}</dd></div>
             <div><dt>Horario</dt><dd>{servicio.horarioTexto}</dd></div>
             <div><dt>Antelación</dt><dd>{servicio.antelacionTexto}</dd></div>

@@ -26,7 +26,7 @@ test.describe("precios confirmados", () => {
     const html = await page.content();
     expect(html).toContain("2.499 €");
     expect(html).toContain("65 €");
-    expect(html).toContain("20 €");
+    expect(html).toContain("25 €");
     for (const l of ["Dénia", "Ondara", "La Xara", "Pedreguer"]) expect(html).toContain(l);
   });
 });
@@ -160,7 +160,7 @@ test.describe("páginas de contenido", () => {
     const faqs = bloques.map((b) => JSON.parse(b)).filter((d) => d["@type"] === "FAQPage");
     expect(faqs.length).toBe(2);
     const texto = JSON.stringify(faqs);
-    expect(texto).toContain("20 €");
+    expect(texto).toContain("25 €");
     expect(texto).not.toMatch(/pendiente/i);
     await page.getByText("¿Tengo que ir a recoger la máquina?").click();
     await expect(page.getByText(/Llevamos la máquina a tu pista/).first()).toBeVisible();

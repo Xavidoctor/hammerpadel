@@ -4,7 +4,7 @@ import { Price } from "@/components/Price";
 import { ProductJsonLd } from "@/components/ProductJsonLd";
 import { ProductPhoto } from "@/components/ProductPhoto";
 import { ProductVideo } from "@/components/ProductVideo";
-import { lemas, recogebolas } from "@/content/catalogo";
+import { envio, lemas, recogebolas } from "@/content/catalogo";
 
 export const metadata: Metadata = {
   title: "Recogebolas Hammer",
@@ -30,7 +30,7 @@ export default function Recogebolas() {
           <p className="kicker">Accesorio</p>
           <h1 className="display">Recogebolas Hammer</h1>
           <p className="lede">{lemas.recoger} {recogebolas.descripcion}</p>
-          <Price texto={recogebolas.precioTexto} />
+          <Price texto={recogebolas.precioTexto} envio={envio.recogebolas} />
           <div className="cta-row">
             <Link className="btn btn--accent btn--lg" href="/contacto?asunto=compra-recogebolas">Solicitar compra</Link>
             <Link className="btn btn--ghost" href="/comprar">Ver la máquina</Link>

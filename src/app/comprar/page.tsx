@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Price } from "@/components/Price";
 import { ProductJsonLd } from "@/components/ProductJsonLd";
 import { ProductPhoto } from "@/components/ProductPhoto";
-import { alquiler, maquina } from "@/content/catalogo";
+import { alquiler, envio, maquina } from "@/content/catalogo";
 
 export const metadata: Metadata = {
   title: "Comprar máquina lanzapelotas de pádel",
@@ -31,7 +31,7 @@ export default function Comprar() {
             {maquina.descripcion} Pensada para jugadores que quieren entrenar individualmente,
             entrenadores que repiten ejercicios técnicos, clubes y academias.
           </p>
-          <Price texto={maquina.precioTexto} />
+          <Price texto={maquina.precioTexto} envio={envio.maquina} />
           <div className="cta-row">
             <Link className="btn btn--accent btn--lg" href="/contacto?asunto=compra-maquina">Solicitar compra</Link>
             <Link className="btn btn--ghost" href={alquiler.ruta}>Pruébala antes: {alquiler.precioTexto} / 90 min</Link>

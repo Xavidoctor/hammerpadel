@@ -23,7 +23,7 @@ Estas decisiones de Xavi **prevalecen** sobre cualquier texto de la v0.1 que las
 | 11 | Sin pasarela de pago | Botones "Solicitar compra" y "Solicitar reserva" sin cobro |
 | 12 | No publicar horarios ficticios | El paso 3 pide una franja **preferida**; los huecos reales solo saldrán de reglas reales |
 | 13 | Sin características técnicas no verificadas | Fichas técnicas con "Pendiente de documentación oficial" |
-| 14 | Precios (actualizados 14-11-2026): 2.499 €, 65 €, 20 €/90 min. IVA pendiente | Fuente única `src/content/catalogo.ts`; nota "Tratamiento del IVA pendiente de confirmar" |
+| 14 | Precios (actualizados 14-11-2026): 2.499 €, 65 €, 25 €/90 min (alquiler subido a 25 € el 14-11-2026). IVA incluido | Fuente única `src/content/catalogo.ts`; nota "IVA incluido." |
 | 15 | Web funcional, rápida y visualmente excelente | Sin vídeo en la carga inicial; motor diferido; niveles de degradación |
 | 16 | (14-11-2026) El alquiler es la actividad principal; la venta de la máquina y el recogebolas es secundaria | Portada y navegación empiezan por el alquiler: CTA principal "Reservar sesión", escenas Pista → Entrenamiento → Alquiler → Reserva → Compra → Recogebolas |
 
@@ -73,7 +73,7 @@ Dos capas separadas que nunca dependen la una de la otra:
 | `/` | Landing: Scroll World + bloque HTML de conversión + resumen indexable | Estático + mejora progresiva |
 | `/comprar` | Máquina Hammer Padel, 2.499 € | Estático |
 | `/recogebolas` | Recogebolas Hammer, 65 € | Estático |
-| `/alquiler` | Reserva en 4 pasos, 20 € / 90 min | Estático + interactivo (cliente) |
+| `/alquiler` | Reserva en 4 pasos, 25 € / 90 min | Estático + interactivo (cliente) |
 | `/alquiler/[localidad]` | Solo cuando haya contenido real por localidad (ver SEO) | Estático |
 | `/como-funciona` | Funcionamiento de la máquina (con documentación real) | Estático |
 | `/entrenamientos` | Ejercicios y rutinas | Estático (contenido editorial) |
@@ -121,7 +121,7 @@ Mantengo tu historia y la ajusto en tres puntos [PROPUESTA]:
 ### Escena 1 — La pista
 - **Visual**: noche, pista de pádel azul vacía, cristales con reflejos, focos encendiéndose uno a uno. La cámara avanza desde fuera del cristal hacia el centro. Al llegar, la máquina Hammer Padel aparece en el fondo de pista, iluminada como un objeto de exposición.
 - **Texto (HTML)**: HAMMER PADEL · Tu entrenamiento. Tu ritmo. Tu pista.
-- **CTA (HTML)**: Comprar máquina — 2.499 € · Alquilar — 20 € / 90 min
+- **CTA (HTML)**: Comprar máquina — 2.499 € · Alquilar — 25 € / 90 min
 - **Póster/LCP**: still de la pista con la máquina ya visible (para que el primer impacto incluya el producto aunque no cargue el vídeo).
 
 ### Escena 2 — Entrenamiento
@@ -140,7 +140,7 @@ Mantengo tu historia y la ajusto en tres puntos [PROPUESTA]:
 
 ### Escena 5 — Alquiler en la Marina Alta
 - **Visual**: la cámara sube por encima del cristal y se eleva hasta una vista aérea nocturna estilizada de la costa de la Marina Alta; cuatro puntos de luz amarilla se encienden.
-- **Texto**: ¿QUIERES PROBARLA? · ALQUILA HAMMER PADEL · 20 € · 90 MINUTOS · Dénia · Ondara · La Xara · Pedreguer.
+- **Texto**: ¿QUIERES PROBARLA? · ALQUILA HAMMER PADEL · 25 € · 90 MINUTOS · Dénia · Ondara · La Xara · Pedreguer.
 - **Precaución**: es una vista **conceptual**, no un mapa con ubicaciones concretas (las ubicaciones exactas no están definidas y no debemos sugerir instalaciones propias).
 
 ### Escena 6 — Cierre / umbral
@@ -212,10 +212,10 @@ Regla: el amarillo es escaso y significa "acción" (CTA, precio, bola). Si todo 
 | Menos tiempo recogiendo. Más tiempo entrenando. | Claro y útil para el recogebolas. | Mantener. |
 | Tu pista. Tu ritmo. Hammer Padel. | Repite el claim principal desordenado. | Descartar o usar solo como firma de pie de página. |
 | (nuevo) "Sin compañero. Sin excusas." | Corto, agresivo-elegante. | Opción para anuncios o escena 2. |
-| (nuevo) "Pruébala por 20 €." | Baja la barrera de entrada del alquiler. | CTA secundario en escena 5 y en `/comprar` ("¿Dudas? Pruébala por 20 €"). |
+| (nuevo) "Pruébala por 25 €." | Baja la barrera de entrada del alquiler. | CTA secundario en escena 5 y en `/comprar` ("¿Dudas? Pruébala por 25 €"). |
 | (nuevo) "Golpe a golpe." | Refuerza repetición. | Titular de `/entrenamientos`. |
 
-Idea con valor comercial: **el alquiler como prueba de compra**. En `/comprar` un bloque "Pruébala antes: 20 € / 90 min" lleva a `/alquiler`. (Un descuento del alquiler sobre la compra sería una promoción: **no** se implementa sin tu aprobación.)
+Idea con valor comercial: **el alquiler como prueba de compra**. En `/comprar` un bloque "Pruébala antes: 25 € / 90 min" lleva a `/alquiler`. (Un descuento del alquiler sobre la compra sería una promoción: **no** se implementa sin tu aprobación.)
 
 ---
 
@@ -296,7 +296,7 @@ Siempre: un botón visible "Ver sin animación" que fija el nivel Reducido (y se
 1. **Ubicación**: 4 botones grandes (Dénia, Ondara, La Xara, Pedreguer).
 2. **Fecha**: tira de los próximos 14 días como botones (días sin disponibilidad deshabilitados con texto "Completo"). Evita calendarios emergentes poco accesibles en móvil.
 3. **Horario**: lista de franjas de 90 min disponibles.
-4. **Datos y confirmación**: nombre, email, teléfono, aceptación de condiciones → resumen "20 € · 90 min · Dénia · jueves 19/11 · 18:00–19:30" → Reservar (MVP sin pago online; pago en fase 2).
+4. **Datos y confirmación**: nombre, email, teléfono, aceptación de condiciones → resumen "25 € · 90 min · Dénia · jueves 19/11 · 18:00–19:30" → Reservar (MVP sin pago online; pago en fase 2).
 
 Toda la reserva en una sola página, sin animaciones, con el resumen siempre visible.
 
@@ -305,7 +305,7 @@ Toda la reserva en una sola página, sin animaciones, con el resumen siempre vis
 locations           id, slug, name, municipality, region, active, notes
 machines            id, serial, label, status (active|maintenance|retired)
 machine_locations   machine_id, location_id, valid_from, valid_to     -- dónde está cada máquina y cuándo
-rate_plans          id, name, duration_min (90), price_cents (2000), currency, valid_from/to, location_id?  -- precios y duraciones distintas
+rate_plans          id, name, duration_min (90), price_cents (2500), currency, valid_from/to, location_id?  -- precios y duraciones distintas
 availability_rules  id, machine_id|location_id, weekday, start_time, end_time, slot_step_min, valid_from/to
 blackouts           id, machine_id?, location_id?, period tstzrange, reason (maintenance|holiday|manual)
 customers           id, name, email, phone, created_at
