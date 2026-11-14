@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!p) return {};
   return {
     title: p.keyword,
-    description: `Llevamos la máquina lanzapelotas Hammer Padel a tu pista en ${p.nombre}, también en urbanizaciones y pistas privadas. ${alquiler.resumen} con ${alquiler.pelotasIncluidas} pelotas, de lunes a domingo de ${horarioAlquiler.primeraReserva} a ${horarioAlquiler.ultimaReserva}.`,
+    description: `Llevamos la máquina lanzapelotas ${maquina.nombre} a tu pista en ${p.nombre}, también en urbanizaciones y pistas privadas. ${alquiler.resumen}, de lunes a domingo de ${horarioAlquiler.primeraReserva} a ${horarioAlquiler.ultimaReserva}.`,
     alternates: { canonical: rutaLocalidad(p.id) },
     // Sin contenido local propio, la página no se indexa (evita contenido duplicado).
     ...(esIndexable(p) ? {} : { robots: { index: false, follow: true } }),
@@ -55,7 +55,7 @@ export default async function AlquilerLocalidad({ params }: Props) {
       <PageHead kicker={`Alquiler en ${p.nombre}`} titulo={p.keyword}>
         <Price texto={alquiler.precioTexto} sufijo={`/ ${alquiler.duracionTexto}`} />
         <p className="lede">
-          Llevamos la máquina lanzapelotas Hammer Padel a tu pista en {p.nombre}. Tú solo tienes que
+          Llevamos la máquina lanzapelotas {maquina.nombre} a tu pista en {p.nombre}. Tú solo tienes que
           entrenar: sin comprarla, sin esperar a un compañero.
         </p>
         <div className="cta-row">
@@ -78,7 +78,7 @@ export default async function AlquilerLocalidad({ params }: Props) {
         <section className="prose" aria-labelledby="t-datos">
           <h2 id="t-datos">Precio, horario y condiciones</h2>
           <dl className="spec">
-            <div><dt>Precio</dt><dd>{alquiler.resumen}, con {alquiler.pelotasIncluidas} pelotas</dd></div>
+            <div><dt>Precio</dt><dd>{alquiler.resumen}</dd></div>
             <div>
               <dt>Horario</dt>
               <dd>{c.dias}. Reservas con inicio entre las {horarioAlquiler.primeraReserva} y las {horarioAlquiler.ultimaReserva}</dd>
@@ -86,7 +86,7 @@ export default async function AlquilerLocalidad({ params }: Props) {
             <div><dt>Antelación</dt><dd>Reserva con al menos {c.antelacionHoras} horas. {c.confirmacion}.</dd></div>
             <div><dt>Dónde</dt><dd>{c.pistas} de {p.nombre}: nosotros llevamos la máquina</dd></div>
             <div><dt>Entrega</dt><dd>{p.entrega}</dd></div>
-            <div><dt>Pelotas</dt><dd>{alquiler.pelotasIncluidas} pelotas incluidas. {c.pelotaPerdida}.</dd></div>
+            <div><dt>Pelotas</dt><dd>{alquiler.pelotasTexto}. {c.pelotaPerdida}.</dd></div>
             <div><dt>Pago</dt><dd>De momento, en efectivo al empezar la sesión. El pago online llegará más adelante.</dd></div>
           </dl>
         </section>
@@ -120,7 +120,7 @@ export default async function AlquilerLocalidad({ params }: Props) {
           <p>
             ¿No sabes qué trabajar en {alquiler.duracionTexto}? Mira los{" "}
             <Link href="/entrenamientos">ejercicios de entrenamiento con máquina</Link>. Y si después
-            quieres tenerla siempre, la <Link href={maquina.ruta}>máquina Hammer Padel</Link> también se
+            quieres tenerla siempre, la <Link href={maquina.ruta}>{maquina.nombre}</Link> también se
             vende.
           </p>
         </section>

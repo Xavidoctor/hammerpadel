@@ -92,9 +92,10 @@ main { flex: 1; }
   font-family: var(--sc-font-display); font-variation-settings: "wdth" 70; font-weight: 800;
   letter-spacing: 0.02em; text-decoration: none; font-size: 1.15rem; white-space: nowrap;
 }
-.bar__mark { display: inline-flex; align-items: flex-start; gap: 0.45em; color: var(--sc-ink); }
-.bar__logo { display: block; height: 2.15rem; width: auto; }
-.bar__mark span { color: var(--sc-accent); font-size: 0.8rem; letter-spacing: 0.18em; line-height: 1; margin-top: 0.3rem; }
+.bar__mark { display: inline-flex; flex-direction: column; align-items: center; gap: 0.22rem; color: var(--sc-ink); }
+.bar__logo { display: block; height: 1.6rem; width: auto; }
+/* "PADEL" centrado bajo el logo; el padding compensa el espaciado tras la última letra */
+.bar__mark span { color: var(--sc-accent); font-size: 0.62rem; letter-spacing: 0.42em; padding-left: 0.42em; line-height: 1; }
 .logo { display: block; }
 .bar__nav { margin-left: auto; }
 .bar__nav ul { display: flex; gap: var(--sc-5); list-style: none; margin: 0; padding: 0; }
@@ -333,43 +334,34 @@ html.hp-static [data-sc-stagger] > * {
   .cta-row .btn { flex: 1 1 14rem; }
 }
 
-/* ---- escena 2 · entrenamiento (movimiento propio: trazas por scroll) */
-.act--train .stage { background: radial-gradient(90% 70% at 50% 30%, #0c1730, #080a0f 70%); }
-.train__court { position: absolute; inset: 0; }
-.train__court svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.act--train .court__floor { filter: brightness(0.62); }
-.trace path {
-  fill: none; stroke: var(--sc-accent); stroke-width: 3; stroke-linecap: round;
-  stroke-dasharray: 1; opacity: 0.9;
-  stroke-dashoffset: calc(1 - clamp(0, (var(--sc-p, 1) - var(--t0)) / 0.08, 1));
-}
-.trace circle {
-  fill: var(--sc-accent);
-  opacity: clamp(0, (var(--sc-p, 1) - var(--t0) - 0.07) * 20, 1);
-}
-.train__labels { list-style: none; margin: 0; padding: 0; position: absolute; inset: 0; pointer-events: none; }
+/* ---- escena 2 · entrenamiento (máquina 3D, scrub de render propio) */
+.act--train .stage { background: #070a12; }
+.train__poster { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+/* nombre del golpe centrado en la animación */
+.train__ticker { list-style: none; margin: 0; padding: 0; position: absolute; z-index: var(--sc-z-copy); left: 0; right: 0; top: 50%; height: 0; pointer-events: none; }
 .train__label {
-  position: absolute; translate: 14px -130%;
+  position: absolute; left: 50%; top: 0; translate: -50% -50%; text-align: center;
   font-family: var(--sc-font-display); font-variation-settings: "wdth" 75; font-weight: 800; text-transform: uppercase;
-  font-size: var(--sc-t-xl); letter-spacing: var(--sc-track-snug); white-space: nowrap;
-  text-shadow: 0 2px 12px rgb(0 0 0 / 0.6);
+  font-size: clamp(2rem, 1rem + 3vw, 3.6rem); letter-spacing: var(--sc-track-snug); white-space: nowrap; line-height: 1;
+  text-shadow: 0 2px 16px rgb(0 0 0 / 0.7);
 }
-.train__label--l { translate: calc(-100% - 14px) -130%; }
-.train__copy { position: absolute; inset: 0; pointer-events: none; }
+.train__num { color: var(--sc-accent); font-size: 0.45em; vertical-align: 0.9em; margin-right: 0.2em; }
+.train__label { font-size: clamp(2.6rem, 1rem + 5vw, 5rem); }
+.train__copy { position: absolute; inset: 0; pointer-events: none; z-index: var(--sc-z-copy); }
 .train__lede {
   position: absolute; left: var(--sc-gutter); top: clamp(5rem, 14vh, 9rem); margin: 0;
-  font-size: var(--sc-t-xl); max-width: 24ch; line-height: 1.2; font-weight: 500;
+  font-size: var(--sc-t-xl); max-width: 24ch; line-height: 1.2; font-weight: 500; text-shadow: 0 2px 14px rgb(0 0 0 / 0.7);
 }
 .train__punch {
   position: absolute; left: var(--sc-gutter); right: var(--sc-gutter); top: clamp(4rem, 12vh, 8rem);
-  font-size: clamp(2.6rem, 1rem + 6vw, 7rem); max-width: 14ch;
+  font-size: clamp(2.6rem, 1rem + 6vw, 7rem); max-width: 14ch; text-shadow: 0 2px 18px rgb(0 0 0 / 0.6);
 }
 .train__punch em { font-style: normal; color: var(--sc-accent); }
 @media (max-width: 700px), (max-aspect-ratio: 4/5) {
-  .train__label { font-size: var(--sc-t-lg); }
   .train__lede { top: calc(var(--bar-h) + 1.25rem); right: var(--sc-gutter); font-size: var(--sc-t-lg); }
   .train__punch { top: calc(var(--bar-h) + 1.25rem); font-size: clamp(2.4rem, 12vw, 4.2rem); }
 }
+html.hp-static .train__ticker { display: none; }
 html.hp-static .train__punch { position: relative; top: auto; padding-top: 60vh; }
 html.hp-static .train__lede { position: relative; top: auto; padding-top: var(--sc-8); }
 
@@ -383,6 +375,28 @@ html.hp-static .train__lede { position: relative; top: auto; padding-top: var(--
   .split, .split--rev { grid-template-columns: 1fr; }
   .split .slot { max-width: 26rem; }
 }
+/* ---- la app */
+.flow--app { background: var(--sc-canvas); border-top: 1px solid var(--sc-hairline); }
+.split--app { grid-template-columns: minmax(0, 6fr) minmax(0, 4fr); }
+.app__datos { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sc-2); }
+.app__datos li { font-size: var(--sc-t-sm); font-weight: 600; color: var(--sc-accent); border: 1px solid color-mix(in oklab, var(--sc-accent) 50%, transparent); border-radius: 999px; padding: 4px 12px; }
+.app__puntos { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sc-4); max-width: 34rem; }
+.app__puntos li { position: relative; padding-left: 1.4rem; color: var(--sc-ink-soft); font-size: var(--sc-t-lg); line-height: 1.4; }
+.app__puntos li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--sc-accent); }
+.app__puntos strong { color: var(--sc-ink); }
+.app__movil { margin: 0; justify-self: center; display: grid; gap: var(--sc-3); justify-items: center; }
+.app__movil figcaption { font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+.app__pantalla { width: min(17rem, 72vw); aspect-ratio: 9 / 18.5; border-radius: 2.2rem; border: 10px solid #1b1e24;
+  background: linear-gradient(180deg, #10141c, #0a0c11); box-shadow: 0 30px 80px rgb(0 0 0 / 0.55), inset 0 0 0 1px #2a2f38;
+  padding: 1.6rem 1.1rem; display: flex; flex-direction: column; gap: 0.8rem; }
+.app__cab { margin: 0; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sc-accent); }
+.app__tit { margin: 0; font-family: var(--sc-font-display); font-variation-settings: "wdth" 75; font-weight: 800; text-transform: uppercase; font-size: 1.7rem; line-height: 1; }
+.app__pantalla ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.app__pantalla li { display: flex; justify-content: space-between; gap: 0.5rem; padding: 0.65rem 0.75rem; border-radius: 0.7rem; background: #161b24; font-size: 0.8rem; color: var(--sc-ink-soft); }
+.app__pantalla li b { color: var(--sc-ink); font-weight: 600; }
+.app__boton { margin: auto 0 0; text-align: center; padding: 0.8rem; border-radius: 0.8rem; background: var(--sc-accent); color: var(--sc-accent-ink); font-weight: 700; font-size: 0.85rem; }
+@media (max-width: 860px) { .split--app { grid-template-columns: 1fr; } }
+
 .flow--product { background: linear-gradient(180deg, #080a0f, var(--sc-canvas)); }
 .flow--balls { overflow: clip; background: radial-gradient(70% 60% at 30% 80%, color-mix(in oklab, var(--hp-court) 30%, transparent), transparent 70%), var(--sc-canvas); }
 .balls { position: absolute; inset: 0; pointer-events: none; }
@@ -414,7 +428,13 @@ html.hp-static .train__lede { position: relative; top: auto; padding-top: var(--
 .rent__towns { list-style: none; margin: 0 0 var(--sc-2); padding: 0; display: flex; flex-wrap: wrap; gap: var(--sc-2) var(--sc-5); font-size: var(--sc-t-lg); font-weight: 600; }
 .rent__note { position: absolute; right: var(--sc-gutter); bottom: var(--sc-4); margin: 0; font-size: var(--sc-t-xs); color: var(--sc-ink-soft); z-index: var(--sc-z-copy); }
 @media (max-width: 860px) {
-  .rent__copy { right: var(--sc-gutter); max-width: none; }
+  /* en móvil el texto va abajo sobre un degradado, para que el mapa no le pase por encima */
+  .rent__copy { left: 0; right: 0; bottom: 0; max-width: none; gap: var(--sc-3);
+    padding: 5rem var(--sc-gutter) clamp(1.5rem, 5vh, 3rem);
+    background: linear-gradient(to top, #0b0d10 55%, color-mix(in oklab, #0b0d10 80%, transparent) 80%, transparent); }
+  .rent__copy .display--md { font-size: clamp(2.2rem, 10vw, 3.2rem); }
+  .rent__price .price__num { font-size: clamp(3rem, 15vw, 4.4rem); }
+  .rent__towns { font-size: 1.1rem; }
   .rent__note { top: calc(var(--bar-h) + var(--sc-3)); bottom: auto; }
 }
 html.hp-static .rent__copy { position: relative; left: auto; bottom: auto; padding: 40vh var(--sc-gutter) var(--sc-8); }
@@ -516,6 +536,24 @@ html.hp-static .rent__copy { position: relative; left: auto; bottom: auto; paddi
   padding: clamp(1.25rem, 5vw, 3rem); box-sizing: border-box;
 }
 .split .photo--estudio, .product-page .photo--estudio { max-width: 28rem; }
+/* Fotos oficiales recortadas (fondo transparente) sobre un foco suave */
+.photo--recorte img {
+  background: radial-gradient(62% 52% at 50% 46%, #4a4f57 0%, #2a2d33 48%, #17181c 100%);
+  padding: clamp(1rem, 4vw, 2.5rem); box-sizing: border-box;
+}
+.split .photo--recorte, .product-page .photo--recorte { max-width: 28rem; }
+.galeria { display: grid; gap: 0.75rem; max-width: 28rem; }
+.galeria__miniaturas { display: flex; gap: 0.75rem; list-style: none; margin: 0; padding: 0; }
+.galeria__mini { display: grid; gap: 0.35rem; justify-items: center; width: 7.5rem; white-space: nowrap; padding: 0.4rem; border-radius: 12px;
+  background: #1c1d22; border: 1px solid var(--sc-line, #33353c); color: var(--sc-ink-soft); cursor: pointer;
+  font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); }
+.galeria__mini img { width: 100%; height: auto; border-radius: 8px; background: radial-gradient(70% 60% at 50% 46%, #4a4f57, #1c1d22); }
+.galeria__mini[aria-pressed="true"] { border-color: var(--sc-accent, #d4f03c); color: var(--sc-ink); }
+.galeria__mini:focus-visible { outline: 2px solid var(--sc-accent, #d4f03c); outline-offset: 2px; }
+@media (max-width: 860px) {
+  .photo--recorte img { max-height: 58svh; object-fit: contain; }
+  .photo--recorte, .galeria { justify-self: center; }
+}
 @media (max-width: 860px) {
   .photo--estudio img { max-height: 58svh; object-fit: contain; }
   .photo--estudio { justify-self: center; }

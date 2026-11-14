@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Price } from "@/components/Price";
 import { ProductJsonLd } from "@/components/ProductJsonLd";
-import { ProductPhoto } from "@/components/ProductPhoto";
+import { ProductGallery } from "@/components/ProductGallery";
 import { alquiler, maquina } from "@/content/catalogo";
 
 export const metadata: Metadata = {
-  title: "Comprar máquina lanzapelotas de pádel",
-  description: `Máquina lanzapelotas Hammer Padel para entrenar pádel de forma autónoma. ${maquina.precioTexto}.`,
+  title: "Hammer X MAX · Comprar máquina lanzapelotas de pádel",
+  description: `Máquina lanzapelotas ${maquina.nombre} de Hammer Padel para entrenar pádel de forma autónoma. ${maquina.precioTexto}.`,
   alternates: { canonical: "/comprar" },
 };
 
@@ -16,17 +16,18 @@ export default function Comprar() {
     <div className="page">
       <ProductJsonLd p={maquina} />
       <div className="product-page">
-        <ProductPhoto
-          src="/medios/maquina/maquina.webp"
-          alt="Máquina lanzapelotas Hammer Padel, de color negro, con el logotipo Hammer Padel, asa y ruedas"
-          ancho={888}
-          alto={1156}
-          className="photo--estudio"
-        prioridad
+        <ProductGallery
+          className="product-page__fotos"
+          fotos={[
+            { src: "/medios/maquina/maquina.webp", nombre: "Vista frontal", ancho: 888, alto: 1156,
+              alt: "Máquina lanzapelotas Hammer X MAX, negra, con el logotipo HAMMER en la tolva llena de pelotas, la boca de lanzamiento y las ruedas" },
+            { src: "/medios/maquina/maquina-lateral.webp", nombre: "Vista lateral", ancho: 888, alto: 1156,
+              alt: "Hammer X MAX vista desde el otro lado, con la boca de lanzamiento a la derecha, la tolva con ventanas y una rueda" },
+          ]}
         />
         <div className="stack">
           <p className="kicker">Máquina lanzapelotas de pádel</p>
-          <h1 className="display">Hammer Padel</h1>
+          <h1 className="display">{maquina.nombre}</h1>
           <p className="lede">
             {maquina.descripcion} Pensada para jugadores que quieren entrenar individualmente,
             entrenadores que repiten ejercicios técnicos, clubes y academias.
