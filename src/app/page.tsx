@@ -176,6 +176,7 @@ export default function Inicio() {
               <span className="price__num">{alquiler.precioTexto}</span>
               <span className="rent__dur">{alquiler.duracionTexto}</span>
             </p>
+            <p className="rent__where">{alquiler.pelotasTexto}</p>
             <p className="rent__where">Disponible inicialmente en</p>
             <ul className="rent__towns">
               {localidades.map((l) => <li key={l.id}>{l.nombre}</li>)}

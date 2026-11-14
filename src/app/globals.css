@@ -92,9 +92,10 @@ main { flex: 1; }
   font-family: var(--sc-font-display); font-variation-settings: "wdth" 70; font-weight: 800;
   letter-spacing: 0.02em; text-decoration: none; font-size: 1.15rem; white-space: nowrap;
 }
-.bar__mark { display: inline-flex; align-items: flex-start; gap: 0.45em; color: var(--sc-ink); }
-.bar__logo { display: block; height: 2.15rem; width: auto; }
-.bar__mark span { color: var(--sc-accent); font-size: 0.8rem; letter-spacing: 0.18em; line-height: 1; margin-top: 0.3rem; }
+.bar__mark { display: inline-flex; flex-direction: column; align-items: center; gap: 0.22rem; color: var(--sc-ink); }
+.bar__logo { display: block; height: 1.6rem; width: auto; }
+/* "PADEL" centrado bajo el logo; el padding compensa el espaciado tras la última letra */
+.bar__mark span { color: var(--sc-accent); font-size: 0.62rem; letter-spacing: 0.42em; padding-left: 0.42em; line-height: 1; }
 .logo { display: block; }
 .bar__nav { margin-left: auto; }
 .bar__nav ul { display: flex; gap: var(--sc-5); list-style: none; margin: 0; padding: 0; }

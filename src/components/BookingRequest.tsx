@@ -181,6 +181,7 @@ export function BookingRequest() {
           <div><dt>Fecha</dt><dd>{fecha ? fechaLarga : "Sin elegir"}</dd></div>
           <div><dt>Horario</dt><dd>{FRANJAS.find((x) => x.id === franja)?.texto ?? "Sin elegir"}</dd></div>
           <div><dt>Duración</dt><dd>{alquiler.duracionTexto}</dd></div>
+          <div><dt>Pelotas</dt><dd>{alquiler.pelotasTexto}</dd></div>
           <div><dt>Precio</dt><dd>{alquiler.precioTexto}</dd></div>
         </dl>
       </aside>

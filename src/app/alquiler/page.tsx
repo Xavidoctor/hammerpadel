@@ -14,7 +14,7 @@ export default function Alquiler() {
   return (
     <div className="page">
       <PageHead kicker="Alquiler" titulo="Alquila Hammer Padel">
-        <Price texto={alquiler.precioTexto} sufijo={`/ ${alquiler.duracionTexto}`} />
+        <Price texto={alquiler.precioTexto} sufijo={`/ ${alquiler.duracionTexto} · ${alquiler.pelotasTexto}`} />
         <p className="lede">
           Entrena sin comprar la máquina, o pruébala antes de decidir. Disponible inicialmente en{" "}
           {localidades.map((l) => l.nombre).join(", ")}.
