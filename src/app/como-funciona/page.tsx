@@ -1,40 +1,124 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CtaAlquiler } from "@/components/CtaAlquiler";
+import { BreadcrumbJsonLd } from "@/components/JsonLd";
 import { PageHead } from "@/components/PageHead";
-import { alquiler } from "@/content/catalogo";
+import { ProductPhoto } from "@/components/ProductPhoto";
+import { ProductVideo } from "@/components/ProductVideo";
+import { alquiler, lemas, localidades, maquina, recogebolas } from "@/content/catalogo";
+import { servicio } from "@/content/servicio";
 
 export const metadata: Metadata = {
-  title: "Cómo funciona",
-  description: "Cómo funciona entrenar con la máquina lanzapelotas Hammer Padel y cómo funciona el alquiler.",
+  title: "Cómo funciona el alquiler de máquina lanzapelotas de pádel",
+  description: `Reserva, te llevamos la máquina Hammer Padel a tu pista y entrenas ${alquiler.duracionTexto} por ${alquiler.precioTexto}. ${localidades.map((l) => l.nombre).join(", ")}.`,
   alternates: { canonical: "/como-funciona" },
 };
+
+const pasos = [
+  {
+    t: "Reserva tu sesión",
+    d: `Elige localidad, día y hora, con al menos 6 horas de antelación. ${servicio.confirmacionTexto}.`,
+  },
+  { t: "Te la llevamos", d: `${servicio.entregaTexto}: de club, de urbanización o privada, en ${localidades.map((l) => l.nombre).join(", ")}.` },
+  { t: "Entrena a tu ritmo", d: "Con 60 pelotas incluidas. Tú golpeas, la máquina repite, sin esperar a un compañero." },
+  { t: "Paga en la pista", d: `${servicio.pagoTexto}. ${servicio.pagoNota}` },
+];
 
 export default function ComoFunciona() {
   return (
     <div className="page">
+      <BreadcrumbJsonLd nombre="Cómo funciona" ruta="/como-funciona" />
       <PageHead kicker="Cómo funciona" titulo="Tú golpeas. Ella repite.">
-        <p className="lede">Entrenamiento autónomo: la máquina lanza, tú repites el golpe hasta dominarlo.</p>
-      </PageHead>
-      <div className="page__body">
-        <p className="notice">
-          <strong>Pendiente.</strong> El funcionamiento detallado de la máquina (modos, ajustes, carga,
-          batería) se publicará con la documentación técnica oficial. No mostramos datos sin verificar.
+        <p className="lede">
+          Alquila la máquina lanzapelotas Hammer Padel por sesiones de {alquiler.duracionTexto}: la
+          llevamos a tu pista y tú solo te preocupas de entrenar.
         </p>
-        <div className="prose">
-          <h2>Entrenar con máquina</h2>
-          <ol className="cards">
-            <li className="card"><h3>1. Prepara la sesión</h3><p>Coloca la máquina en tu pista y decide qué golpe vas a trabajar.</p></li>
-            <li className="card"><h3>2. Repite</h3><p>Golpe tras golpe, sin esperar a un compañero.</p></li>
-            <li className="card"><h3>3. Recoge rápido</h3><p>Con el recogebolas Hammer vuelves antes a entrenar.</p></li>
+      </PageHead>
+
+      <div className="page__body sections">
+        <section aria-labelledby="t-alquiler">
+          <h2 id="t-alquiler" className="section-title">El alquiler, paso a paso</h2>
+          <ol className="steps steps--cards">
+            {pasos.map((p, i) => (
+              <li key={p.t}>
+                <span aria-hidden="true">{i + 1}</span>
+                <h3>{p.t}</h3>
+                <p>{p.d}</p>
+              </li>
+            ))}
           </ol>
-          <h2>Cómo funciona el alquiler</h2>
-          <p>
-            Eliges localidad, fecha y horario, y reservas una sesión de {alquiler.duracionTexto} por{" "}
-            {alquiler.precioTexto}. La entrega y las pistas donde usarla están pendientes de definir.
+          <dl className="spec spec--compact">
+            <div><dt>Precio</dt><dd>{alquiler.resumen}</dd></div>
+            <div><dt>Pelotas</dt><dd>{servicio.pelotasTexto}</dd></div>
+            <div><dt>Días</dt><dd>{servicio.diasTexto}</dd></div>
+            <div><dt>Horario</dt><dd>{servicio.horarioTexto}</dd></div>
+            <div><dt>Antelación</dt><dd>{servicio.antelacionTexto}</dd></div>
+            <div><dt>Confirmación</dt><dd>{servicio.confirmacionTexto}</dd></div>
+            <div><dt>Pistas</dt><dd>{servicio.pistasTexto}</dd></div>
+            <div><dt>Dónde</dt><dd>{localidades.map((l) => l.nombre).join(", ")} ({alquiler.comarca})</dd></div>
+            <div><dt>Pago</dt><dd>En efectivo, en la sesión</dd></div>
+            <div><dt>Pelotas perdidas</dt><dd>{servicio.pelotaPerdidaTexto}</dd></div>
+            <div><dt>Cancelaciones</dt><dd className="pending">Pendiente de confirmar</dd></div>
+          </dl>
+          <p className="notice">
+            <strong>A tener en cuenta.</strong> La pista la pones tú: puede ser de club, de urbanización o
+            privada. {servicio.canalTexto}.
           </p>
-          <p><Link href="/alquiler">Ir a la reserva</Link></p>
-        </div>
+        </section>
+
+        <section aria-labelledby="t-entrenar" className="split split--content">
+          <ProductPhoto
+            src="/medios/maquina/maquina.webp"
+            alt="Máquina lanzapelotas Hammer Padel, de color negro, con asa y ruedas"
+            ancho={888}
+            alto={1156}
+            className="photo--estudio"
+          />
+          <div className="stack">
+            <h2 id="t-entrenar" className="section-title">Entrenar con máquina</h2>
+            <p className="lede">{lemas.entrenar}</p>
+            <div className="prose">
+              <p>
+                Con una máquina lanzapelotas trabajas un golpe concreto muchas veces seguidas. La repetición
+                fija el gesto, y como no dependes de un compañero, aprovechas cada minuto de pista.
+              </p>
+              <ul>
+                <li><strong>Jugadores</strong> que quieren entrenar solos y a su ritmo.</li>
+                <li><strong>Entrenadores</strong> que necesitan repetir ejercicios técnicos sin lanzar a mano.</li>
+                <li><strong>Quien piensa comprar</strong> y quiere probar la máquina antes.</li>
+              </ul>
+              <p><Link href="/entrenamientos">Ideas de ejercicios por golpe</Link></p>
+            </div>
+            <p className="notice">
+              <strong>Pendiente.</strong> Modos, ajustes, carga de pelotas y batería se explicarán con la
+              documentación técnica oficial. No publicamos datos sin verificar.
+            </p>
+          </div>
+        </section>
+
+        <section aria-labelledby="t-recoger" className="uso uso--flush">
+          <h2 id="t-recoger" className="section-title">Y al acabar la serie, recoge en segundos</h2>
+          <div className="uso__grid">
+            <ProductVideo
+              base="/medios/recogebolas/recogebolas"
+              descripcion="Recogebolas Hammer recogiendo pelotas en pista y vaciándolas en la máquina"
+            />
+            <div className="stack">
+              <p className="lede">{lemas.recoger}</p>
+              <p className="prose">
+                El recogebolas Hammer recoge las pelotas del suelo sin agacharte y las vacía directamente
+                en la máquina. Se vende por separado por {recogebolas.precioTexto}.
+              </p>
+              <div className="cta-row">
+                <Link className="btn btn--ghost" href={recogebolas.ruta}>Ver el recogebolas</Link>
+                <Link className="btn btn--ghost" href={maquina.ruta}>Comprar la máquina · {maquina.precioTexto}</Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
+
+      <CtaAlquiler />
     </div>
   );
 }
