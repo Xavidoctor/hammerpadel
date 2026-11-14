@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { alquiler, localidades, navegacion } from "@/content/catalogo";
+import { rutaLocalidad } from "@/content/localidades";
 import { Logo } from "./Logo";
 
 export function SiteFooter() {
@@ -12,7 +13,14 @@ export function SiteFooter() {
             <span className="sr-only">Hammer Padel</span>
           </p>
           <p className="foot__soft">
-            Alquiler en {localidades.map((l) => l.nombre).join(", ")} ({alquiler.comarca}).
+            Alquiler en{" "}
+            {localidades.map((l, i) => (
+              <span key={l.id}>
+                {i > 0 ? (i === localidades.length - 1 ? " y " : ", ") : null}
+                <Link href={rutaLocalidad(l.id)}>{l.nombre}</Link>
+              </span>
+            ))}{" "}
+            ({alquiler.comarca}).
           </p>
         </div>
         <nav aria-label="Pie de página">
