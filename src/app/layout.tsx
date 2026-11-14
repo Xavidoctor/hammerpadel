@@ -33,7 +33,7 @@ export const viewport: Viewport = {
 // en vez de un script en línea, que algunos alojamientos bloquean.
 const sinJs = `
 .world [data-sc-act]{--sc-p:1!important}
-.pista__frame{--t:1!important;animation:none!important}
+.pista__frame{--t:1!important}
 [data-sc-cue],[data-sc-in],[data-sc-stagger]>*{opacity:1!important;transform:none!important}
 .train__punch{position:relative!important;top:auto!important;padding-top:60vh}
 .train__lede{position:relative!important;top:auto!important;padding-top:var(--sc-8)}

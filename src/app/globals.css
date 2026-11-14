@@ -222,24 +222,23 @@ html.hp-static [data-sc-stagger] > * {
   filter: brightness(calc(0.35 + var(--sc-p, 1) * 0.65)) saturate(calc(0.7 + var(--sc-p, 1) * 0.3));
   will-change: transform, filter;
 }
-/* Foto iluminada única, dos movimientos:
-   1) encendido (--t, por tiempo al cargar): la pista parte apagada (foto 1) y
-      los focos se encienden por parejas, de fondo a primer plano, con destello
-      y haz de luz. Así nadie aterriza en una pantalla negra.
-   2) dron (--sc-p, por scroll): la cámara baja, se nivela y avanza hacia la
-      máquina con una curva suave (smoothstep), sin cortes.
-   Todo en transform/filter (GPU). Sin JS, sin animación o con movimiento
-   reducido, --t vale 1: pista encendida desde el principio. */
+/* Escena 1: la web abre con la pista apagada (foto 1) y el scroll la enciende.
+   Un solo valor de scroll (--sc-p) mueve dos cosas:
+   1) encendido (--t, primera mitad): los focos se encienden por parejas, de
+      fondo a primer plano, con destello y haz de luz;
+   2) dron (--e): la cámara baja, se nivela y avanza hacia la máquina con una
+      curva suave (smoothstep), sin cortes.
+   Todo en transform/filter/opacity (GPU). Sin JS o sin animación, --sc-p vale
+   1 y la pista se ve encendida; con movimiento reducido, también. */
 @property --t { syntax: "<number>"; inherits: true; initial-value: 1; }
-@keyframes hp-luces { from { --t: 0; } to { --t: 1; } }
-html:not(.hp-static) .pista__frame { --t: 0; }
-html.sc-ready:not(.hp-static) .pista__frame { animation: hp-luces 3.2s linear 0.3s both; }
 @media (prefers-reduced-motion: reduce) {
-  html:not(.hp-static) .pista__frame { --t: 1; animation: none; }
+  html:not(.hp-static) .pista__frame { --t: 1 !important; }
 }
 .pista__frame {
   --q: var(--sc-p, 1);
-  --e: calc(var(--q) * var(--q) * (3 - 2 * var(--q)));
+  --t: clamp(0, var(--q) * 2, 1);
+  --d: clamp(0, (var(--q) - 0.15) / 0.85, 1);
+  --e: calc(var(--d) * var(--d) * (3 - 2 * var(--d)));
   --l2: clamp(0, (var(--t) - 0.58) * 9, 1);
   position: absolute; left: 50%; top: 50%;
   width: max(100%, 177.6svh); aspect-ratio: 1671 / 941;
