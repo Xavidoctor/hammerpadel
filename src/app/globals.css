@@ -337,14 +337,16 @@ html.hp-static [data-sc-stagger] > * {
 /* ---- escena 2 · entrenamiento (máquina 3D, scrub de render propio) */
 .act--train .stage { background: #070a12; }
 .train__poster { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
-.train__ticker { list-style: none; margin: 0; padding: 0; position: absolute; z-index: var(--sc-z-copy); left: var(--sc-gutter); bottom: clamp(2.5rem, 9vh, 6rem); width: min(30rem, calc(100% - 2 * var(--sc-gutter))); height: 4rem; pointer-events: none; }
+/* nombre del golpe centrado en la animación */
+.train__ticker { list-style: none; margin: 0; padding: 0; position: absolute; z-index: var(--sc-z-copy); left: 0; right: 0; top: 50%; height: 0; pointer-events: none; }
 .train__label {
-  position: absolute; left: 0; bottom: 0;
+  position: absolute; left: 50%; top: 0; translate: -50% -50%; text-align: center;
   font-family: var(--sc-font-display); font-variation-settings: "wdth" 75; font-weight: 800; text-transform: uppercase;
   font-size: clamp(2rem, 1rem + 3vw, 3.6rem); letter-spacing: var(--sc-track-snug); white-space: nowrap; line-height: 1;
   text-shadow: 0 2px 16px rgb(0 0 0 / 0.7);
 }
 .train__num { color: var(--sc-accent); font-size: 0.45em; vertical-align: 0.9em; margin-right: 0.2em; }
+.train__label { font-size: clamp(2.6rem, 1rem + 5vw, 5rem); }
 .train__copy { position: absolute; inset: 0; pointer-events: none; z-index: var(--sc-z-copy); }
 .train__lede {
   position: absolute; left: var(--sc-gutter); top: clamp(5rem, 14vh, 9rem); margin: 0;

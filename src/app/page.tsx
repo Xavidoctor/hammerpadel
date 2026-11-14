@@ -139,7 +139,7 @@ export default function Inicio() {
           </ul>
           <div className="train__copy">
             <h2 id="t-train" className="sr-only">Entrenamiento autónomo</h2>
-            <p className="train__lede" data-sc-cue="0 0.22 0">
+            <p className="train__lede" data-sc-cue="0 0.7 0 0.08">
               Una máquina. Tu lado de la pista. Cada bola donde la necesitas.
             </p>
             <ul className="sr-only">
