@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { AppMockup } from "@/components/AppMockup";
 import { CourtSvg } from "@/components/CourtSvg";
 import { ProductPhoto } from "@/components/ProductPhoto";
 import { ProductSlot } from "@/components/ProductSlot";
 import { ProductVideo } from "@/components/ProductVideo";
 import { Price } from "@/components/Price";
 import { MotionToggle, ScrollCraftStage } from "@/components/ScrollCraftStage";
-import { alquiler, lemas, listaLocalidades, localidades, maquina, recogebolas } from "@/content/catalogo";
+import { alquiler, listaLocalidades, localidades, maquina, recogebolas } from "@/content/catalogo";
 import { app } from "@/content/app";
 import { HORIZONTAL, VERTICAL, golpes } from "@/lib/pista";
 import { mediosPista } from "@/content/medios";
@@ -178,7 +179,7 @@ export default function Inicio() {
               {localidades.map((l) => <li key={l.id}>{l.nombre}</li>)}
             </ul>
           </div>
-          <div className="rent__copy" data-sc-cue="0.7 1 0.12 0.04">
+          <div className="rent__copy" data-sc-cue="0.7">
             <p className="kicker">Entrena sin comprarla</p>
             <p className="rent__price">
               <span className="price__num">{alquiler.precioTexto}</span>
@@ -190,20 +191,6 @@ export default function Inicio() {
         </div>
       </section>
 
-      {/* ESCENA 4 · RESERVA */}
-      <section id="reservar" className="flow flow--close" aria-labelledby="t-close">
-        <div className="wrap close">
-          <h2 id="t-close" className="display">Reservar entrenamiento</h2>
-          <ol className="steps" data-sc-stagger="80">
-            <li><span>1</span>Elige localidad</li>
-            <li><span>2</span>Elige fecha</li>
-            <li><span>3</span>Elige horario</li>
-            <li><span>4</span>Reserva</li>
-          </ol>
-          <p className="lede">{alquiler.resumen}, {alquiler.pelotasTexto}. {lemas.repetir}</p>
-          <Link className="btn btn--accent btn--lg" href={alquiler.ruta}>Empezar reserva</Link>
-        </div>
-      </section>
 
       {/* LA APP: punto fuerte de la máquina (ilustración neutra hasta tener capturas reales) */}
       <section id="app" className="flow flow--app" aria-labelledby="t-app">
@@ -218,20 +205,7 @@ export default function Inicio() {
               ))}
             </ul>
           </div>
-          <figure className="app__movil" aria-hidden="true">
-            <div className="app__pantalla">
-              <p className="app__cab">{app.nombre}</p>
-              <p className="app__tit">Mi sesión</p>
-              <ul>
-                <li><span>Jugadores</span><b>1 · 2 · 3 · 4</b></li>
-                <li><span>Ejercicio 1</span><b>Derecha</b></li>
-                <li><span>Ejercicio 2</span><b>Revés</b></li>
-                <li><span>Ejercicio 3</span><b>Bandeja</b></li>
-              </ul>
-              <p className="app__boton">Lista para la pista</p>
-            </div>
-            <figcaption>Ilustración. No es una captura de la app.</figcaption>
-          </figure>
+          <AppMockup />
         </div>
       </section>
 
