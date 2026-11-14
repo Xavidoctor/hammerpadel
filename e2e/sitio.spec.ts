@@ -103,24 +103,42 @@ test.describe("la landing nunca bloquea la reserva ni la compra", () => {
   });
 });
 
-test.describe("solicitud de alquiler (prototipo)", () => {
-  test("valida y no muestra horarios como disponibles", async ({ page }) => {
+test.describe("reserva de alquiler (prototipo)", () => {
+  test("valida los pasos", async ({ page }) => {
     await page.goto("/alquiler");
-    await expect(page.getByText(/no mostramos horarios/)).toBeVisible();
+    await expect(page.getByText(/todavía no\s+se guardan reservas/)).toBeVisible();
     await page.getByRole("button", { name: "Solicitar reserva" }).click();
     await expect(page.locator("form [role=alert]")).toContainText("Elige una localidad");
   });
 
-  test("se completa con teclado y no envía nada", async ({ page }) => {
+  test("muestra horas reales de 90 min dentro del horario y no envía nada", async ({ page }) => {
     await page.goto("/alquiler");
     await page.getByLabel("Dénia").check();
-    await page.locator('input[name="fecha"]').first().check();
-    await page.getByLabel(/Tarde/).check();
+    const dia = page.locator('input[name="fecha"]:not([disabled])').first();
+    await expect(dia).toBeVisible();
+    await dia.check();
+    const horas = page.locator('input[name="hora"]');
+    await expect(horas.first()).toBeAttached();
+    const valores = await horas.evaluateAll((els) => els.map((e) => (e as HTMLInputElement).value));
+    expect(valores.every((v) => v >= "08:00" && v <= "20:30")).toBe(true);
+    await horas.first().check();
+    await expect(page.locator(".summary")).toContainText(/\d\d:\d\d–\d\d:\d\d/);
     await page.getByLabel("Nombre").fill("Prueba");
+    await page.getByLabel("Teléfono").fill("600 000 000");
     await page.getByLabel("Email").fill("prueba@example.com");
+    await page.getByLabel("Club o pista").fill("Club de prueba, pista 2");
     await page.getByLabel(/Acepto/).check();
     await page.getByRole("button", { name: "Solicitar reserva" }).press("Enter");
     await expect(page.getByRole("status")).toContainText("no se envía nada");
+  });
+
+  test("la API solo acepta localidades conocidas y no expone máquinas", async ({ request }) => {
+    expect((await request.get("/api/disponibilidad?localidad=madrid")).status()).toBe(400);
+    const r = await request.get("/api/disponibilidad?localidad=ondara");
+    expect(r.ok()).toBe(true);
+    const texto = await r.text();
+    expect(texto).not.toMatch(/hp-\d|xavi|marc/i);
+    expect(JSON.parse(texto).dias).toHaveLength(14);
   });
 });
 
