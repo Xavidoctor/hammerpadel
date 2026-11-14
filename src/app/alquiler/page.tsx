@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import { BookingRequest } from "@/components/BookingRequest";
 import { PageHead } from "@/components/PageHead";
 import { Price } from "@/components/Price";
-import { alquiler, localidades } from "@/content/catalogo";
+import { alquiler, localidades, localidadesTexto } from "@/content/catalogo";
 
 export const metadata: Metadata = {
   title: "Alquiler de máquina lanzapelotas de pádel en la Marina Alta",
-  description: `Alquila la máquina Hammer Padel por ${alquiler.resumen} en Dénia, Ondara, La Xara y Pedreguer.`,
+  description: `Alquila la máquina Hammer Padel por ${alquiler.resumen} en ${localidadesTexto}.`,
   alternates: { canonical: "/alquiler" },
 };
 

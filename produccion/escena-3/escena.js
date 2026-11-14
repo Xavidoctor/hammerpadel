@@ -21,13 +21,15 @@ import { texturaCesped, texturaRed } from "../escena-2/escena.js";
 
 // Orden de encendido = orden de la ruta. Coordenadas aproximadas (centro urbano).
 export const PUEBLOS = [
-  { nombre: "Pedreguer", lon: 0.0342, lat: 38.7931, p: 0.05 },
-  { nombre: "Ondara", lon: 0.0172, lat: 38.8281, p: 0.11 },
-  { nombre: "La Xara", lon: 0.0727, lat: 38.8217, p: 0.17 },
-  { nombre: "Dénia", lon: 0.1057, lat: 38.8408, p: 0.23 },
+  { nombre: "Els Poblets", lon: 0.0221, lat: 38.8578, p: 0.04, lado: "der" },
+  { nombre: "El Verger", lon: 0.011, lat: 38.846, p: 0.08, lado: "izq" },
+  { nombre: "Ondara", lon: 0.0172, lat: 38.8281, p: 0.12, lado: "izq" },
+  { nombre: "Pedreguer", lon: 0.0342, lat: 38.7931, p: 0.16, lado: "der" },
+  { nombre: "La Xara", lon: 0.0727, lat: 38.8217, p: 0.2, lado: "abajo" },
+  { nombre: "Dénia", lon: 0.1057, lat: 38.8408, p: 0.24, lado: "der" },
 ];
 const ACENTO = 0xd7ff1e;
-const DENIA = PUEBLOS[3];
+const DENIA = PUEBLOS[PUEBLOS.length - 1];
 const M_LON = Math.cos((DENIA.lat * Math.PI) / 180) * 111320, M_LAT = 110540;
 const aXZ = (lon, lat) => [(lon - DENIA.lon) * M_LON, -(lat - DENIA.lat) * M_LAT + 10];
 
@@ -104,8 +106,8 @@ export async function montar(canvas, w, h) {
     const hm = new THREE.SpriteMaterial({ map: halo, color: ACENTO, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false });
     const hs = new THREE.Sprite(hm); hs.position.set(pos.x, 80, pos.z); hs.renderOrder = 9; mapa.add(hs);
     const et = etiqueta(q.nombre); et.position.set(pos.x, 100, pos.z); mapa.add(et);
-    // etiqueta a la derecha salvo Ondara (a la izquierda, o encima en vertical, para no pisar La Xara)
-    if (i === 1) et.center.set(vertical ? 0.5 : 1.08, vertical ? -0.35 : 0.5); else et.center.set(-0.08, 0.5);
+    // cada etiqueta a un lado para que no se pisen
+    if (q.lado === "izq") et.center.set(1.08, 0.5); else if (q.lado === "abajo") et.center.set(0.5, 1.25); else et.center.set(-0.08, 0.5);
     return { q, d, dm, hs, hm, et };
   });
 
@@ -178,13 +180,13 @@ export async function montar(canvas, w, h) {
 
   // ================= CÁMARA =================
   const cam = new THREE.PerspectiveCamera(vertical ? 58 : 42, w / h, 0.05, 300000);
-  const centro = puntos.reduce((a, b) => a.clone().add(b), new THREE.Vector3()).multiplyScalar(0.25).setY(0);
-  const DIST0 = vertical ? 38000 : 17000;          // vista cenital: los cuatro pueblos y la costa
+  const centro = puntos.reduce((a, b) => a.clone().add(b), new THREE.Vector3()).multiplyScalar(1 / puntos.length).setY(0);
+  const DIST0 = vertical ? 33000 : 17000;          // vista cenital: los cuatro pueblos y la costa
   const final = vertical
-    ? { t: new THREE.Vector3(-0.5, -0.1, 3.4), d: 5.2, e: 0.46, az: 0.75 }
+    ? { t: new THREE.Vector3(-2.6, 0.2, 6.2), d: 6.2, e: 0.5, az: 0.9 }
     : { t: new THREE.Vector3(-1.4, 0.45, 3.6), d: 5.2, e: 0.3, az: 1.1 };
   const T_BAJA = 0.3, T_LLEGA = 0.64;
-  const pose = (p) => {
+  const poseRaw = (p) => {
     let t, d, e, az;
     if (p < T_BAJA) {
       const s = p / T_BAJA;
@@ -198,8 +200,27 @@ export async function montar(canvas, w, h) {
       e = mezcla(1.5, final.e, Math.pow(s, 1.6)); az = mezcla(0.05, final.az, s);
     } else {
       const s = suave((p - T_LLEGA) / (1 - T_LLEGA));
-      t = final.t.clone().lerp(DESTINO.clone().setY(final.t.y).add(new THREE.Vector3(vertical ? 0 : -0.9, 0, 0.3)), s); d = final.d * mezcla(1, 0.8, s); e = final.e - 0.05 * s; az = final.az - 0.3 * s;
+      if (vertical) {
+        // en vertical la cámara sigue a la máquina mientras entra, para que no salga de plano
+        const mp = camino.getPointAt(tramo(p, 0.66, 0.9)).add(new THREE.Vector3(0, 0.25, 0));
+        t = final.t.clone().lerp(mp, tramo(p, T_LLEGA, 0.72)); d = final.d * mezcla(1, 0.8, s); e = final.e - 0.06 * s; az = final.az - 0.35 * s;
+      } else {
+        t = final.t.clone().lerp(DESTINO.clone().setY(final.t.y).add(new THREE.Vector3(-0.9, 0, 0.3)), s); d = final.d * mezcla(1, 0.8, s); e = final.e - 0.05 * s; az = final.az - 0.3 * s;
+      }
     }
+    return { t, d, e, az };
+  };
+
+  // trayectoria aún más suave: cada fotograma promedia la pose de sus vecinos (núcleo gaussiano)
+  // en espacio de parámetros (punto de mira, log de la distancia, elevación, azimut)
+  const poseSuave = (p) => {
+    let sw = 0; const acc = { t: new THREE.Vector3(), ld: 0, e: 0, az: 0 };
+    for (let k = -12; k <= 12; k++) {
+      const q = cl(p + k * 0.004), wgt = Math.exp(-((k / 6) ** 2));
+      const r0 = poseRaw(q);
+      acc.t.addScaledVector(r0.t, wgt); acc.ld += Math.log(r0.d) * wgt; acc.e += r0.e * wgt; acc.az += r0.az * wgt; sw += wgt;
+    }
+    const t = acc.t.multiplyScalar(1 / sw), d = Math.exp(acc.ld / sw), e = acc.e / sw, az = acc.az / sw;
     const pos = new THREE.Vector3(Math.sin(az) * Math.cos(e) * d, Math.sin(e) * d, Math.cos(az) * Math.cos(e) * d).add(t);
     return { pos, t, d };
   };
@@ -213,7 +234,7 @@ export async function montar(canvas, w, h) {
 
   function fotograma(p) {
     p = cl(p);
-    const { pos, t, d } = pose(p);
+    const { pos, t, d } = poseSuave(p);
     cam.position.copy(pos); cam.lookAt(t);
     cam.near = Math.max(0.05, d * 0.002); cam.far = Math.max(400, d * 20); cam.updateProjectionMatrix();
 
@@ -221,10 +242,10 @@ export async function montar(canvas, w, h) {
     const fm = cl((Math.log(d) - Math.log(500)) / (Math.log(3000) - Math.log(500)));
     for (const [m, op] of fundibles) m.opacity = op * fm;
     mapa.visible = fm > 0.001;
-    const escalaTxt = d * (vertical ? 0.075 : 0.05);
+    const escalaTxt = d * (vertical ? 0.036 : 0.05);
     marTxt.material.opacity = fm * 0.9; marTxt.scale.set(escalaTxt * 0.8 * marTxt.userData.aspecto, escalaTxt * 0.8, 1);
     rutaMat.opacity = 0.95 * fm * cl((Math.log(d) - Math.log(2500)) / (Math.log(7000) - Math.log(2500)));
-    rutaM.geometry.setDrawRange(0, Math.floor(rutaTotal * tramo(p, PUEBLOS[0].p, PUEBLOS[3].p) / 6) * 6);
+    rutaM.geometry.setDrawRange(0, Math.floor(rutaTotal * tramo(p, PUEBLOS[0].p, DENIA.p) / 6) * 6);
     for (const o of pueblos) {
       const on = tramo(p, o.q.p, o.q.p + 0.04);
       o.dm.color.setHex(0x55606f).lerp(new THREE.Color(ACENTO), on);

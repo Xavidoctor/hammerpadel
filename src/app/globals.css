@@ -428,7 +428,6 @@ html.hp-static .train__lede { position: relative; top: auto; padding-top: var(--
 .rent__dur { font-family: var(--sc-font-display); font-variation-settings: "wdth" 75; text-transform: uppercase; font-weight: 800; font-size: var(--sc-t-xl); }
 .rent__where { margin: 0; color: var(--sc-ink-soft); font-size: var(--sc-t-sm); }
 .rent__towns { list-style: none; margin: 0 0 var(--sc-2); padding: 0; display: flex; flex-wrap: wrap; gap: var(--sc-2) var(--sc-5); font-size: var(--sc-t-lg); font-weight: 600; }
-.rent__note { position: absolute; right: var(--sc-gutter); bottom: var(--sc-4); margin: 0; font-size: var(--sc-t-xs); color: var(--sc-ink-soft); z-index: var(--sc-z-copy); }
 @media (max-width: 860px) {
   /* en móvil el texto va abajo sobre un degradado, para que el mapa no le pase por encima */
   .rent__copy { left: 0; right: 0; bottom: 0; max-width: none; gap: var(--sc-3);
@@ -437,7 +436,6 @@ html.hp-static .train__lede { position: relative; top: auto; padding-top: var(--
   .rent__copy .display--md { font-size: clamp(2.2rem, 10vw, 3.2rem); }
   .rent__price .price__num { font-size: clamp(3rem, 15vw, 4.4rem); }
   .rent__towns { font-size: 1.1rem; }
-  .rent__note { top: auto; bottom: var(--sc-2); right: var(--sc-gutter); }
   .rent__intro { right: var(--sc-gutter); max-width: none; }
   .rent__intro .display--md { font-size: clamp(1.9rem, 8.5vw, 2.6rem); }
 }
