@@ -262,7 +262,7 @@ export default function Inicio() {
             <p>
               Hammer Padel alquila una máquina lanzapelotas para entrenar pádel de forma autónoma:
               repetir golpes, trabajar situaciones de juego y aprovechar mejor el tiempo en pista.
-              El alquiler de máquina de pádel está disponible en {listaLocalidades}
+              El alquiler de máquina de pádel está disponible en {listaLocalidades}{" "}
               por {alquiler.resumen}.
             </p>
             <p>
