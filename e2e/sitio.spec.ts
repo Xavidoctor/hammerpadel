@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const PAGINAS = ["/", "/comprar", "/recogebolas", "/alquiler", "/como-funciona", "/entrenamientos", "/clubes", "/soporte", "/contacto", "/legal"];
+const PAGINAS = ["/", "/comprar", "/recogebolas", "/alquiler", "/como-funciona", "/entrenamientos", "/clubes", "/soporte", "/contacto", "/legal", "/legal/aviso-legal", "/legal/privacidad", "/legal/cookies", "/legal/condiciones-alquiler", "/legal/condiciones-venta"];
 
 test.describe("páginas", () => {
   for (const ruta of PAGINAS) {
