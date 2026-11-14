@@ -7,6 +7,7 @@ import { PageHead } from "@/components/PageHead";
 import { ProductPhoto } from "@/components/ProductPhoto";
 import { ProductVideo } from "@/components/ProductVideo";
 import { alquiler, lemas, localidades, maquina, recogebolas } from "@/content/catalogo";
+import { app } from "@/content/app";
 import { servicio } from "@/content/servicio";
 
 export const metadata: Metadata = {
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 const pasos = [
   {
     t: "Reserva tu sesión",
-    d: `Elige localidad, día y hora, con al menos 6 horas de antelación. ${servicio.confirmacionTexto}.`,
+    d: `Elige localidad, día y hora, con al menos 6 horas de antelación. ${servicio.confirmacionTexto}. Descarga la app gratis y prepara tu entrenamiento.`,
   },
   { t: "Te la llevamos", d: `${servicio.entregaTexto}: de club, de urbanización o privada, en ${localidades.map((l) => l.nombre).join(", ")}.` },
   { t: "Entrena a tu ritmo", d: "Con 60 pelotas incluidas. Tú golpeas, la máquina repite, sin esperar a un compañero." },
@@ -51,6 +52,7 @@ export default function ComoFunciona() {
           <dl className="spec spec--compact">
             <div><dt>Precio</dt><dd>{alquiler.resumen}</dd></div>
             <div><dt>Pelotas</dt><dd>{servicio.pelotasTexto}</dd></div>
+            <div><dt>App</dt><dd>{app.nombre}, gratis (iPhone y Android). Con ella controlas la máquina</dd></div>
             <div><dt>Días</dt><dd>{servicio.diasTexto}</dd></div>
             <div><dt>Horario</dt><dd>{servicio.horarioTexto}</dd></div>
             <div><dt>Antelación</dt><dd>{servicio.antelacionTexto}</dd></div>

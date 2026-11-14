@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AppBloque } from "@/components/AppBloque";
 import { Price } from "@/components/Price";
+import { app } from "@/content/app";
 import { ProductJsonLd } from "@/components/ProductJsonLd";
 import { ProductPhoto } from "@/components/ProductPhoto";
 import { alquiler, envio, maquina } from "@/content/catalogo";
@@ -51,7 +52,11 @@ export default function Comprar() {
             </p>
             <h2>Especificaciones técnicas</h2>
             <dl className="spec">
-              {["Velocidad", "Capacidad de bolas", "Autonomía", "Dimensiones y peso", "Conectividad", "Garantía"].map((k) => (
+              <div>
+                <dt>Control</dt>
+                <dd>App {app.nombre} por Bluetooth (iPhone y Android, gratis)</dd>
+              </div>
+              {["Velocidad", "Capacidad de bolas", "Autonomía", "Dimensiones y peso", "Garantía"].map((k) => (
                 <div key={k}>
                   <dt>{k}</dt>
                   <dd className="pending">Pendiente de documentación oficial</dd>

@@ -17,6 +17,7 @@ export const faqAlquiler: Pregunta[] = [
   { p: "¿Cómo reservo?", r: `${servicio.canalTexto}. ${servicio.confirmacionTexto} (Xavi o Marc).` },
   { p: "¿Cómo se paga?", r: `${servicio.pagoTexto}. ${servicio.pagoNota}` },
   { p: "¿En qué pistas se puede usar?", r: `La pista la pones tú. ${servicio.pistasTexto}: también vamos a urbanizaciones y pistas particulares.` },
+  { p: "¿Necesito la app para la sesión de alquiler?", r: `Sí. La máquina se controla con la app ${app.nombre}, gratis para iPhone y Android. Descárgala antes y prepara el entrenamiento en casa.` },
   { p: "¿Tengo que llevar pelotas?", r: `No. ${servicio.pelotasTexto} en cada sesión.` },
   { p: "¿Qué pasa si se pierde alguna pelota?", r: `Se cobra ${servicio.pelotaPerdidaTexto}.` },
   { p: "¿Puedo cancelar o cambiar mi reserva?", r: "La política de cancelaciones y cambios está pendiente de publicar.", pendiente: true },
@@ -33,7 +34,7 @@ export const faqProducto: Pregunta[] = [
   { p: "¿Se puede comprar online?", r: "Todavía no. De momento la compra se solicita desde el formulario de contacto y te respondemos personalmente." },
   { p: "¿La máquina tiene app?", r: `Sí, ${app.nombre}. Tiene entrenamientos preparados para jugar solo o en grupos de hasta 4 personas, puedes personalizarlos y prepararlos antes de ir a la pista.` },
   { p: "¿Pueden entrenar varias personas a la vez?", r: "Sí. La app incluye entrenamientos preparados para grupos de hasta 4 personas." },
-  { p: "¿En qué móviles funciona la app y cuánto cuesta?", r: "Plataformas, descarga y precio de la app pendientes de confirmar.", pendiente: true },
+  { p: "¿En qué móviles funciona la app y cuánto cuesta?", r: `${app.plataformasTexto}. ${app.conexionTexto}.` },
   { p: "¿Cuánta autonomía tiene la batería? ¿A qué velocidad lanza?", r: "Las especificaciones técnicas se publicarán con la documentación oficial. No damos datos sin verificar.", pendiente: true },
   { p: "¿Cuánto tarda el envío?", r: "Plazos de entrega pendientes de definir.", pendiente: true },
 ];
