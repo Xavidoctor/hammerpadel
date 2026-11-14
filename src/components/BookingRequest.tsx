@@ -6,9 +6,9 @@ import type { DisponibilidadPublica } from "@/lib/reservas/consulta";
 
 /**
  * Flujo de reserva en 4 pasos, independiente de cualquier animación.
- * Las horas vienen de /api/disponibilidad (horario confirmado, máquinas y
- * repartidores). PROTOTIPO: todavía no hay base de datos, así que no se
- * tienen en cuenta reservas de otros clientes y nada se envía.
+ * Las horas vienen de /api/disponibilidad. Con base de datos, la reserva se
+ * graba como pendiente y Xavi o Marc la confirman. Sin base de datos (modo
+ * prototipo) no se envía nada.
  */
 
 type Dia = DisponibilidadPublica["dias"][number];
@@ -25,7 +25,8 @@ export function BookingRequest() {
   const [fecha, setFecha] = useState("");
   const [hora, setHora] = useState("");
   const [errores, setErrores] = useState<string[]>([]);
-  const [enviado, setEnviado] = useState(false);
+  const [enviado, setEnviado] = useState<"" | "prototipo" | "real">("");
+  const [enviando, setEnviando] = useState(false);
   const peticion = useRef(0);
 
   async function cargar(id: LocalidadId) {
@@ -56,7 +57,7 @@ export function BookingRequest() {
   const locNombre = localidades.find((l) => l.id === loc)?.nombre;
   const fechaLarga = fecha ? fmt(fecha, { weekday: "long", day: "numeric", month: "long" }) : "";
 
-  function enviar(ev: React.FormEvent<HTMLFormElement>) {
+  async function enviar(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     const f = new FormData(ev.currentTarget);
     const texto = (k: string) => String(f.get(k) ?? "").trim();
@@ -70,10 +71,54 @@ export function BookingRequest() {
     if (!texto("pista")) e.push("Indica el club o la pista donde entrenarás.");
     if (!f.get("acepto")) e.push("Acepta las condiciones para continuar.");
     setErrores(e);
-    if (e.length === 0) setEnviado(true);
+    if (e.length > 0) return;
+    if (!datos || datos.prototipo) {
+      setEnviado("prototipo");
+      return;
+    }
+    setEnviando(true);
+    try {
+      const r = await fetch("/api/reservas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          localidad: loc, fecha, inicio: hora, nombre: texto("nombre"), telefono: texto("telefono"),
+          email: texto("email"), pista: texto("pista"), acepto: true, web: texto("web"),
+        }),
+      });
+      if (r.status === 201) {
+        setEnviado("real");
+        return;
+      }
+      const j = (await r.json().catch(() => ({}))) as { errores?: string[]; motivo?: string };
+      setErrores(j.errores?.length ? j.errores : ["No se ha podido enviar la reserva. Inténtalo de nuevo."]);
+      if (r.status === 409 && loc) {
+        setHora("");
+        void cargar(loc);
+      }
+    } catch {
+      setErrores(["No se ha podido enviar la reserva. Revisa tu conexión e inténtalo de nuevo."]);
+    } finally {
+      setEnviando(false);
+    }
   }
 
-  if (enviado && franja) {
+  if (enviado === "real" && franja) {
+    return (
+      <div className="result" role="status" aria-live="polite">
+        <h2>Reserva recibida</h2>
+        <p>
+          {locNombre}, {fechaLarga}, de {franja.inicio} a {franja.fin}. {alquiler.resumen}, pago en efectivo en la sesión.
+        </p>
+        <p>
+          Hemos apartado esta hora para ti. <strong>Xavi o Marc te llamarán o escribirán para
+          confirmarla</strong> antes de la sesión.
+        </p>
+      </div>
+    );
+  }
+
+  if (enviado === "prototipo" && franja) {
     return (
       <div className="result" role="status" aria-live="polite">
         <h2>Solicitud preparada (prototipo)</h2>
@@ -84,18 +129,21 @@ export function BookingRequest() {
           En este prototipo <strong>no se envía nada</strong> ni se crea ninguna reserva. Cuando el
           sistema de reservas esté activo, aquí verás la confirmación.
         </p>
-        <button type="button" className="btn btn--ghost" onClick={() => setEnviado(false)}>Volver</button>
+        <button type="button" className="btn btn--ghost" onClick={() => setEnviado("")}>Volver</button>
       </div>
     );
   }
 
   return (
     <div className="booking">
-      <form className="form" onSubmit={enviar} noValidate aria-describedby={`${uid}-proto`}>
-        <p className="notice" id={`${uid}-proto`}>
-          <strong>Prototipo.</strong> Las horas siguen el horario real del servicio, pero todavía no
-          se guardan reservas: no se tienen en cuenta las de otros clientes y no se envía nada.
-        </p>
+      <form className="form" onSubmit={enviar} noValidate
+        aria-describedby={datos?.prototipo !== false ? `${uid}-proto` : undefined}>
+        {datos?.prototipo !== false && (
+          <p className="notice" id={`${uid}-proto`}>
+            <strong>Prototipo.</strong> Las horas siguen el horario real del servicio, pero todavía no
+            se guardan reservas: no se tienen en cuenta las de otros clientes y no se envía nada.
+          </p>
+        )}
 
         <fieldset className="fieldset">
           <legend><span>1</span> Elige localidad</legend>
@@ -108,7 +156,10 @@ export function BookingRequest() {
               </div>
             ))}
           </div>
-          <p className="hint">Te llevamos la máquina a tu pista. Tú reservas la pista en tu club.</p>
+          <p className="hint">
+            Te llevamos la máquina a tu pista: clubes, urbanizaciones y pistas privadas. Si es en un club,
+            tú reservas la pista.
+          </p>
         </fieldset>
 
         <fieldset className="fieldset" aria-busy={estado === "cargando"}>
@@ -184,22 +235,35 @@ export function BookingRequest() {
             <div className="field">
               <label htmlFor={`${uid}-p`}>Club o pista</label>
               <input id={`${uid}-p`} name="pista" required aria-describedby={`${uid}-p-h`} />
-              <p className="hint" id={`${uid}-p-h`}>Nombre del club y número de pista, o la dirección.</p>
+              <p className="hint" id={`${uid}-p-h`}>
+                Club y número de pista, o la dirección de la urbanización o pista privada.
+              </p>
             </div>
           </div>
           <label className="check">
             <input type="checkbox" name="acepto" />
-            <span>Acepto las condiciones de alquiler y la política de privacidad (pendientes de redactar).</span>
+            <span>
+              Acepto las condiciones de alquiler (entre ellas, 1 € por cada pelota perdida) y la
+              política de privacidad.
+            </span>
           </label>
+          <div className="trampa" aria-hidden="true">
+            <label htmlFor={`${uid}-w`}>No rellenes este campo</label>
+            <input id={`${uid}-w`} name="web" tabIndex={-1} autoComplete="off" />
+          </div>
           {errores.length > 0 && (
             <div role="alert">
               {errores.map((e) => <p className="error" key={e}>{e}</p>)}
             </div>
           )}
           <div className="cta-row">
-            <button type="submit" className="btn btn--accent btn--lg">Solicitar reserva</button>
+            <button type="submit" className="btn btn--accent btn--lg" disabled={enviando}>
+              {enviando ? "Enviando…" : "Solicitar reserva"}
+            </button>
           </div>
-          <p className="hint">Pago en efectivo en la sesión. El pago online llegará más adelante.</p>
+          <p className="hint">
+            Pago en efectivo en la sesión. Xavi o Marc confirman cada reserva por teléfono o WhatsApp.
+          </p>
         </fieldset>
       </form>
 
@@ -211,6 +275,7 @@ export function BookingRequest() {
           <div><dt>Horario</dt><dd>{franja ? `${franja.inicio}–${franja.fin}` : "Sin elegir"}</dd></div>
           <div><dt>Duración</dt><dd>{alquiler.duracionTexto}</dd></div>
           <div><dt>Precio</dt><dd>{alquiler.precioTexto}</dd></div>
+          <div><dt>Incluye</dt><dd>{alquiler.incluyeTexto}</dd></div>
           <div><dt>Pago</dt><dd>Efectivo en la sesión</dd></div>
         </dl>
       </aside>

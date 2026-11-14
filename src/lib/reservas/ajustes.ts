@@ -26,7 +26,10 @@ export type Ajustes = {
   antelacionMinima: Minutos;
   /** Días que se muestran para reservar (hoy incluido). */
   diasVista: number;
+  /** Modo de reparto por defecto. */
   modo: ModoReparto;
+  /** Modo de reparto por localidad (prevalece sobre `modo`). */
+  modoPorLocalidad: Partial<Record<string, ModoReparto>>;
 };
 
 export const AJUSTES: Ajustes = {
@@ -35,14 +38,24 @@ export const AJUSTES: Ajustes = {
   ultimaHora: 20 * 60 + 30, // [CONFIRMADO] 20:30 última reserva
   paso: 30, // [PROPUESTA]
   duracion: 90, // [CONFIRMADO]
-  montaje: 15, // [PROPUESTA]
-  recogida: 15, // [PROPUESTA]
+  montaje: 3, // [CONFIRMADO] 3 min
+  recogida: 3, // [CONFIRMADO] 3 min
   trasladoMismaLocalidad: 10, // [PROPUESTA]
   trasladoEntreLocalidades: 20, // [PROPUESTA] las 4 localidades están a 4–12 km
-  antelacionMinima: 12 * 60, // [PROPUESTA]
+  antelacionMinima: 6 * 60, // [CONFIRMADO] 6 h
   diasVista: 14, // [PROPUESTA]
-  modo: "deja_y_vuelve", // [PROPUESTA] pendiente de que Xavi confirme
+  // [CONFIRMADO] Lunes a domingo: no hay días cerrados por defecto (los
+  // festivos o días libres se crean como bloqueos).
+  // [CONFIRMADO] En Ondara y Pedreguer el repartidor se queda en la pista; en
+  // Dénia y La Xara puede volver a casa u oficina, así que se cuenta como
+  // "deja y vuelve" (si le conviene, igualmente puede quedarse).
+  modo: "deja_y_vuelve",
+  modoPorLocalidad: { ondara: "se_queda", pedreguer: "se_queda" },
 };
+
+export function modoEn(aj: Ajustes, localidadId: string): ModoReparto {
+  return aj.modoPorLocalidad[localidadId] ?? aj.modo;
+}
 
 /** [CONFIRMADO] flota inicial: 5 máquinas. */
 export const MAQUINAS = ["hp-1", "hp-2", "hp-3", "hp-4", "hp-5"].map((id) => ({

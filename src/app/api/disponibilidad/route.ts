@@ -10,6 +10,6 @@ export async function GET(req: Request) {
   if (!localidades.some((l) => l.id === localidad)) {
     return Response.json({ error: "Localidad no válida." }, { status: 400 });
   }
-  const datos = await disponibilidadPublica(repositorio(), localidad, new Date());
+  const datos = await disponibilidadPublica(await repositorio(), localidad, new Date());
   return Response.json(datos, { headers: { "Cache-Control": "no-store" } });
 }

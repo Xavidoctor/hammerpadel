@@ -1,4 +1,4 @@
-import { traslado, type Ajustes } from "./ajustes";
+import { modoEn, traslado, type Ajustes } from "./ajustes";
 import { diaSemana, enZona, sumarDias } from "./tiempo";
 import {
   ESTADOS_QUE_OCUPAN,
@@ -37,7 +37,7 @@ export function tareasDeSesion(
   s: { id: string; localidadId: string; inicio: Minutos; fin: Minutos },
 ): Tarea[] {
   const base = { reservaId: s.id, localidadId: s.localidadId };
-  if (aj.modo === "se_queda") {
+  if (modoEn(aj, s.localidadId) === "se_queda") {
     return [{ ...base, tipo: "sesion_completa", inicio: s.inicio - aj.montaje, fin: s.fin + aj.recogida }];
   }
   return [

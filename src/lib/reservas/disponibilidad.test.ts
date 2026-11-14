@@ -24,6 +24,7 @@ const aj: Ajustes = {
   trasladoMismaLocalidad: 10,
   trasladoEntreLocalidades: 20,
   modo: "deja_y_vuelve",
+  modoPorLocalidad: {},
 };
 const FECHA = "2026-11-19";
 const h = (t: string) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3));
@@ -179,6 +180,20 @@ describe("modo «se queda»", () => {
     expect(probar(d, "denia", "11:00", a).ok).toBe(false);
     expect(probar(d, "denia", "12:00", a).ok).toBe(false); // 11:45 + 10 > 11:45
     expect(probar(d, "denia", "12:30", a).ok).toBe(true);
+  });
+});
+
+describe("modo por localidad (datos de Xavi)", () => {
+  const real: Ajustes = { ...aj, montaje: 3, recogida: 3, modoPorLocalidad: { ondara: "se_queda", pedreguer: "se_queda" } };
+  it("en Ondara el repartidor se queda: no puede hacer otra entrega durante la sesión", () => {
+    const d = dia({ repartidores: XAVI, reservas: [reserva({ inicio: h("10:00"), localidadId: "ondara" })] });
+    expect(probar(d, "denia", "10:30", real).ok).toBe(false);
+    // Termina 11:30 + 3 de recogida + 20 de trayecto = 11:53; montaje a las 11:57.
+    expect(probar(d, "denia", "12:00", real).ok).toBe(true);
+  });
+  it("en Dénia deja la máquina y puede atender otra sesión mientras", () => {
+    const d = dia({ repartidores: XAVI, reservas: [reserva({ inicio: h("10:00"), localidadId: "denia" })] });
+    expect(probar(d, "la-xara", "10:30", real).ok).toBe(true);
   });
 });
 

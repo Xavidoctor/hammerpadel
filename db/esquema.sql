@@ -1,6 +1,7 @@
 -- Hammer Padel · esquema de reservas de alquiler (PROPUESTA, fase B).
--- PostgreSQL 15+. No está desplegado en ningún sitio: se prueba en local con
--- PostgreSQL embebido (src/lib/reservas/esquema.test.ts).
+-- PostgreSQL 15+ (Neon, aprobado por Xavi el 14-11-2026). Se prueba en local
+-- con PostgreSQL embebido (src/lib/reservas/*.test.ts). Aplicar una sola vez
+-- en la base de datos nueva: psql "$DATABASE_URL" -f db/esquema.sql
 -- Horas en timestamptz (UTC); la web las muestra en Europe/Madrid.
 
 create extension if not exists btree_gist;
@@ -23,27 +24,8 @@ create table repartidores (
   activo  boolean not null default true
 );
 
--- Una sola fila con los ajustes del servicio (ver src/lib/reservas/ajustes.ts).
-create table ajustes (
-  id                 int primary key default 1 check (id = 1),
-  zona_horaria       text not null default 'Europe/Madrid',
-  primera_hora       time not null,
-  ultima_hora        time not null,
-  paso_min           int  not null check (paso_min > 0),
-  montaje_min        int  not null check (montaje_min >= 0),
-  recogida_min       int  not null check (recogida_min >= 0),
-  antelacion_min     int  not null check (antelacion_min >= 0),
-  dias_vista         int  not null check (dias_vista > 0),
-  modo               text not null check (modo in ('deja_y_vuelve', 'se_queda'))
-);
-
--- Minutos de trayecto de un repartidor entre localidades (incluida A → A).
-create table trayectos (
-  desde    text not null references localidades,
-  hasta    text not null references localidades,
-  minutos  int  not null check (minutos >= 0),
-  primary key (desde, hasta)
-);
+-- Los ajustes (horario, montaje, trayectos, antelación, modo por localidad)
+-- viven en src/lib/reservas/ajustes.ts: una sola fuente de verdad.
 
 create table tarifas (
   id               text primary key,   -- 'sesion-90'
@@ -69,6 +51,7 @@ create table clientes (
   nombre    text not null,
   telefono  text not null,
   email     text not null,
+  unique (telefono, email),
   creado    timestamptz not null default now()
 );
 
@@ -82,7 +65,7 @@ create table reservas (
   tarifa_id           text not null references tarifas,
   sesion              tstzrange not null,            -- lo que reserva el cliente
   ciclo               tstzrange not null,            -- montaje + sesión + recogida
-  estado              text not null default 'confirmada'
+  estado              text not null default 'pendiente'  -- Xavi o Marc confirman a mano
                       check (estado in ('retenida', 'pendiente', 'confirmada', 'cancelada', 'completada', 'no_presentado')),
   precio_centimos     int  not null,                 -- calculado en el servidor
   forma_pago          text not null default 'efectivo' check (forma_pago in ('efectivo', 'online')),
@@ -95,6 +78,7 @@ create table reservas (
     where (estado in ('retenida', 'pendiente', 'confirmada'))
 );
 create index reservas_sesion on reservas using gist (sesion);
+create index reservas_estado on reservas (estado);
 
 -- Los trayectos de los repartidores no se pueden expresar como restricción:
 -- la web graba cada reserva dentro de una transacción con
@@ -108,13 +92,10 @@ create table historial_reservas (
   en          timestamptz not null default now()
 );
 
--- Datos iniciales [CONFIRMADOS por Xavi] y ajustes [PROPUESTA].
+-- Datos iniciales [CONFIRMADOS por Xavi].
 insert into localidades (id, nombre) values
   ('pedreguer', 'Pedreguer'), ('ondara', 'Ondara'), ('la-xara', 'La Xara'), ('denia', 'Dénia');
 insert into maquinas (id) values ('hp-1'), ('hp-2'), ('hp-3'), ('hp-4'), ('hp-5');
 insert into repartidores (id, nombre) values ('xavi', 'Xavi'), ('marc', 'Marc');
-insert into tarifas (id, duracion_min, precio_centimos) values ('sesion-90', 90, 2000);
-insert into ajustes (primera_hora, ultima_hora, paso_min, montaje_min, recogida_min, antelacion_min, dias_vista, modo)
-  values ('08:00', '20:30', 30, 15, 15, 720, 14, 'deja_y_vuelve');
-insert into trayectos (desde, hasta, minutos)
-  select a.id, b.id, case when a.id = b.id then 10 else 20 end from localidades a cross join localidades b;
+insert into tarifas (id, duracion_min, precio_centimos) values ('sesion-90', 90, 2500);
+
