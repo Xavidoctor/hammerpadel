@@ -152,3 +152,61 @@ test.describe("menú: cierre automático", () => {
     await expect(nav).toBeHidden();
   });
 });
+
+test.describe("páginas de contenido", () => {
+  test("soporte publica FAQ estructurada solo con respuestas confirmadas", async ({ page }) => {
+    await page.goto("/soporte");
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faqs = bloques.map((b) => JSON.parse(b)).filter((d) => d["@type"] === "FAQPage");
+    expect(faqs.length).toBe(2);
+    const texto = JSON.stringify(faqs);
+    expect(texto).toContain("20 €");
+    expect(texto).not.toMatch(/pendiente/i);
+    await page.getByText("¿Tengo que ir a recoger la máquina?").click();
+    await expect(page.getByText(/Llevamos la máquina a tu pista/).first()).toBeVisible();
+  });
+
+  for (const ruta of ["/como-funciona", "/entrenamientos", "/clubes", "/soporte", "/contacto"]) {
+    test(`${ruta} tiene migas de pan y no se desborda en horizontal`, async ({ page }) => {
+      await page.goto(ruta);
+      const html = await page.content();
+      expect(html).toContain('"BreadcrumbList"');
+      const desborde = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      expect(desborde).toBeLessThanOrEqual(1);
+    });
+  }
+});
+
+test.describe("formulario de contacto", () => {
+  test("marca los errores y conserva lo escrito", async ({ page }) => {
+    await page.goto("/contacto?asunto=soporte");
+    await expect(page.getByLabel("Asunto")).toHaveValue("soporte");
+    await page.getByLabel("Nombre").fill("Ana");
+    await page.getByLabel("Email").fill("mal");
+    await page.getByRole("button", { name: "Enviar mensaje" }).click();
+    await expect(page.locator(".error--box")).toContainText("Revisa los campos");
+    await expect(page.getByLabel("Email")).toHaveAttribute("aria-invalid", "true");
+    await expect(page.getByLabel("Nombre")).toHaveValue("Ana");
+  });
+
+  test("sin envío configurado no finge haber enviado", async ({ page }) => {
+    await page.goto("/contacto");
+    await page.getByLabel("Nombre").fill("Ana");
+    await page.getByLabel("Email").fill("ana@correo.com");
+    await page.getByLabel("Mensaje").fill("Quiero reservar una sesión el sábado.");
+    await page.getByLabel(/Acepto que Hammer Padel/).check();
+    await page.getByRole("button", { name: "Enviar mensaje" }).click();
+    await expect(page.getByRole("status")).toContainText(/no se ha enviado|Abrir mi correo/);
+    await expect(page.getByText("Mensaje enviado")).toHaveCount(0);
+  });
+
+  test("funciona sin JavaScript", async ({ browser }) => {
+    const ctx = await browser.newContext({ javaScriptEnabled: false });
+    const page = await ctx.newPage();
+    await page.goto("/clubes");
+    await page.getByLabel("Nombre").fill("Club de prueba");
+    await page.getByLabel("Nombre").press("Enter");
+    await expect(page.getByText("Revisa los campos marcados.")).toBeVisible();
+    await ctx.close();
+  });
+});
