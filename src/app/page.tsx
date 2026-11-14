@@ -11,9 +11,9 @@ import { mediosPista } from "@/content/medios";
 
 /** Focos de la foto iluminada (en % del encuadre 1671x941), de fondo a primer plano. */
 const LAMPARAS = [
-  { x: 38.6, y: 45.8, orden: 0 }, { x: 61.3, y: 45.8, orden: 0 },
-  { x: 29.8, y: 28.5, orden: 1 }, { x: 69.9, y: 28.5, orden: 1 },
-  { x: 16.2, y: 5.8, orden: 2 }, { x: 83.4, y: 5.8, orden: 2 },
+  { x: 38.3, y: 45.7, orden: 0 }, { x: 61.7, y: 45.7, orden: 0 },
+  { x: 29.1, y: 28.8, orden: 1 }, { x: 70.8, y: 28.8, orden: 1 },
+  { x: 18.3, y: 6.5, orden: 2 }, { x: 81.7, y: 6.5, orden: 2 },
 ];
 
 const pct = (v: number, t: number) => `${((v / t) * 100).toFixed(2)}%`;
@@ -34,8 +34,12 @@ export default function Inicio() {
         <div data-sc-stage className="stage">
           {medios.foto && !medios.video ? (
             <div className="pista__frame">
-              <img className="pista__layer pista__foto" src={medios.foto} width={2400} height={1352}
-                alt="Máquina Hammer Padel en una pista de pádel azul iluminada" fetchPriority="high" />
+              <img className="pista__layer pista__foto" src={medios.foto} width={2200} height={1238}
+                alt="Máquina Hammer Padel en una pista de pádel azul" fetchPriority="high" />
+              {medios.luces.map((src, n) => (
+                <img key={src} className="pista__layer pista__luz" src={src} alt="" aria-hidden="true"
+                  style={{ ["--n" as string]: n }} />
+              ))}
               <div className="pista__suelo" aria-hidden="true" />
               {LAMPARAS.map((l, i) => (
                 <span key={i} className="pista__lamp" aria-hidden="true"

@@ -223,7 +223,7 @@ html.hp-static [data-sc-stagger] > * {
   will-change: transform, filter;
 }
 /* Foto iluminada única, dos movimientos:
-   1) encendido (--t, por tiempo al cargar): la pista parte casi a oscuras y
+   1) encendido (--t, por tiempo al cargar): la pista parte apagada (foto 1) y
       los focos se encienden por parejas, de fondo a primer plano, con destello
       y haz de luz. Así nadie aterriza en una pantalla negra.
    2) dron (--sc-p, por scroll): la cámara baja, se nivela y avanza hacia la
@@ -240,10 +240,7 @@ html.sc-ready:not(.hp-static) .pista__frame { animation: hp-luces 3.2s linear 0.
 .pista__frame {
   --q: var(--sc-p, 1);
   --e: calc(var(--q) * var(--q) * (3 - 2 * var(--q)));
-  --l0: clamp(0, (var(--t) - 0.04) * 9, 1);
-  --l1: clamp(0, (var(--t) - 0.31) * 9, 1);
   --l2: clamp(0, (var(--t) - 0.58) * 9, 1);
-  --luz: calc((var(--l0) + var(--l1) + var(--l2)) / 3);
   position: absolute; left: 50%; top: 50%;
   width: max(100%, 177.6svh); aspect-ratio: 1671 / 941;
   translate: -50% -50%;
@@ -257,12 +254,14 @@ html.sc-ready:not(.hp-static) .pista__frame { animation: hp-luces 3.2s linear 0.
   will-change: transform;
 }
 .pista__layer { position: absolute; inset: 0; width: 100%; height: 100%; }
-.pista__foto {
-  filter:
-    brightness(calc(0.13 + var(--luz) * 0.87))
-    saturate(calc(0.35 + var(--luz) * 0.65))
-    contrast(calc(1.15 - var(--luz) * 0.15));
-  will-change: filter;
+/* La foto base es la pista apagada. Cada pareja de focos añade su propia
+   capa de luz (sumada en modo "screen"), así la pista iluminada sale de la
+   misma foto, sin desdobles. */
+.pista__frame { isolation: isolate; background: #000; }
+.pista__luz {
+  mix-blend-mode: screen; pointer-events: none;
+  opacity: clamp(0, (var(--t) - 0.04 - var(--n) * 0.27) * 9, 1);
+  will-change: opacity;
 }
 /* Rebote de luz azul sobre el suelo cuando se encienden los focos cercanos. */
 .pista__suelo {

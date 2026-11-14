@@ -18,6 +18,9 @@ export function mediosPista() {
     foto: url("pista.webp"),
     /** Las fotos actuales ya muestran la máquina: no se superpone el hueco de producto. */
     fotoIncluyeMaquina: existe("pista.webp"),
+    /** Capas de luz (una por pareja de focos, de fondo a primer plano), calculadas
+     *  a partir de la propia foto apagada con produccion/iluminar-pista.py. */
+    luces: [0, 1, 2].map((n) => url(`luz-${n}.webp`)).filter((u): u is string => u !== null),
     fotoMovil: url("pista-m.webp") ?? url("pista.webp"),
     video: url("pista.mp4"),
     videoMovil: url("pista-m.mp4"),
