@@ -53,14 +53,16 @@ const keywords: Record<LocalidadId, string> = {
 const entregaCerca = "Montamos la máquina en unos minutos y nos quedamos cerca durante toda la sesión, por si necesitas algo. Al terminar, la recogemos.";
 const entregaVuelta = "Montamos la máquina en unos minutos antes de empezar y la recogemos al terminar la sesión.";
 
+const entregaSegun = "Montamos la máquina en unos minutos antes de empezar. Según el momento, nos quedamos cerca durante la sesión o volvemos a recogerla al terminar.";
+
 const entregas: Record<LocalidadId, string> = {
   ondara: entregaCerca,
   pedreguer: entregaCerca,
   denia: entregaVuelta,
   "la-xara": entregaVuelta,
-  // [PENDIENTE] Si el equipo se queda o vuelve en El Verger y Els Poblets: texto neutro.
-  "el-verger": entregaVuelta,
-  "els-poblets": entregaVuelta,
+  // [CONFIRMADO] 14-11-2026: en El Verger y Els Poblets depende del momento.
+  "el-verger": entregaSegun,
+  "els-poblets": entregaSegun,
 };
 
 /** Datos locales verificados. Vacío hasta que Hammer Padel los facilite. */
