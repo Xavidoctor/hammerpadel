@@ -3,12 +3,12 @@ import { BookingRequest } from "@/components/BookingRequest";
 import Link from "next/link";
 import { PageHead } from "@/components/PageHead";
 import { Price } from "@/components/Price";
-import { alquiler, localidades } from "@/content/catalogo";
+import { alquiler, listaLocalidades, localidades } from "@/content/catalogo";
 import { rutaLocalidad } from "@/content/localidades";
 
 export const metadata: Metadata = {
   title: "Alquiler de máquina lanzapelotas de pádel en la Marina Alta",
-  description: `Alquila la máquina Hammer Padel por ${alquiler.resumen} en Dénia, Ondara, La Xara y Pedreguer.`,
+  description: `Alquila la máquina Hammer Padel por ${alquiler.resumen} en ${listaLocalidades}.`,
   alternates: { canonical: "/alquiler" },
 };
 
@@ -19,7 +19,7 @@ export default function Alquiler() {
         <Price texto={alquiler.precioTexto} sufijo={`/ ${alquiler.duracionTexto} · ${alquiler.pelotasTexto}`} />
         <p className="lede">
           Entrena sin comprar la máquina, o pruébala antes de decidir. Disponible inicialmente en{" "}
-          {localidades.map((l) => l.nombre).join(", ")}.
+          {listaLocalidades}.
         </p>
       </PageHead>
       <div id="reservar" className="reservar-ancla">

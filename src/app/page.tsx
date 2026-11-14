@@ -5,7 +5,7 @@ import { ProductSlot } from "@/components/ProductSlot";
 import { ProductVideo } from "@/components/ProductVideo";
 import { Price } from "@/components/Price";
 import { MotionToggle, ScrollCraftStage } from "@/components/ScrollCraftStage";
-import { alquiler, lemas, localidades, maquina, recogebolas } from "@/content/catalogo";
+import { alquiler, lemas, listaLocalidades, localidades, maquina, recogebolas } from "@/content/catalogo";
 import { app } from "@/content/app";
 import { HORIZONTAL, VERTICAL, golpes } from "@/lib/pista";
 import { mediosPista } from "@/content/medios";
@@ -95,7 +95,7 @@ export default function Inicio() {
             </h1>
             <p className="hero-sub">
               Alquila la máquina lanzapelotas por {alquiler.precioTexto} la sesión de 90 minutos en{" "}
-              {localidades.map((l) => l.nombre).join(", ").replace(/, ([^,]*)$/, " y $1")}.
+              {listaLocalidades}.
             </p>
             <div className="cta-row">
               <Link className="btn btn--accent" href={alquiler.ruta}>
@@ -289,7 +289,7 @@ export default function Inicio() {
             <p>
               Hammer Padel alquila una máquina lanzapelotas para entrenar pádel de forma autónoma:
               repetir golpes, trabajar situaciones de juego y aprovechar mejor el tiempo en pista.
-              El alquiler de máquina de pádel está disponible en Dénia, Ondara, La Xara y Pedreguer
+              El alquiler de máquina de pádel está disponible en {listaLocalidades}
               por {alquiler.resumen}.
             </p>
             <p>

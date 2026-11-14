@@ -53,12 +53,20 @@ export const alquiler = {
 /** Orden de oeste a este. Ubicaciones exactas pendientes de definir. */
 export const localidades = [
   { id: "pedreguer", nombre: "Pedreguer" },
+  { id: "el-verger", nombre: "El Verger" },
   { id: "ondara", nombre: "Ondara" },
+  { id: "els-poblets", nombre: "Els Poblets" },
   { id: "la-xara", nombre: "La Xara" },
   { id: "denia", nombre: "Dénia" },
 ] as const;
 
 export type LocalidadId = (typeof localidades)[number]["id"];
+
+/** "Pedreguer, El Verger, … y Dénia" */
+export const listaLocalidades = localidades
+  .map((l) => l.nombre)
+  .join(", ")
+  .replace(/, ([^,]*)$/, " y $1");
 
 export const lemas = {
   principal: "Tu entrenamiento. Tu ritmo. Tu pista.",

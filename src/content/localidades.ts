@@ -6,7 +6,8 @@
  * inicio entre las 8:00 y las 20:30, de lunes a domingo, con 6 h de antelación
  * mínima, confirmadas a mano por el equipo, solo desde la web; se atienden
  * urbanizaciones y pistas privadas; 1 € por pelota perdida; al principio, pago
- * en efectivo en la sesión. En Ondara y Pedreguer el equipo se queda cerca
+ * en efectivo en la sesión. El Verger y Els Poblets añadidos el 14-11-2026.
+ * En Ondara y Pedreguer el equipo se queda cerca
  * durante la sesión.
  *
  * [PENDIENTE] Datos propios de cada localidad. No se inventan clubes,
@@ -45,6 +46,8 @@ const keywords: Record<LocalidadId, string> = {
   ondara: "Alquiler de máquina de pádel en Ondara",
   "la-xara": "Alquiler de máquina de pádel en La Xara",
   pedreguer: "Alquiler de máquina lanzapelotas en Pedreguer",
+  "el-verger": "Alquiler de máquina de pádel en El Verger",
+  "els-poblets": "Alquiler de máquina de pádel en Els Poblets",
 };
 
 const entregaCerca = "Montamos la máquina en unos minutos y nos quedamos cerca durante toda la sesión, por si necesitas algo. Al terminar, la recogemos.";
@@ -55,6 +58,9 @@ const entregas: Record<LocalidadId, string> = {
   pedreguer: entregaCerca,
   denia: entregaVuelta,
   "la-xara": entregaVuelta,
+  // [PENDIENTE] Si el equipo se queda o vuelve en El Verger y Els Poblets: texto neutro.
+  "el-verger": entregaVuelta,
+  "els-poblets": entregaVuelta,
 };
 
 /** Datos locales verificados. Vacío hasta que Hammer Padel los facilite. */
