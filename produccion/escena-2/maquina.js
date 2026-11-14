@@ -10,7 +10,7 @@ export function crearMaquina(THREE, { logo } = {}) {
   g.name = "maquina";
 
   const plastico = new THREE.MeshPhysicalMaterial({
-    color: 0x2b2e34, roughness: 0.55, metalness: 0.0, clearcoat: 0.35, clearcoatRoughness: 0.45, envMapIntensity: 2.2,
+    color: 0x222429, roughness: 0.55, metalness: 0.0, clearcoat: 0.35, clearcoatRoughness: 0.45, envMapIntensity: 2.2,
   });
   plastico.onBeforeCompile = (s) => { // grano fino de plástico texturizado
     s.fragmentShader = s.fragmentShader.replace(
@@ -112,16 +112,35 @@ export function crearMaquina(THREE, { logo } = {}) {
   geoLab.setAttribute("position", new THREE.Float32BufferAttribute(lab, 3)); geoLab.setIndex(il); geoLab.computeVertexNormals();
   g.add(new THREE.Mesh(geoLab, plastico));
 
-  // bolas en la tolva
-  const fieltro = materialPelota(THREE);
-  const bolaGeo = new THREE.SphereGeometry(0.0335, 20, 14);
-  const rnd = mulberry(7);
-  for (let i = 0; i < 42; i++) {
-    const x = (rnd() - 0.5) * 0.29, z = -0.04 + (rnd() - 0.5) * 0.42;
-    const y = borde(z) - 0.035 + rnd() * 0.03 - (Math.abs(x) > 0.11 ? 0.012 : 0);
-    const b = new THREE.Mesh(bolaGeo, fieltro); b.position.set(x, y, z); b.rotation.set(rnd() * 6, rnd() * 6, 0);
-    g.add(b);
+  // borde enrollado grueso de la tolva (como la pieza real)
+  {
+    const pts = tolvaExt[tolvaExt.length - 1].map((p, i) => { const q = tolvaInt[0][i]; return new THREE.Vector3((p.x + q.x) / 2, p.y + 0.004, (p.z + q.z) / 2); });
+    const curva = new THREE.CatmullRomCurve3(pts, true);
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(curva, 160, 0.011, 10, true), plastico));
   }
+
+  // bolas en la tolva: capas empaquetadas sin solaparse; la de arriba forma un montón
+  // suave como en las fotos oficiales
+  const fieltro = materialPelota(THREE);
+  const RB = 0.0335, bolaGeo = new THREE.SphereGeometry(RB, 24, 16);
+  const rnd = mulberry(7);
+  const dentro = (x, z, w, d, cz) => Math.pow(Math.abs(x) / (w / 2), 6) + Math.pow(Math.abs(z - cz) / (d / 2), 6) <= 1;
+  const capas = [
+    { dy: -0.026, w: 0.349 - 2 * RB, d: 0.506 - 2 * RB, off: 0 },
+    { dy: 0.028, w: 0.24, d: 0.36, off: 0.5 },
+    { dy: 0.078, w: 0.13, d: 0.2, off: 0 },
+  ];
+  const sx = 2 * RB * 1.02, sz = sx * 0.866;
+  capas.forEach((c, ci) => {
+    for (let iz = -8; iz <= 8; iz++) for (let ix = -6; ix <= 6; ix++) {
+      const x = (ix + ((iz & 1) ? 0.5 : 0) + c.off) * sx, z = -0.032 + (iz + c.off) * sz;
+      if (!dentro(x, z, c.w, c.d, -0.032)) continue;
+      if (ci > 0 && rnd() < 0.15) continue;
+      const b = new THREE.Mesh(bolaGeo, fieltro);
+      b.position.set(x + (rnd() - 0.5) * 0.004, borde(z) + c.dy + (rnd() - 0.5) * 0.006, z + (rnd() - 0.5) * 0.004);
+      b.rotation.set(rnd() * 6, rnd() * 6, rnd() * 6); g.add(b);
+    }
+  });
 
   // ventanas frontales de la tolva (3), sobre la boca, con bolas a la vista (como la máquina real)
   for (let k = 0; k < 3; k++) {
@@ -192,17 +211,14 @@ export function crearMaquina(THREE, { logo } = {}) {
     const r = new THREE.Mesh(new THREE.SphereGeometry(0.004, 8, 6), metal); r.position.set(x, 0.075, z); g.add(r);
   }
 
-  // ---------- asa telescópica trasera ----------
-  const asaMat = new THREE.MeshStandardMaterial({ color: 0x111214, roughness: 0.5 });
-  for (const s of [-1, 1]) {
-    const tubo = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.62, 0.018), asaMat);
-    tubo.position.set(s * 0.085, 0.43, -0.255); g.add(tubo);
-  }
-  const asa = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.03, 0.03), asaMat);
-  asa.position.set(0, 0.79, -0.255); g.add(asa);
-  for (const y of [0.2, 0.47]) {
-    const abr = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.035, 0.03), asaMat); abr.position.set(0, y, -0.248); g.add(abr);
-  }
+  // ---------- asa trasera (tubo redondeado en U, sobresale poco del borde) ----------
+  const asaMat = new THREE.MeshStandardMaterial({ color: 0x111214, roughness: 0.45 });
+  const asaCurva = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-0.085, 0.42, -0.262), new THREE.Vector3(-0.085, 0.76, -0.262), new THREE.Vector3(-0.07, 0.805, -0.262),
+    new THREE.Vector3(0.07, 0.805, -0.262), new THREE.Vector3(0.085, 0.76, -0.262), new THREE.Vector3(0.085, 0.42, -0.262),
+  ], false, "centripetal");
+  g.add(new THREE.Mesh(new THREE.TubeGeometry(asaCurva, 80, 0.012, 12, false), asaMat));
+  const abr = new THREE.Mesh(new THREE.BoxGeometry(0.21, 0.04, 0.03), asaMat); abr.position.set(0, 0.44, -0.25); g.add(abr);
 
   // ---------- logotipo Hammer en los dos laterales de la tolva ----------
   // Calcomanía proyectada sobre la superficie curva (DecalGeometry), como un vinilo.

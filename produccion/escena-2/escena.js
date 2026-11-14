@@ -135,6 +135,11 @@ export async function montar(canvas, w, h) {
   const maq = crearMaquina(THREE, { logo });
   maq.position.set(0, 0, MAQ_Z);
   sc.add(maq);
+  // luz de recorte sobre la máquina para que se lea su forma (sin ella queda a contraluz)
+  const clave = new THREE.SpotLight(0xe8eeff, 5, 6, 0.6, 0.8, 1.5);
+  clave.position.set(1.2, 2.2, MAQ_Z - 1.8); clave.target.position.set(0, 0.45, MAQ_Z); sc.add(clave, clave.target);
+  const recorte = new THREE.SpotLight(0xcfe0ff, 3.5, 6, 0.6, 0.8, 1.5);
+  recorte.position.set(-1.3, 1.6, MAQ_Z - 1.2); recorte.target.position.set(0, 0.5, MAQ_Z); sc.add(recorte, recorte.target);
   const salida = maq.userData.salida.clone().add(maq.position);
 
   // ---------- bolas ----------
@@ -162,8 +167,8 @@ export async function montar(canvas, w, h) {
   // Arranca detrás de la máquina, a su derecha (la máquina en primer plano abajo a la
   // derecha y la pista al fondo) y la rodea hasta el ángulo simétrico del otro lado.
   const cam = new THREE.PerspectiveCamera(vertical ? 62 : 50, w / h, 0.05, 120);
-  const A0 = vertical ? 0.5 : 0.62;            // ángulo inicial respecto al eje de la pista
-  const RADIO = vertical ? 1.3 : 2.1;          // distancia horizontal a la máquina
+  const A0 = vertical ? 0.42 : 0.62;            // ángulo inicial respecto al eje de la pista
+  const RADIO = vertical ? 1.75 : 2.1;          // distancia horizontal a la máquina
   const suave = (t) => t * t * (3 - 2 * t);
 
   // ---------- postproceso: brillo suave en focos y estelas ----------
@@ -181,7 +186,7 @@ export async function montar(canvas, w, h) {
     const k = 1 - Math.abs(1 - 2 * tc);                // 0 en los extremos, 1 en el centro
     const rad = RADIO + 0.35 * k;
     cam.position.set(Math.sin(a) * rad, (vertical ? 1.42 : 1.45) + 0.75 * k, MAQ_Z - Math.cos(a) * rad);
-    if (vertical) cam.lookAt(-Math.sin(a) * 0.9, 0.25, MAQ_Z + 3.2);
+    if (vertical) cam.lookAt(-Math.sin(a) * 0.45, 0.05, MAQ_Z + 3.2);
     else cam.lookAt(-Math.sin(a) * 1.4, 0.3, MAQ_Z + 4);
     cam.aspect = w / h; cam.updateProjectionMatrix();
 
@@ -190,11 +195,11 @@ export async function montar(canvas, w, h) {
       const f = o.vuelo;
       // marca de bote y zona: aparecen y se quedan tenues
       const tb = ts - f.T;
-      o.marca.material.opacity = tb < 0 ? 0 : 0.75 * Math.min(1, tb * 8) * (0.35 + 0.65 * Math.exp(-tb * 2.5));
+      o.marca.material.opacity = tb < 0 ? 0 : Math.min(1, tb * 8) * (0.6 + 0.4 * Math.exp(-tb * 2.5));
       o.marca.scale.setScalar(tb < 0 ? 0.01 : 0.7 + 0.5 * Math.min(1, tb * 3));
       const tg = ts - f.TG;
-      o.zona.material.opacity = ts < 0 ? 0 : Math.min(0.16, ts * 0.12) * (tg > 0 ? 0.5 + 0.5 * Math.exp(-tg * 2) : 1);
-      o.destello.material.opacity = tg < 0 ? 0 : 0.9 * Math.exp(-tg * 8);
+      o.zona.material.opacity = ts < 0 ? 0 : Math.min(0.55, ts * 0.45) * (tg > 0 ? 0.6 + 0.4 * Math.exp(-tg * 2) : 1);
+      o.destello.visible = false; // sin anillos en el aire: Xavi (14-11) solo quiere las marcas del suelo
       o.destello.scale.setScalar(tg < 0 ? 0.01 : 1 + tg * 4);
       o.destello.lookAt(cam.position);
       if (ts < 0 || tg > 0) { o.b.visible = false; o.estela.visible = false; continue; }
