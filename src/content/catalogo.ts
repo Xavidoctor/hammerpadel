@@ -26,7 +26,7 @@ export type Producto = {
 
 export const maquina: Producto = {
   id: "maquina",
-  /** [CONFIRMADO] 14/11/2026: el modelo se llama Hammer X MAX. */
+  /** [CONFIRMADO] 14-11-2026: el modelo se llama Hammer X MAX. */
   nombre: "Hammer X MAX",
   descripcion: "Máquina lanzapelotas para entrenar pádel de forma autónoma.",
   precioCentimos: 249900,
@@ -50,7 +50,9 @@ export const alquiler = {
   precioTexto: "25 €",
   duracionMinutos: 90,
   duracionTexto: "90 minutos",
-  resumen: "25 € por sesión de 90 minutos",
+  pelotas: 60,
+  pelotasTexto: "60 pelotas incluidas",
+  resumen: "25 € por sesión de 90 minutos con 60 pelotas",
   ruta: "/alquiler",
   comarca: "Marina Alta, Alicante",
 } as const;

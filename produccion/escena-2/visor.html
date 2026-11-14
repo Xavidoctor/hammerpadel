@@ -1,0 +1,20 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#ddd}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script></head>
+<body><script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { crearMaquina } from "./maquina.js";
+import { texturaLogo } from "./comun.js";
+const W=900,H=900;
+const r=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true}); r.setSize(W,H); r.shadowMap.enabled=true; r.toneMapping=THREE.ACESFilmicToneMapping;
+document.body.appendChild(r.domElement);
+const sc=new THREE.Scene(); sc.background=new THREE.Color(0xd9dbde);
+sc.environment=new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(),0.04).texture;
+const sol=new THREE.DirectionalLight(0xffffff,2.2); sol.position.set(1.5,3,2); sol.castShadow=true; sc.add(sol);
+const suelo=new THREE.Mesh(new THREE.PlaneGeometry(5,5),new THREE.ShadowMaterial({opacity:0.25})); suelo.rotation.x=-Math.PI/2; suelo.receiveShadow=true; sc.add(suelo);
+const logo=await texturaLogo(THREE,"/public/marca/hammer-logo.svg");
+const m=crearMaquina(THREE,{logo}); sc.add(m);
+const cam=new THREE.PerspectiveCamera(30,W/H,0.1,50);
+window.vista=(ang,alt=0.55,dist=2.4)=>{cam.position.set(Math.sin(ang)*dist,alt+0.4,Math.cos(ang)*dist);cam.lookAt(0,0.38,0);r.render(sc,cam);return true};
+window.listo=true;
+</script></body></html>

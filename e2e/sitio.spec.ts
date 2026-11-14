@@ -27,6 +27,7 @@ test.describe("precios confirmados", () => {
     expect(html).toContain("2.499 €");
     expect(html).toContain("65 €");
     expect(html).toContain("25 €");
+    expect(html).toContain("60 pelotas");
     for (const l of ["Dénia", "Ondara", "La Xara", "Pedreguer"]) expect(html).toContain(l);
   });
 });
@@ -40,7 +41,7 @@ test.describe("la landing nunca bloquea la reserva ni la compra", () => {
     const reservar = page.getByRole("link", { name: /^Reservar sesión/ });
     await expect(reservar).toBeVisible();
     expect(await reservar.evaluate((el) => getComputedStyle(el.closest("[data-sc-cue]")!).opacity)).toBe("1");
-    await expect(page.getByRole("link", { name: /^Comprar · / })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Quiero mi propia Hammer X MAX" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Reservar entrenamiento" })).toBeVisible();
     await ctx.close();
   });

@@ -8,8 +8,8 @@ import { ProductPhoto } from "@/components/ProductPhoto";
 import { alquiler, envio, maquina } from "@/content/catalogo";
 
 export const metadata: Metadata = {
-  title: "Comprar máquina lanzapelotas de pádel",
-  description: `Máquina lanzapelotas Hammer Padel para entrenar pádel de forma autónoma. ${maquina.precioTexto}.`,
+  title: "Hammer X MAX · Comprar máquina lanzapelotas de pádel",
+  description: `Máquina lanzapelotas ${maquina.nombre} de Hammer Padel para entrenar pádel de forma autónoma. ${maquina.precioTexto}.`,
   alternates: { canonical: "/comprar" },
 };
 
@@ -27,7 +27,7 @@ export default function Comprar() {
         prioridad
         />
         <div className="stack">
-          <p className="kicker">Máquina lanzapelotas de pádel · Hammer Padel</p>
+          <p className="kicker">Máquina lanzapelotas de pádel</p>
           <h1 className="display">{maquina.nombre}</h1>
           <p className="lede">
             {maquina.descripcion} Pensada para jugadores que quieren entrenar individualmente,
