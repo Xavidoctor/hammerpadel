@@ -1,0 +1,62 @@
+import type { Minutos, ModoReparto } from "./tipos";
+
+/**
+ * Ajustes del servicio de alquiler. Se cambian aquí (y en la fase B, en la
+ * base de datos) sin tocar la lógica.
+ *
+ * [CONFIRMADO] = dato dado por Xavi (14-11-2026).
+ * [PROPUESTA]  = valor provisional a la espera de que Xavi lo confirme.
+ */
+export type Ajustes = {
+  zonaHoraria: string;
+  /** Primera hora de inicio de sesión. */
+  primeraHora: Minutos;
+  /** Última hora de inicio de sesión. */
+  ultimaHora: Minutos;
+  /** Separación entre horas de inicio ofrecidas. */
+  paso: Minutos;
+  duracion: Minutos;
+  /** Tiempo del repartidor en la pista antes de empezar (entregar y montar). */
+  montaje: Minutos;
+  /** Tiempo del repartidor en la pista al terminar (desmontar y cargar). */
+  recogida: Minutos;
+  trasladoMismaLocalidad: Minutos;
+  trasladoEntreLocalidades: Minutos;
+  /** Margen mínimo entre el momento de reservar y el inicio de la sesión. */
+  antelacionMinima: Minutos;
+  /** Días que se muestran para reservar (hoy incluido). */
+  diasVista: number;
+  modo: ModoReparto;
+};
+
+export const AJUSTES: Ajustes = {
+  zonaHoraria: "Europe/Madrid",
+  primeraHora: 8 * 60, // [CONFIRMADO] 8:00
+  ultimaHora: 20 * 60 + 30, // [CONFIRMADO] 20:30 última reserva
+  paso: 30, // [PROPUESTA]
+  duracion: 90, // [CONFIRMADO]
+  montaje: 15, // [PROPUESTA]
+  recogida: 15, // [PROPUESTA]
+  trasladoMismaLocalidad: 10, // [PROPUESTA]
+  trasladoEntreLocalidades: 20, // [PROPUESTA] las 4 localidades están a 4–12 km
+  antelacionMinima: 12 * 60, // [PROPUESTA]
+  diasVista: 14, // [PROPUESTA]
+  modo: "deja_y_vuelve", // [PROPUESTA] pendiente de que Xavi confirme
+};
+
+/** [CONFIRMADO] flota inicial: 5 máquinas. */
+export const MAQUINAS = ["hp-1", "hp-2", "hp-3", "hp-4", "hp-5"].map((id) => ({
+  id,
+  estado: "activa" as const,
+}));
+
+/** [CONFIRMADO] repartidores: Xavi y Marc (14-11-2026). */
+export const REPARTIDORES = [
+  { id: "xavi", nombre: "Xavi" },
+  { id: "marc", nombre: "Marc" },
+];
+
+/** Minutos de trayecto de un repartidor entre dos localidades. */
+export function traslado(aj: Ajustes, desde: string, hasta: string): Minutos {
+  return desde === hasta ? aj.trasladoMismaLocalidad : aj.trasladoEntreLocalidades;
+}

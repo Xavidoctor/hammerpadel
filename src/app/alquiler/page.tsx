@@ -27,8 +27,10 @@ export default function Alquiler() {
         {localidades.map((l) => (
           <div key={l.id}>
             <h3>Alquiler de máquina de pádel en {l.nombre}</h3>
-            <p className="pending">
-              Información de la zona (pistas donde usarla, entrega y recogida) pendiente de definir.
+            <p>
+              Te llevamos la máquina a tu pista en {l.nombre}, la montamos antes de empezar y la
+              recogemos al terminar. Tú reservas la pista en tu club. Primera sesión a las 8:00 y
+              última a las 20:30.
             </p>
           </div>
         ))}
