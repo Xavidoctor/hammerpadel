@@ -375,6 +375,26 @@ html.hp-static .train__lede { position: relative; top: auto; padding-top: var(--
   .split, .split--rev { grid-template-columns: 1fr; }
   .split .slot { max-width: 26rem; }
 }
+/* ---- la app */
+.flow--app { background: var(--sc-canvas); border-top: 1px solid var(--sc-hairline); }
+.split--app { grid-template-columns: minmax(0, 6fr) minmax(0, 4fr); }
+.app__puntos { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sc-4); max-width: 34rem; }
+.app__puntos li { position: relative; padding-left: 1.4rem; color: var(--sc-ink-soft); font-size: var(--sc-t-lg); line-height: 1.4; }
+.app__puntos li::before { content: ""; position: absolute; left: 0; top: 0.55em; width: 0.55rem; height: 0.55rem; border-radius: 50%; background: var(--sc-accent); }
+.app__puntos strong { color: var(--sc-ink); }
+.app__movil { margin: 0; justify-self: center; display: grid; gap: var(--sc-3); justify-items: center; }
+.app__movil figcaption { font-size: var(--sc-t-xs); color: var(--sc-ink-soft); }
+.app__pantalla { width: min(17rem, 72vw); aspect-ratio: 9 / 18.5; border-radius: 2.2rem; border: 10px solid #1b1e24;
+  background: linear-gradient(180deg, #10141c, #0a0c11); box-shadow: 0 30px 80px rgb(0 0 0 / 0.55), inset 0 0 0 1px #2a2f38;
+  padding: 1.6rem 1.1rem; display: flex; flex-direction: column; gap: 0.8rem; }
+.app__cab { margin: 0; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sc-accent); }
+.app__tit { margin: 0; font-family: var(--sc-font-display); font-variation-settings: "wdth" 75; font-weight: 800; text-transform: uppercase; font-size: 1.7rem; line-height: 1; }
+.app__pantalla ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+.app__pantalla li { display: flex; justify-content: space-between; gap: 0.5rem; padding: 0.65rem 0.75rem; border-radius: 0.7rem; background: #161b24; font-size: 0.8rem; color: var(--sc-ink-soft); }
+.app__pantalla li b { color: var(--sc-ink); font-weight: 600; }
+.app__boton { margin: auto 0 0; text-align: center; padding: 0.8rem; border-radius: 0.8rem; background: var(--sc-accent); color: var(--sc-accent-ink); font-weight: 700; font-size: 0.85rem; }
+@media (max-width: 860px) { .split--app { grid-template-columns: 1fr; } }
+
 .flow--product { background: linear-gradient(180deg, #080a0f, var(--sc-canvas)); }
 .flow--balls { overflow: clip; background: radial-gradient(70% 60% at 30% 80%, color-mix(in oklab, var(--hp-court) 30%, transparent), transparent 70%), var(--sc-canvas); }
 .balls { position: absolute; inset: 0; pointer-events: none; }

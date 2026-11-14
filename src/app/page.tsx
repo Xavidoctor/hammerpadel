@@ -6,6 +6,7 @@ import { ProductVideo } from "@/components/ProductVideo";
 import { Price } from "@/components/Price";
 import { MotionToggle, ScrollCraftStage } from "@/components/ScrollCraftStage";
 import { alquiler, lemas, localidades, maquina, recogebolas } from "@/content/catalogo";
+import { app } from "@/content/app";
 import { HORIZONTAL, VERTICAL, golpes } from "@/lib/pista";
 import { mediosPista } from "@/content/medios";
 
@@ -199,6 +200,35 @@ export default function Inicio() {
           </ol>
           <p className="lede">{alquiler.resumen}. {lemas.repetir}</p>
           <Link className="btn btn--accent btn--lg" href={alquiler.ruta}>Empezar reserva</Link>
+        </div>
+      </section>
+
+      {/* LA APP: punto fuerte de la máquina (ilustración neutra hasta tener capturas reales) */}
+      <section id="app" className="flow flow--app" aria-labelledby="t-app">
+        <div className="wrap split split--app">
+          <div className="stack" data-sc-in>
+            <p className="kicker">La app {app.nombre}</p>
+            <h2 id="t-app" className="display display--md">Prepara el entrenamiento antes de llegar a la pista</h2>
+            <ul className="app__puntos">
+              {app.puntos.map((pt) => (
+                <li key={pt.t}><strong>{pt.t}.</strong> {pt.d}</li>
+              ))}
+            </ul>
+          </div>
+          <figure className="app__movil" aria-hidden="true">
+            <div className="app__pantalla">
+              <p className="app__cab">{app.nombre}</p>
+              <p className="app__tit">Mi sesión</p>
+              <ul>
+                <li><span>Jugadores</span><b>1 · 2 · 3 · 4</b></li>
+                <li><span>Ejercicio 1</span><b>Derecha</b></li>
+                <li><span>Ejercicio 2</span><b>Revés</b></li>
+                <li><span>Ejercicio 3</span><b>Bandeja</b></li>
+              </ul>
+              <p className="app__boton">Lista para la pista</p>
+            </div>
+            <figcaption>Ilustración. No es una captura de la app.</figcaption>
+          </figure>
         </div>
       </section>
 
