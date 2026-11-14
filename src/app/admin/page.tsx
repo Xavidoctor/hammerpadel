@@ -25,7 +25,7 @@ const ESTADO_TEXTO: Record<string, string> = {
 function whatsapp(r: ReservaAdmin) {
   const tel = r.telefono.replace(/\D/g, "");
   const numero = tel.length === 9 ? `34${tel}` : tel;
-  const texto = `Hola ${r.nombre}, te confirmamos tu sesión Hammer Padel el ${fechaLarga(r.fecha)} de ${hhmm(r.inicio)} a ${hhmm(r.fin)} en ${r.pista}. ¡Nos vemos allí!`;
+  const texto = `Hola ${r.nombre}, te confirmamos tu sesión Hammer Padel el ${fechaLarga(r.fecha)} de ${hhmm(r.inicio)} a ${hhmm(r.fin)} en ${r.pista}. Descarga antes la app gratuita HammerPadel Control (iPhone y Android): con ella controlas la máquina por Bluetooth. ¡Nos vemos allí!`;
   return `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
 }
 

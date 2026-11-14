@@ -114,6 +114,10 @@ export function BookingRequest() {
           Hemos apartado esta hora para ti. <strong>Xavi o Marc te llamarán o escribirán para
           confirmarla</strong> antes de la sesión.
         </p>
+        <p>
+          Antes de la sesión, descarga en tu móvil la app gratuita <strong>HammerPadel Control</strong>{" "}
+          (iPhone y Android): con ella controlas la máquina por Bluetooth.
+        </p>
       </div>
     );
   }
