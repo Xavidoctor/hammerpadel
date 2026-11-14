@@ -45,8 +45,10 @@ total = sum(pesos) + amb
 mascaras = [p / total for p in pesos]
 m_amb = amb / total
 
-# apagado: muy oscuro y algo más azul; los LED y la máquina casi negros
-oscuro = lit * 0.05 + np.array([0.012, 0.006, 0.002], np.float32)  # BGR
+# apagado: muy oscuro y algo más azul, pero la máquina se intuye desde el primer fotograma
+# (Xavi, 14-11): una luz tenue sobre ella deja ver su silueta, la tolva y las pelotas.
+maquina = g(0.5, 0.6, 0.11, 0.24)
+oscuro = lit * (0.05 + 0.3 * maquina[..., None]) + np.array([0.012, 0.006, 0.002], np.float32)  # BGR
 
 def encendido(u, t0):
     # LED: arranque rápido con un pequeño destello y asentamiento
