@@ -54,7 +54,13 @@ export const alquiler = {
   resumen: "25 € por sesión de 90 minutos",
   pelotas: 60,
   pelotasIncluidas: 60,
-  incluyeTexto: "60 pelotas incluidas",
+  incluyeTexto: "60 pelotas y 1 recogebolas incluidos",
+  /** [CONFIRMADO] Xavi 14-11-2026: cada sesión incluye 1 recogebolas; un segundo cuesta 2,50 € más por sesión. */
+  recogebolasIncluidos: 1,
+  recogebolasTexto: "1 recogebolas incluido",
+  recogebolasExtraCentimos: 250,
+  recogebolasExtraTexto: "2,50 €",
+  recogebolasExtraFrase: "Si queréis un segundo recogebolas, son 2,50 € más por sesión",
   ruta: "/alquiler",
   comarca: "Marina Alta, Alicante",
 } as const;

@@ -22,7 +22,7 @@ const pasos = [
     d: `Elige localidad, día y hora, con al menos 6 horas de antelación. ${servicio.confirmacionTexto}. Descarga la app gratis y prepara tu entrenamiento.`,
   },
   { t: "Te la llevamos", d: `${servicio.entregaTexto}: de club, de urbanización o privada, en ${localidades.map((l) => l.nombre).join(", ")}.` },
-  { t: "Entrena a tu ritmo", d: "Con 60 pelotas incluidas. Tú golpeas, la máquina repite, sin esperar a un compañero." },
+  { t: "Entrena a tu ritmo", d: "Con 60 pelotas y un recogebolas incluidos. Tú golpeas, la máquina repite, sin esperar a un compañero." },
   { t: "Paga en la pista", d: `${servicio.pagoTexto}. ${servicio.pagoNota}` },
 ];
 
@@ -52,6 +52,7 @@ export default function ComoFunciona() {
           <dl className="spec spec--compact">
             <div><dt>Precio</dt><dd>{alquiler.resumen}</dd></div>
             <div><dt>Pelotas</dt><dd>{servicio.pelotasTexto}</dd></div>
+            <div><dt>Recogebolas</dt><dd>{servicio.recogebolasTexto}</dd></div>
             <div><dt>App</dt><dd>{app.nombre}, gratis (iPhone y Android). Con ella controlas la máquina</dd></div>
             <div><dt>Días</dt><dd>{servicio.diasTexto}</dd></div>
             <div><dt>Horario</dt><dd>{servicio.horarioTexto}</dd></div>

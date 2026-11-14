@@ -69,6 +69,7 @@ create table reservas (
                       check (estado in ('retenida', 'pendiente', 'confirmada', 'cancelada', 'completada', 'no_presentado')),
   precio_centimos     int  not null,                 -- calculado en el servidor
   forma_pago          text not null default 'efectivo' check (forma_pago in ('efectivo', 'online')),
+  recogebolas_extra   boolean not null default false, -- segundo recogebolas (+2,50 €); uno va siempre incluido
   retenida_hasta      timestamptz,                   -- fase D: mientras se paga online
   reprogramada_desde  uuid references reservas,
   creada              timestamptz not null default now(),

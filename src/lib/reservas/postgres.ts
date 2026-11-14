@@ -1,3 +1,4 @@
+import { alquiler } from "@/content/catalogo";
 import { AJUSTES, type Ajustes } from "./ajustes";
 import { comprobarHora, fechaReservable, minInicioDelDia, type DatosDia, type Motivo } from "./disponibilidad";
 import type { RepositorioReservas } from "./repositorio";
@@ -22,6 +23,8 @@ export type SolicitudReserva = {
   telefono: string;
   email: string;
   pista: string;
+  /** Recogebolas extra (la sesión ya incluye uno). Suma alquiler.recogebolasExtraCentimos. */
+  segundoRecogebolas?: boolean;
 };
 
 export type ResultadoCrear =
@@ -35,6 +38,7 @@ export type ReservaAdmin = {
   fin: Minutos;
   localidadId: string;
   pista: string;
+  segundoRecogebolas: boolean;
   estado: EstadoReserva;
   maquinaId: string;
   repartidorId: string;
@@ -101,15 +105,17 @@ export class RepositorioPostgres implements RepositorioReservas {
         );
         const [fila] = await tx.query<{ id: string }>(
           `insert into reservas (cliente_id, localidad_id, pista, maquina_id, repartidor_id, tarifa_id,
-                                 sesion, ciclo, estado, precio_centimos, forma_pago)
+                                 sesion, ciclo, estado, precio_centimos, forma_pago, recogebolas_extra)
            values ($1, $2, $3, $4, $5, $6,
                    tstzrange(${instante("$7", "$8", this.tz)}, ${instante("$7", "$9", this.tz)}),
                    tstzrange(${instante("$7", "$10", this.tz)}, ${instante("$7", "$11", this.tz)}),
-                   'pendiente', $12, 'efectivo')
+                   'pendiente', $12, 'efectivo', $13)
            returning id`,
           [
             cliente.id, s.localidadId, s.pista, r.maquinaId, r.repartidorId, tarifa.id,
-            s.fecha, r.inicio, r.fin, r.inicio - aj.montaje, r.fin + aj.recogida, tarifa.precio_centimos,
+            s.fecha, r.inicio, r.fin, r.inicio - aj.montaje, r.fin + aj.recogida,
+            tarifa.precio_centimos + (s.segundoRecogebolas ? alquiler.recogebolasExtraCentimos : 0),
+            s.segundoRecogebolas === true,
           ],
         );
         await tx.query(
@@ -131,7 +137,7 @@ export class RepositorioPostgres implements RepositorioReservas {
       `select r.id, d.fecha::text as fecha,
               ${minutosLocales("lower(r.sesion)", "d.fecha", tz)} as inicio,
               ${minutosLocales("upper(r.sesion)", "d.fecha", tz)} as fin,
-              r.localidad_id as "localidadId", r.pista, r.estado,
+              r.localidad_id as "localidadId", r.pista, r.recogebolas_extra as "segundoRecogebolas", r.estado,
               r.maquina_id as "maquinaId", r.repartidor_id as "repartidorId",
               c.nombre, c.telefono, c.email, r.precio_centimos as "precioCentimos", r.creada::text as creada
          from reservas r

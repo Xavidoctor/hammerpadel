@@ -185,7 +185,7 @@ export default function Inicio() {
               <span className="price__num">{alquiler.precioTexto}</span>
               <span className="rent__dur">{alquiler.duracionMinutos} min · {alquiler.pelotasTexto}</span>
             </p>
-            <p className="rent__where">La llevamos a tu pista, también en urbanizaciones y pistas privadas.</p>
+            <p className="rent__where">La llevamos a tu pista, también en urbanizaciones y pistas privadas. Con un recogebolas incluido (el segundo, {alquiler.recogebolasExtraTexto} más).</p>
             <Link className="btn btn--accent" href={alquiler.ruta}>Reservar entrenamiento</Link>
           </div>
         </div>

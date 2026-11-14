@@ -46,6 +46,7 @@ export default function Alquiler() {
           </li>
           <li>Reserva con al menos 6 horas de antelación. Xavi o Marc te confirman la reserva.</li>
           <li>Te llevamos la máquina a clubes, urbanizaciones y pistas privadas.</li>
+          <li>Incluye un recogebolas para recoger más rápido y aprovechar el entrenamiento. {alquiler.recogebolasExtraFrase}.</li>
           <li>Pelotas perdidas: 1 € por pelota.</li>
           <li>La máquina se controla desde el móvil con la app gratuita HammerPadel Control (iPhone y Android, por Bluetooth): descárgala antes de la sesión.</li>
         </ul>

@@ -87,6 +87,7 @@ export default async function AlquilerLocalidad({ params }: Props) {
             <div><dt>Dónde</dt><dd>{c.pistas} de {p.nombre}: nosotros llevamos la máquina</dd></div>
             <div><dt>Entrega</dt><dd>{p.entrega}</dd></div>
             <div><dt>Pelotas</dt><dd>{alquiler.pelotasTexto}. {c.pelotaPerdida}.</dd></div>
+            <div><dt>Recogebolas</dt><dd>{alquiler.recogebolasTexto}. {alquiler.recogebolasExtraFrase}.</dd></div>
             <div><dt>Pago</dt><dd>De momento, en efectivo al empezar la sesión. El pago online llegará más adelante.</dd></div>
           </dl>
         </section>

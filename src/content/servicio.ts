@@ -22,4 +22,5 @@ export const servicio = {
   pistasTexto: "Pistas de club, de urbanización o privadas",
   pelotaPerdidaTexto: "1 € por cada pelota perdida",
   pelotasTexto: "Incluye 60 pelotas",
+  recogebolasTexto: "Incluye un recogebolas para recoger más rápido y aprovechar el entrenamiento. El segundo, 2,50 € más por sesión",
 } as const;

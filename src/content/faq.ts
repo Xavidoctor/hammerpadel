@@ -10,7 +10,7 @@ const pueblos = localidades.map((l) => l.nombre).join(", ");
  * se muestra como pendiente y NO entra en los datos estructurados.
  */
 export const faqAlquiler: Pregunta[] = [
-  { p: "¿Cuánto cuesta alquilar la máquina?", r: `${alquiler.precioTexto} por sesión de ${alquiler.duracionTexto}, IVA incluido. La sesión incluye 60 pelotas.` },
+  { p: "¿Cuánto cuesta alquilar la máquina?", r: `${alquiler.precioTexto} por sesión de ${alquiler.duracionTexto}, IVA incluido. La sesión incluye 60 pelotas y un recogebolas.` },
   { p: "¿Dónde está disponible el alquiler?", r: `De momento en ${pueblos} (${alquiler.comarca}).` },
   { p: "¿Tengo que ir a recoger la máquina?", r: `No. ${servicio.entregaTexto} y la recogemos al terminar.` },
   { p: "¿Qué días y a qué horas puedo reservar?", r: `${servicio.diasTexto}. ${servicio.horarioTexto}. Cada sesión dura ${alquiler.duracionTexto}.` },
@@ -19,6 +19,7 @@ export const faqAlquiler: Pregunta[] = [
   { p: "¿En qué pistas se puede usar?", r: `La pista la pones tú. ${servicio.pistasTexto}: también vamos a urbanizaciones y pistas particulares.` },
   { p: "¿Necesito la app para la sesión de alquiler?", r: `Sí. La máquina se controla con la app ${app.nombre}, gratis para iPhone y Android. Descárgala antes y prepara el entrenamiento en casa.` },
   { p: "¿Tengo que llevar pelotas?", r: `No. ${servicio.pelotasTexto} en cada sesión.` },
+  { p: "¿Incluye recogebolas?", r: `Sí. ${servicio.recogebolasTexto}.` },
   { p: "¿Qué pasa si se pierde alguna pelota?", r: `Se cobra ${servicio.pelotaPerdidaTexto}.` },
   { p: "¿Puedo cancelar o cambiar mi reserva?", r: "La política de cancelaciones y cambios está pendiente de publicar.", pendiente: true },
   { p: "¿Con cuánta antelación tengo que reservar?", r: `${servicio.antelacionTexto}.` },

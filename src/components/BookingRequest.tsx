@@ -29,6 +29,7 @@ export function BookingRequest() {
   const [errores, setErrores] = useState<string[]>([]);
   const [enviado, setEnviado] = useState<"" | "prototipo" | "real">("");
   const [enviando, setEnviando] = useState(false);
+  const [segundoRecogebolas, setSegundoRecogebolas] = useState(false);
   const peticion = useRef(0);
 
   async function cargar(id: LocalidadId) {
@@ -58,6 +59,11 @@ export function BookingRequest() {
   const franja = dia?.horas.find((h) => h.inicio === hora);
   const locNombre = localidades.find((l) => l.id === loc)?.nombre;
   const fechaLarga = fecha ? fmt(fecha, { weekday: "long", day: "numeric", month: "long" }) : "";
+  const totalCentimos = alquiler.precioCentimos + (segundoRecogebolas ? alquiler.recogebolasExtraCentimos : 0);
+  const totalTexto = `${(totalCentimos / 100).toLocaleString("es-ES", { minimumFractionDigits: totalCentimos % 100 ? 2 : 0 })} €`;
+  const resumenSesion = segundoRecogebolas
+    ? `${alquiler.resumen} + segundo recogebolas (${alquiler.recogebolasExtraTexto}): ${totalTexto}`
+    : alquiler.resumen;
 
   async function enviar(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
@@ -85,7 +91,7 @@ export function BookingRequest() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           localidad: loc, fecha, inicio: hora, nombre: texto("nombre"), telefono: texto("telefono"),
-          email: texto("email"), pista: texto("pista"), acepto: true, web: texto("web"),
+          email: texto("email"), pista: texto("pista"), segundoRecogebolas, acepto: true, web: texto("web"),
         }),
       });
       if (r.status === 201) {
@@ -110,7 +116,7 @@ export function BookingRequest() {
       <div className="result" role="status" aria-live="polite">
         <h2>Reserva recibida</h2>
         <p>
-          {locNombre}, {fechaLarga}, de {franja.inicio} a {franja.fin}. {alquiler.resumen}, pago en efectivo en la sesión.
+          {locNombre}, {fechaLarga}, de {franja.inicio} a {franja.fin}. {resumenSesion}, pago en efectivo en la sesión.
         </p>
         <p>
           Hemos apartado esta hora para ti. <strong>Xavi o Marc te llamarán o escribirán para
@@ -129,7 +135,7 @@ export function BookingRequest() {
       <div className="result" role="status" aria-live="polite">
         <h2>Solicitud preparada (prototipo)</h2>
         <p>
-          {locNombre}, {fechaLarga}, de {franja.inicio} a {franja.fin}. {alquiler.resumen}, pago en efectivo en la sesión.
+          {locNombre}, {fechaLarga}, de {franja.inicio} a {franja.fin}. {resumenSesion}, pago en efectivo en la sesión.
         </p>
         <p>
           En este prototipo <strong>no se envía nada</strong> ni se crea ninguna reserva. Cuando el
@@ -247,6 +253,17 @@ export function BookingRequest() {
             </div>
           </div>
           <label className="check">
+            <input
+              type="checkbox"
+              name="segundoRecogebolas"
+              checked={segundoRecogebolas}
+              onChange={(e) => setSegundoRecogebolas(e.target.checked)}
+            />
+            <span>
+              Añadir un segundo recogebolas (+{alquiler.recogebolasExtraTexto}). La sesión ya incluye uno.
+            </span>
+          </label>
+          <label className="check">
             <input type="checkbox" name="acepto" />
             <span>
               Acepto las <Link href="/legal/condiciones-alquiler">condiciones de alquiler</Link> (entre ellas, 1 € por
@@ -280,8 +297,9 @@ export function BookingRequest() {
           <div><dt>Fecha</dt><dd>{fecha ? fechaLarga : "Sin elegir"}</dd></div>
           <div><dt>Horario</dt><dd>{franja ? `${franja.inicio}–${franja.fin}` : "Sin elegir"}</dd></div>
           <div><dt>Duración</dt><dd>{alquiler.duracionTexto}</dd></div>
-          <div><dt>Precio</dt><dd>{alquiler.precioTexto}</dd></div>
           <div><dt>Incluye</dt><dd>{alquiler.incluyeTexto}</dd></div>
+          {segundoRecogebolas && <div><dt>Extra</dt><dd>Segundo recogebolas (+{alquiler.recogebolasExtraTexto})</dd></div>}
+          <div><dt>Total</dt><dd>{totalTexto}</dd></div>
           <div><dt>Pago</dt><dd>Efectivo en la sesión</dd></div>
         </dl>
       </aside>

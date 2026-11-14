@@ -25,7 +25,7 @@ const ESTADO_TEXTO: Record<string, string> = {
 function whatsapp(r: ReservaAdmin) {
   const tel = r.telefono.replace(/\D/g, "");
   const numero = tel.length === 9 ? `34${tel}` : tel;
-  const texto = `Hola ${r.nombre}, te confirmamos tu sesión Hammer Padel el ${fechaLarga(r.fecha)} de ${hhmm(r.inicio)} a ${hhmm(r.fin)} en ${r.pista}. Descarga antes la app gratuita HammerPadel Control (iPhone y Android): con ella controlas la máquina por Bluetooth. ¡Nos vemos allí!`;
+  const texto = `Hola ${r.nombre}, te confirmamos tu sesión Hammer Padel el ${fechaLarga(r.fecha)} de ${hhmm(r.inicio)} a ${hhmm(r.fin)} en ${r.pista}${r.segundoRecogebolas ? ", con dos recogebolas" : ""}. Descarga antes la app gratuita HammerPadel Control (iPhone y Android): con ella controlas la máquina por Bluetooth. ¡Nos vemos allí!`;
   return `https://wa.me/${numero}?text=${encodeURIComponent(texto)}`;
 }
 
@@ -94,6 +94,7 @@ export default async function Admin() {
                     <span className="admin__estado">{ESTADO_TEXTO[r.estado] ?? r.estado}</span>
                   </div>
                   <p>{r.pista}</p>
+                  {r.segundoRecogebolas && <p><strong>2 recogebolas</strong> (uno extra, +2,50 €)</p>}
                   <p>
                     {r.nombre} · <a href={`tel:${r.telefono}`}>{r.telefono}</a> ·{" "}
                     <a href={whatsapp(r)} target="_blank" rel="noreferrer">WhatsApp</a> ·{" "}

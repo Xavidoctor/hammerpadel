@@ -38,6 +38,7 @@ export async function POST(req: Request) {
       `<b>Nueva reserva (pendiente de confirmar)</b>`,
       `${e(loc)} · ${d.fecha} · ${hhmm(d.inicio)}–${hhmm(d.inicio + 90)}`,
       `Pista: ${e(d.pista)}`,
+      d.segundoRecogebolas ? `Recogebolas: 2 (uno extra, +2,50 €)` : `Recogebolas: 1 (incluido)`,
       `Cliente: ${e(d.nombre)} · ${e(d.telefono)} · ${e(d.email)}`,
       `Asignada a: ${e(rep)} · máquina ${e(r.maquinaId)}`,
       `<a href="${origen}/admin">Abrir el panel</a>`,

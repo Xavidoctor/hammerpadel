@@ -24,7 +24,8 @@ export default function CondicionesAlquiler() {
 
       <h2>1. El servicio</h2>
       <ul>
-        <li>Alquiler de una máquina lanzapelotas Hammer Padel durante una sesión de {alquiler.duracionTexto}, con {alquiler.pelotas} pelotas.</li>
+        <li>Alquiler de una máquina lanzapelotas Hammer Padel durante una sesión de {alquiler.duracionTexto}, con {alquiler.pelotas} pelotas y un recogebolas.</li>
+        <li>Se puede añadir un segundo recogebolas por {alquiler.recogebolasExtraTexto} más por sesión, indicándolo al reservar.</li>
         <li>Hammer Padel lleva la máquina a la pista que indiques y la recoge al terminar.</li>
         <li>Zona de servicio: {zona} ({alquiler.comarca}).</li>
         <li>Servicio de lunes a domingo. Horario de inicio de las sesiones: de 8:00 a 20:30 (la última sesión empieza a las 20:30).</li>

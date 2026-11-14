@@ -30,10 +30,11 @@ export function validarSolicitud(
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errores.push("Escribe un email válido.");
   const pista = recorta(b.pista, 200);
   if (!pista) errores.push("Indica el club, la urbanización o la pista donde entrenarás.");
+  const segundoRecogebolas = b.segundoRecogebolas === true;
   if (b.acepto !== true) errores.push("Acepta las condiciones para continuar.");
 
   if (errores.length) return { ok: false, errores };
-  return { ok: true, datos: { localidadId, fecha, inicio, nombre, telefono, email, pista } };
+  return { ok: true, datos: { localidadId, fecha, inicio, nombre, telefono, email, pista, segundoRecogebolas } };
 }
 
 export const MENSAJES_RECHAZO: Record<string, string> = {
