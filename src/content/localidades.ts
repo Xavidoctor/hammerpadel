@@ -3,7 +3,11 @@
  *
  * [CONFIRMADO] por Hammer Padel (2026-11-14): el alquiler se hace en la pista
  * del cliente (Hammer Padel lleva la máquina), 20 € / 90 min, reservas con
- * inicio entre las 8:00 y las 20:30 y, al principio, pago en efectivo en la sesión.
+ * inicio entre las 8:00 y las 20:30, de lunes a domingo, con 6 h de antelación
+ * mínima, confirmadas a mano por el equipo, solo desde la web; se atienden
+ * urbanizaciones y pistas privadas; 1 € por pelota perdida; al principio, pago
+ * en efectivo en la sesión. En Ondara y Pedreguer el equipo se queda cerca
+ * durante la sesión.
  *
  * [PENDIENTE] Datos propios de cada localidad. No se inventan clubes,
  * direcciones, reseñas ni horarios. Mientras una localidad no tenga sus datos
@@ -21,8 +25,6 @@ export type DatosLocales = {
   zonas: string[];
   /** Qué tipo de pistas hay en la zona y dónde se puede usar la máquina. */
   pistas: string;
-  /** Cómo se coordina la entrega y la recogida en esta localidad. */
-  entrega: string;
   /** Preguntas frecuentes reales de clientes de esta localidad. */
   preguntas: PreguntaLocal[];
 };
@@ -32,6 +34,8 @@ export type PaginaLocalidad = {
   nombre: string;
   /** Palabra clave principal de la página. */
   keyword: string;
+  /** [CONFIRMADO] Cómo funciona la entrega en esta localidad. */
+  entrega: string;
   /** null mientras falten datos locales verificados. */
   local: DatosLocales | null;
 };
@@ -43,6 +47,16 @@ const keywords: Record<LocalidadId, string> = {
   pedreguer: "Alquiler de máquina lanzapelotas en Pedreguer",
 };
 
+const entregaCerca = "Montamos la máquina en unos minutos y nos quedamos cerca durante toda la sesión, por si necesitas algo. Al terminar, la recogemos.";
+const entregaVuelta = "Montamos la máquina en unos minutos antes de empezar y la recogemos al terminar la sesión.";
+
+const entregas: Record<LocalidadId, string> = {
+  ondara: entregaCerca,
+  pedreguer: entregaCerca,
+  denia: entregaVuelta,
+  "la-xara": entregaVuelta,
+};
+
 /** Datos locales verificados. Vacío hasta que Hammer Padel los facilite. */
 const datosLocales: Partial<Record<LocalidadId, DatosLocales>> = {};
 
@@ -50,13 +64,14 @@ export const paginasLocalidad: PaginaLocalidad[] = localidades.map((l) => ({
   id: l.id,
   nombre: l.nombre,
   keyword: keywords[l.id],
+  entrega: entregas[l.id],
   local: datosLocales[l.id] ?? null,
 }));
 
 /** Una página es indexable solo si tiene contenido local propio suficiente. */
 export function esIndexable(p: PaginaLocalidad): boolean {
   const d = p.local;
-  return !!d && d.zonas.length > 0 && d.pistas.trim() !== "" && d.entrega.trim() !== "" && d.preguntas.length > 0;
+  return !!d && d.zonas.length > 0 && d.pistas.trim() !== "" && d.preguntas.length > 0;
 }
 
 export function paginaLocalidad(id: string): PaginaLocalidad | undefined {
@@ -67,3 +82,12 @@ export const rutaLocalidad = (id: LocalidadId) => `/alquiler/${id}`;
 
 /** Horario confirmado: primera y última hora de inicio de una reserva. */
 export const horarioAlquiler = { primeraReserva: "8:00", ultimaReserva: "20:30" } as const;
+
+/** Condiciones confirmadas por Hammer Padel (2026-11-14). */
+export const condicionesAlquiler = {
+  dias: "De lunes a domingo",
+  antelacionHoras: 6,
+  confirmacion: "Confirmamos cada reserva personalmente",
+  pistas: "Pistas de urbanizaciones y pistas privadas",
+  pelotaPerdida: "1 € por cada pelota perdida",
+} as const;

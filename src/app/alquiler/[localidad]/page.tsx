@@ -6,6 +6,7 @@ import { Price } from "@/components/Price";
 import { RentalJsonLd } from "@/components/RentalJsonLd";
 import { alquiler, maquina } from "@/content/catalogo";
 import {
+  condicionesAlquiler as c,
   esIndexable,
   horarioAlquiler,
   paginaLocalidad,
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!p) return {};
   return {
     title: p.keyword,
-    description: `Llevamos la máquina lanzapelotas Hammer Padel a tu pista en ${p.nombre}. ${alquiler.resumen}, con reservas de ${horarioAlquiler.primeraReserva} a ${horarioAlquiler.ultimaReserva}.`,
+    description: `Llevamos la máquina lanzapelotas Hammer Padel a tu pista en ${p.nombre}, también en urbanizaciones y pistas privadas. ${alquiler.resumen}, de lunes a domingo de ${horarioAlquiler.primeraReserva} a ${horarioAlquiler.ultimaReserva}.`,
     alternates: { canonical: rutaLocalidad(p.id) },
     // Sin contenido local propio, la página no se indexa (evita contenido duplicado).
     ...(esIndexable(p) ? {} : { robots: { index: false, follow: true } }),
@@ -67,7 +68,7 @@ export default async function AlquilerLocalidad({ params }: Props) {
         <section aria-labelledby="t-pasos">
           <h2 id="t-pasos" className="local__h2">Así funciona en {p.nombre}</h2>
           <ol className="steps">
-            <li><span>1</span>Reservas: eliges {p.nombre}, el día y la franja.</li>
+            <li><span>1</span>Reservas en la web y te confirmamos la reserva.</li>
             <li><span>2</span>Te llevamos la máquina a tu pista.</li>
             <li><span>3</span>Entrenas {alquiler.duracionTexto} a tu ritmo.</li>
             <li><span>4</span>Pagas en la sesión.</li>
@@ -75,14 +76,17 @@ export default async function AlquilerLocalidad({ params }: Props) {
         </section>
 
         <section className="prose" aria-labelledby="t-datos">
-          <h2 id="t-datos">Precio, horario y pago</h2>
+          <h2 id="t-datos">Precio, horario y condiciones</h2>
           <dl className="spec">
             <div><dt>Precio</dt><dd>{alquiler.resumen}</dd></div>
             <div>
               <dt>Horario</dt>
-              <dd>Reservas con inicio entre las {horarioAlquiler.primeraReserva} y las {horarioAlquiler.ultimaReserva}</dd>
+              <dd>{c.dias}. Reservas con inicio entre las {horarioAlquiler.primeraReserva} y las {horarioAlquiler.ultimaReserva}</dd>
             </div>
-            <div><dt>Dónde</dt><dd>En tu pista de {p.nombre}: nosotros llevamos la máquina</dd></div>
+            <div><dt>Antelación</dt><dd>Reserva con al menos {c.antelacionHoras} horas. {c.confirmacion}.</dd></div>
+            <div><dt>Dónde</dt><dd>{c.pistas} de {p.nombre}: nosotros llevamos la máquina</dd></div>
+            <div><dt>Entrega</dt><dd>{p.entrega}</dd></div>
+            <div><dt>Pelotas</dt><dd>{c.pelotaPerdida}</dd></div>
             <div><dt>Pago</dt><dd>De momento, en efectivo al empezar la sesión. El pago online llegará más adelante.</dd></div>
           </dl>
         </section>
@@ -95,8 +99,6 @@ export default async function AlquilerLocalidad({ params }: Props) {
               <ul>{p.local.zonas.map((z) => <li key={z}>{z}</li>)}</ul>
               <h3>Pistas</h3>
               <p>{p.local.pistas}</p>
-              <h3>Entrega y recogida</h3>
-              <p>{p.local.entrega}</p>
               {p.local.preguntas.length ? (
                 <>
                   <h3>Preguntas frecuentes en {p.nombre}</h3>
@@ -111,8 +113,8 @@ export default async function AlquilerLocalidad({ params }: Props) {
             </>
           ) : (
             <p className="pending">
-              Zonas de {p.nombre} donde llevamos la máquina, pistas y cómo coordinamos la entrega:
-              información pendiente de publicar.
+              Zonas y urbanizaciones de {p.nombre} donde ya llevamos la máquina y preguntas frecuentes
+              de la zona: información pendiente de publicar.
             </p>
           )}
           <p>

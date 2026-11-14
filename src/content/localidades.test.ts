@@ -3,8 +3,8 @@ import { localidades } from "./catalogo";
 import { esIndexable, paginasLocalidad, type PaginaLocalidad } from "./localidades";
 import { rutasLocalidad } from "@/app/sitemap";
 
-const base: PaginaLocalidad = { id: "denia", nombre: "Dénia", keyword: "x", local: null };
-const completo = { zonas: ["Zona"], pistas: "Pistas", entrega: "Entrega", preguntas: [{ pregunta: "¿?", respuesta: "Sí" }] };
+const base: PaginaLocalidad = { id: "denia", nombre: "Dénia", keyword: "x", entrega: "e", local: null };
+const completo = { zonas: ["Zona"], pistas: "Pistas", preguntas: [{ pregunta: "¿?", respuesta: "Sí" }] };
 
 describe("páginas por localidad", () => {
   it("hay una página por cada localidad confirmada, con keyword propia", () => {
@@ -16,7 +16,7 @@ describe("páginas por localidad", () => {
   it("sin datos locales no es indexable", () => {
     expect(esIndexable(base)).toBe(false);
     expect(esIndexable({ ...base, local: { ...completo, zonas: [] } })).toBe(false);
-    expect(esIndexable({ ...base, local: { ...completo, entrega: " " } })).toBe(false);
+    expect(esIndexable({ ...base, local: { ...completo, pistas: " " } })).toBe(false);
     expect(esIndexable({ ...base, local: { ...completo, preguntas: [] } })).toBe(false);
   });
 
