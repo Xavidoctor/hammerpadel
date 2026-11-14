@@ -17,7 +17,7 @@ Fase B programada: con `DATABASE_URL` configurada, las reservas se graban como *
 | Confirmación | manual, por Xavi o Marc | Confirmado |
 | Pelotas perdidas | 1 € por pelota | Confirmado |
 | Pago | efectivo en la sesión (online más adelante) | Confirmado |
-| Trayecto mismo pueblo / entre pueblos | 10 / 20 min | Propuesta |
+| Trayecto mismo pueblo / entre pueblos | 10 / 20 min | Confirmado |
 | Días visibles / paso | 14 / 30 min | Propuesta |
 | Cancelación y fianza | sin definir | Pendiente |
 

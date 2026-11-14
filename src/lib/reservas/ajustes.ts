@@ -40,8 +40,8 @@ export const AJUSTES: Ajustes = {
   duracion: 90, // [CONFIRMADO]
   montaje: 3, // [CONFIRMADO] 3 min
   recogida: 3, // [CONFIRMADO] 3 min
-  trasladoMismaLocalidad: 10, // [PROPUESTA]
-  trasladoEntreLocalidades: 20, // [PROPUESTA] las 4 localidades están a 4–12 km
+  trasladoMismaLocalidad: 10, // [CONFIRMADO]
+  trasladoEntreLocalidades: 20, // [CONFIRMADO]
   antelacionMinima: 6 * 60, // [CONFIRMADO] 6 h
   diasVista: 14, // [PROPUESTA]
   // [CONFIRMADO] Lunes a domingo: no hay días cerrados por defecto (los
