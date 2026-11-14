@@ -53,6 +53,7 @@ export const alquiler = {
   pelotasTexto: "60 pelotas incluidas",
   resumen: "25 € por sesión de 90 minutos",
   pelotas: 60,
+  incluyeTexto: "60 pelotas incluidas",
   ruta: "/alquiler",
   comarca: "Marina Alta, Alicante",
 } as const;

@@ -39,6 +39,15 @@ export default function Alquiler() {
           ))}
         </ul>
         <h2>Condiciones</h2>
+        <ul>
+          <li>
+            Sesión de 90 minutos por {alquiler.precioTexto} con {alquiler.pelotasIncluidas} pelotas incluidas.
+            Pago en efectivo en la sesión.
+          </li>
+          <li>Reserva con al menos 6 horas de antelación. Xavi o Marc te confirman la reserva.</li>
+          <li>Te llevamos la máquina a clubes, urbanizaciones y pistas privadas.</li>
+          <li>Pelotas perdidas: 1 € por pelota.</li>
+        </ul>
         <p className="pending">
           Cancelaciones, reprogramaciones, fianza y responsabilidad por daños: pendientes de aprobación.
         </p>

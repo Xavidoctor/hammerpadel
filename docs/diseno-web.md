@@ -294,6 +294,8 @@ Siempre: un botón visible "Ver sin animación" que fija el nivel Reducido (y se
 
 ## 8. Sistema de reservas
 
+> **14-11-2026:** el diseño vigente del sistema de reservas (2 repartidores, 5 máquinas, horario 8:00–20:30) está en [`docs/reservas.md`](reservas.md). Lo que sigue es el planteamiento inicial.
+
 ### 8.1 Flujo de usuario (4 pasos) [CONFIRMADO el flujo, PROPUESTA el detalle]
 1. **Ubicación**: 4 botones grandes (Dénia, Ondara, La Xara, Pedreguer).
 2. **Fecha**: tira de los próximos 14 días como botones (días sin disponibilidad deshabilitados con texto "Completo"). Evita calendarios emergentes poco accesibles en móvil.
