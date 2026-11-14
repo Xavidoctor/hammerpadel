@@ -1,12 +1,19 @@
 /**
  * Fuente única de precios y datos comerciales del prototipo.
  * [CONFIRMADO] por Hammer Padel: precios y localidades de alquiler.
- * [PENDIENTE] tratamiento del IVA: no se indica "IVA incluido" hasta confirmarlo.
+ * [CONFIRMADO] 14/11/2026: precios con IVA incluido; envío de la máquina incluido;
+ * recogebolas 6,99 € de envío por 1 unidad, gratis desde 2; devoluciones con envío a cargo del cliente.
  * Nada de especificaciones técnicas: están pendientes de documentación oficial.
  */
 
-export const IVA_PENDIENTE = true;
-export const NOTA_IVA = "Tratamiento del IVA pendiente de confirmar.";
+export const NOTA_IVA = "IVA incluido.";
+
+/** Envío y devoluciones de la venta (confirmado por Xavi, 14/11/2026). */
+export const envio = {
+  maquina: "Envío incluido.",
+  recogebolas: "Envío 6,99 € por un recogebolas. Gratis a partir de 2.",
+  devoluciones: "En las devoluciones, el envío corre a cargo del cliente.",
+} as const;
 
 export type Producto = {
   id: "maquina" | "recogebolas";

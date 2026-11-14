@@ -10,6 +10,8 @@ export const app = {
   nombre: "HammerPadel Control",
   lema: "Prepara el entrenamiento en casa. En la pista, solo entrena.",
   datos: ["Gratis", "iPhone y Android", "Bluetooth"],
+  plataformasTexto: "Gratis para iPhone y Android",
+  conexionTexto: "Se conecta a la máquina por Bluetooth",
   puntos: [
     { t: "Controla la máquina", d: "Desde el móvil, por Bluetooth. También en las sesiones de alquiler." },
     { t: "Entrenamientos preparados", d: "Para entrenar solo o en grupo, de hasta 4 personas." },
