@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ContactForm } from "@/components/ContactForm";
+import { AppBloque } from "@/components/AppBloque";
 import { BreadcrumbJsonLd } from "@/components/JsonLd";
 import { PageHead } from "@/components/PageHead";
 import { ProductPhoto } from "@/components/ProductPhoto";
@@ -22,7 +23,7 @@ const perfiles = [
   {
     t: "Academias",
     d: "Un recurso para que los alumnos practiquen lo trabajado en clase, también entre sesiones con el entrenador.",
-    usos: ["Grupos por niveles", "Práctica autónoma entre clases", "Campus y clínics"],
+    usos: ["Grupos de hasta 4 con entrenamientos preparados", "Práctica autónoma entre clases", "Campus y clínics"],
   },
   {
     t: "Clubes",
@@ -61,7 +62,7 @@ export default function Clubes() {
         <section aria-labelledby="t-opciones" className="split split--content">
           <ProductPhoto
             src="/medios/maquina/maquina.webp"
-            alt="Máquina lanzapelotas Hammer Padel, de color negro, con el logotipo Hammer Padel"
+            alt="Máquina lanzapelotas Hammer X MAX, de color negro, con el logotipo Hammer Padel"
             ancho={888}
             alto={1156}
             className="photo--estudio"
@@ -83,7 +84,7 @@ export default function Clubes() {
                 <p className="kicker">Para tu centro</p>
                 <h3>Compra</h3>
                 <p className="option__price"><span className="price__num">{maquina.precioTexto}</span></p>
-                <p>Máquina Hammer Padel. Recogebolas Hammer por {recogebolas.precioTexto}.</p>
+                <p>Máquina {maquina.nombre}, IVA y envío incluidos. Recogebolas Hammer por {recogebolas.precioTexto}.</p>
                 <Link className="btn btn--ghost" href={maquina.ruta}>Ver la máquina</Link>
               </div>
             </div>
@@ -94,6 +95,11 @@ export default function Clubes() {
             </p>
           </div>
         </section>
+
+        <AppBloque
+          titulo="Clases de grupo, ya preparadas"
+          intro="La app trae entrenamientos para grupos de hasta 4 personas. Prepara la clase antes de llegar y dedica la hora de pista a corregir."
+        />
 
         <section aria-labelledby="t-form-clubes" className="sections__form">
           <h2 id="t-form-clubes" className="section-title">Hablemos de tu club</h2>

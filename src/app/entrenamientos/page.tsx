@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CtaAlquiler } from "@/components/CtaAlquiler";
+import { AppBloque } from "@/components/AppBloque";
 import { BreadcrumbJsonLd } from "@/components/JsonLd";
 import { PageHead } from "@/components/PageHead";
 import { alquiler, lemas } from "@/content/catalogo";
@@ -113,6 +114,11 @@ export default function Entrenamientos() {
           </ul>
         </section>
 
+        <AppBloque
+          titulo="Entrenamientos listos en la app"
+          intro="La app de la máquina trae entrenamientos preparados para jugar solo o en grupos de hasta 4 personas, y te deja personalizarlos. Prepáralos antes de ir a la pista."
+        />
+
         <section aria-labelledby="t-sesion" className="prose-wide">
           <h2 id="t-sesion" className="section-title">Una sesión de {alquiler.duracionTexto}, organizada</h2>
           <p className="lede">Una propuesta para aprovechar una sesión de alquiler. Ajústala a tu nivel y a tu forma física.</p>
@@ -139,9 +145,9 @@ export default function Entrenamientos() {
             <li>Ante dolor o molestias, para. Si tienes una lesión, consulta antes con un profesional.</li>
           </ul>
           <p className="notice">
-            <strong>Contenido orientativo.</strong> Las rutinas específicas para la máquina Hammer Padel
-            (ajustes por ejercicio) se añadirán cuando estén validadas con la documentación oficial y con
-            entrenadores. ¿Eres entrenador y quieres colaborar? <Link href="/clubes">Escríbenos</Link>.
+            <strong>Contenido orientativo.</strong> Estos ejercicios son generales de pádel. Los
+            entrenamientos de la máquina están en su app; aquí publicaremos ejemplos cuando estén
+            documentados. ¿Eres entrenador y quieres colaborar? <Link href="/clubes">Escríbenos</Link>.
           </p>
         </section>
       </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CtaAlquiler } from "@/components/CtaAlquiler";
+import { AppBloque } from "@/components/AppBloque";
 import { BreadcrumbJsonLd } from "@/components/JsonLd";
 import { PageHead } from "@/components/PageHead";
 import { ProductPhoto } from "@/components/ProductPhoto";
@@ -69,7 +70,7 @@ export default function ComoFunciona() {
         <section aria-labelledby="t-entrenar" className="split split--content">
           <ProductPhoto
             src="/medios/maquina/maquina.webp"
-            alt="Máquina lanzapelotas Hammer Padel, de color negro, con asa y ruedas"
+            alt="Máquina lanzapelotas Hammer X MAX, de color negro, con asa y ruedas"
             ancho={888}
             alto={1156}
             className="photo--estudio"
@@ -79,7 +80,7 @@ export default function ComoFunciona() {
             <p className="lede">{lemas.entrenar}</p>
             <div className="prose">
               <p>
-                Con una máquina lanzapelotas trabajas un golpe concreto muchas veces seguidas. La repetición
+                Con la Hammer X MAX trabajas un golpe concreto muchas veces seguidas. La repetición
                 fija el gesto, y como no dependes de un compañero, aprovechas cada minuto de pista.
               </p>
               <ul>
@@ -90,11 +91,13 @@ export default function ComoFunciona() {
               <p><Link href="/entrenamientos">Ideas de ejercicios por golpe</Link></p>
             </div>
             <p className="notice">
-              <strong>Pendiente.</strong> Modos, ajustes, carga de pelotas y batería se explicarán con la
+              <strong>Pendiente.</strong> Ajustes, carga de pelotas y batería se explicarán con la
               documentación técnica oficial. No publicamos datos sin verificar.
             </p>
           </div>
         </section>
+
+        <AppBloque intro="Con la app eliges un entrenamiento preparado, para ti solo o para un grupo de hasta 4 personas, o creas el tuyo. Lo dejas listo antes de llegar y en la pista solo entrenas." />
 
         <section aria-labelledby="t-recoger" className="uso uso--flush">
           <h2 id="t-recoger" className="section-title">Y al acabar la serie, recoge en segundos</h2>
