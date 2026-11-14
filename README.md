@@ -80,6 +80,10 @@ email público, ofrece abrir el correo del visitante con el mensaje ya escrito (
 de que el envío aún no está activo. Incluye campo trampa contra bots y un límite de 5 envíos por IP
 cada 10 minutos. Gmail permite unos 500 envíos al día, de sobra para un formulario de contacto.
 
+## Publicar en Netlify
+
+Ver [docs/despliegue-netlify.md](docs/despliegue-netlify.md): conexión del repositorio, variables de entorno y dominio. Configuración en `netlify.toml`.
+
 ## Estructura
 
 ```
