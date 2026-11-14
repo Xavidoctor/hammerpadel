@@ -17,7 +17,7 @@ export const contacto = {
 
 export const ASUNTOS = [
   { id: "alquiler", texto: "Alquiler de máquina" },
-  { id: "compra-maquina", texto: "Comprar la máquina Hammer Padel" },
+  { id: "compra-maquina", texto: "Comprar la máquina Hammer X MAX" },
   { id: "compra-recogebolas", texto: "Comprar el recogebolas" },
   { id: "clubes", texto: "Clubes, academias y entrenadores" },
   { id: "soporte", texto: "Soporte" },
