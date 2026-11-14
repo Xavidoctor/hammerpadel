@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useId, useMemo, useState, useSyncExternalStore } from "react";
 import { alquiler, localidades, type LocalidadId } from "@/content/catalogo";
 
@@ -160,7 +161,7 @@ export function BookingRequest() {
           </div>
           <label className="check">
             <input type="checkbox" name="acepto" />
-            <span>Acepto las condiciones de alquiler y la política de privacidad (pendientes de redactar).</span>
+            <span>Acepto las <Link href="/legal/condiciones-alquiler">condiciones de alquiler</Link> y he leído la <Link href="/legal/privacidad">política de privacidad</Link>.</span>
           </label>
           {errores.length > 0 && (
             <div role="alert">

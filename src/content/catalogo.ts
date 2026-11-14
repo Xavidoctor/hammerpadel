@@ -1,12 +1,17 @@
 /**
  * Fuente única de precios y datos comerciales del prototipo.
  * [CONFIRMADO] por Hammer Padel: precios y localidades de alquiler.
- * [PENDIENTE] tratamiento del IVA: no se indica "IVA incluido" hasta confirmarlo.
+ * [CONFIRMADO] 2026-11-14: todos los precios llevan el IVA incluido.
  * Nada de especificaciones técnicas: están pendientes de documentación oficial.
  */
 
-export const IVA_PENDIENTE = true;
-export const NOTA_IVA = "Tratamiento del IVA pendiente de confirmar.";
+export const NOTA_IVA = "IVA incluido";
+
+/** [CONFIRMADO] Envío: máquina incluido; recogebolas 6,99 € si es uno, gratis desde 2. */
+export const envio = {
+  maquina: "Envío incluido",
+  recogebolas: "Envío 6,99 € por una unidad; gratis a partir de dos",
+} as const;
 
 export type Producto = {
   id: "maquina" | "recogebolas";
@@ -45,6 +50,7 @@ export const alquiler = {
   duracionTexto: "90 minutos",
   pelotasTexto: "60 pelotas incluidas",
   resumen: "25 € por sesión de 90 minutos",
+  pelotas: 60,
   ruta: "/alquiler",
   comarca: "Marina Alta, Alicante",
 } as const;

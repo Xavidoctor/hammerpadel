@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useId, useState } from "react";
 
@@ -66,6 +67,10 @@ export function ContactForm() {
         <textarea id={`${uid}-m`} name="mensaje" />
       </div>
       {error && <p className="error" role="alert">{error}</p>}
+      <p className="hint">
+        Hammer Padel usará tus datos solo para responder a tu mensaje. Puedes acceder a ellos, corregirlos o pedir
+        que los borremos. Más información en la <Link href="/legal/privacidad">política de privacidad</Link>.
+      </p>
       <div className="cta-row"><button className="btn btn--accent btn--lg" type="submit">Enviar</button></div>
     </form>
   );
