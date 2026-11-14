@@ -1,4 +1,4 @@
-import { alquiler } from "@/content/catalogo";
+import { alquiler, maquina } from "@/content/catalogo";
 import { rutaLocalidad, type PaginaLocalidad } from "@/content/localidades";
 
 /**
@@ -14,7 +14,7 @@ export function RentalJsonLd({ p, base }: { p: PaginaLocalidad; base: string }) 
       "@type": "Service",
       name: p.keyword,
       serviceType: "Alquiler de máquina lanzapelotas de pádel",
-      description: `Alquiler de la máquina lanzapelotas Hammer Padel en ${p.nombre}: la llevamos a tu pista. ${alquiler.resumen}.`,
+      description: `Alquiler de la máquina lanzapelotas ${maquina.nombre} en ${p.nombre}: la llevamos a tu pista. ${alquiler.resumen}.`,
       url,
       provider: { "@type": "Organization", name: "Hammer Padel" },
       areaServed: {
@@ -26,7 +26,7 @@ export function RentalJsonLd({ p, base }: { p: PaginaLocalidad; base: string }) 
         "@type": "Offer",
         price: (alquiler.precioCentimos / 100).toFixed(2),
         priceCurrency: "EUR",
-        description: `Sesión de ${alquiler.duracionMinutos} minutos con ${alquiler.pelotasIncluidas} pelotas incluidas.`,
+        description: `Sesión de ${alquiler.duracionMinutos} minutos con ${alquiler.pelotas} pelotas incluidas.`,
         eligibleDuration: { "@type": "QuantitativeValue", value: alquiler.duracionMinutos, unitCode: "MIN" },
       },
     },

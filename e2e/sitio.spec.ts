@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const PAGINAS = ["/", "/comprar", "/recogebolas", "/alquiler", "/alquiler/denia", "/alquiler/ondara", "/alquiler/la-xara", "/alquiler/pedreguer", "/como-funciona", "/entrenamientos", "/clubes", "/soporte", "/contacto", "/legal", "/legal/aviso-legal", "/legal/privacidad", "/legal/cookies", "/legal/condiciones-alquiler", "/legal/condiciones-venta"];
+const PAGINAS = ["/", "/comprar", "/recogebolas", "/alquiler", "/alquiler/denia", "/alquiler/ondara", "/alquiler/la-xara", "/alquiler/pedreguer", "/alquiler/el-verger", "/alquiler/els-poblets", "/como-funciona", "/entrenamientos", "/clubes", "/soporte", "/contacto", "/legal", "/legal/aviso-legal", "/legal/privacidad", "/legal/cookies", "/legal/condiciones-alquiler", "/legal/condiciones-venta"];
 
 test.describe("páginas", () => {
   for (const ruta of PAGINAS) {
@@ -28,7 +28,7 @@ test.describe("precios confirmados", () => {
     expect(html).toContain("65 €");
     expect(html).toContain("25 €");
     expect(html).toContain("60 pelotas");
-    for (const l of ["Dénia", "Ondara", "La Xara", "Pedreguer"]) expect(html).toContain(l);
+    for (const l of ["Dénia", "Ondara", "La Xara", "Pedreguer", "El Verger", "Els Poblets"]) expect(html).toContain(l);
   });
 });
 
@@ -173,7 +173,7 @@ test.describe("menú: cierre automático", () => {
 });
 
 test.describe("alquiler por localidad", () => {
-  for (const [id, nombre] of [["denia", "Dénia"], ["ondara", "Ondara"], ["la-xara", "La Xara"], ["pedreguer", "Pedreguer"]]) {
+  for (const [id, nombre] of [["denia", "Dénia"], ["ondara", "Ondara"], ["la-xara", "La Xara"], ["pedreguer", "Pedreguer"], ["el-verger", "El Verger"], ["els-poblets", "Els Poblets"]]) {
     test(`/alquiler/${id}: H1 propio, datos estructurados, enlace a reserva y noindex sin datos locales`, async ({ page }) => {
       await page.goto(`/alquiler/${id}`);
       await expect(page.locator("h1")).toContainText(nombre);
@@ -194,9 +194,9 @@ test.describe("alquiler por localidad", () => {
     expect(res?.status()).toBe(404);
   });
 
-  test("/alquiler enlaza a las cuatro localidades", async ({ page }) => {
+  test("/alquiler enlaza a todas las localidades", async ({ page }) => {
     await page.goto("/alquiler");
-    for (const nombre of ["Dénia", "Ondara", "La Xara", "Pedreguer"]) {
+    for (const nombre of ["Dénia", "Ondara", "La Xara", "Pedreguer", "El Verger", "Els Poblets"]) {
       await expect(page.getByRole("link", { name: `Alquiler de máquina de pádel en ${nombre}` })).toBeVisible();
     }
   });

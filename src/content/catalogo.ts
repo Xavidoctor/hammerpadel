@@ -49,11 +49,11 @@ export const alquiler = {
   precioCentimos: 2500,
   precioTexto: "25 €",
   duracionMinutos: 90,
-  pelotasIncluidas: 60,
   duracionTexto: "90 minutos",
   pelotasTexto: "60 pelotas incluidas",
   resumen: "25 € por sesión de 90 minutos",
   pelotas: 60,
+  pelotasIncluidas: 60,
   incluyeTexto: "60 pelotas incluidas",
   ruta: "/alquiler",
   comarca: "Marina Alta, Alicante",
@@ -62,17 +62,22 @@ export const alquiler = {
 /** Orden de oeste a este. Ubicaciones exactas pendientes de definir. */
 export const localidades = [
   { id: "pedreguer", nombre: "Pedreguer" },
-  { id: "ondara", nombre: "Ondara" },
   { id: "el-verger", nombre: "El Verger" },
+  { id: "ondara", nombre: "Ondara" },
   { id: "els-poblets", nombre: "Els Poblets" },
   { id: "la-xara", nombre: "La Xara" },
   { id: "denia", nombre: "Dénia" },
 ] as const;
 
-/** «Pedreguer, Ondara, … y Dénia», para textos. El Verger y Els Poblets: Xavi, 14-11-2026. */
-export const localidadesTexto = localidades.map((l) => l.nombre).join(", ").replace(/, ([^,]*)$/, " y $1");
-
 export type LocalidadId = (typeof localidades)[number]["id"];
+
+/** "Pedreguer, El Verger, … y Dénia" */
+export const listaLocalidades = localidades
+  .map((l) => l.nombre)
+  .join(", ")
+  .replace(/, ([^,]*)$/, " y $1");
+/** Alias usado por la portada del prototipo. */
+export const localidadesTexto = listaLocalidades;
 
 export const lemas = {
   principal: "Tu entrenamiento. Tu ritmo. Tu pista.",
