@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { BookingRequest } from "@/components/BookingRequest";
+import Link from "next/link";
 import { PageHead } from "@/components/PageHead";
 import { Price } from "@/components/Price";
 import { alquiler, localidades } from "@/content/catalogo";
+import { rutaLocalidad } from "@/content/localidades";
 
 export const metadata: Metadata = {
   title: "Alquiler de máquina lanzapelotas de pádel en la Marina Alta",
@@ -20,18 +22,22 @@ export default function Alquiler() {
           {localidades.map((l) => l.nombre).join(", ")}.
         </p>
       </PageHead>
-      <BookingRequest />
+      <div id="reservar" className="reservar-ancla">
+        <BookingRequest />
+      </div>
 
       <section className="page__body prose" aria-labelledby="t-local">
         <h2 id="t-local">Alquiler de máquina de pádel por localidad</h2>
-        {localidades.map((l) => (
-          <div key={l.id}>
-            <h3>Alquiler de máquina de pádel en {l.nombre}</h3>
-            <p className="pending">
-              Información de la zona (pistas donde usarla, entrega y recogida) pendiente de definir.
-            </p>
-          </div>
-        ))}
+        <p>
+          Llevamos la máquina a tu pista. Consulta cómo funciona el alquiler en cada localidad:
+        </p>
+        <ul className="cards">
+          {localidades.map((l) => (
+            <li key={l.id} className="card">
+              <h3><Link href={rutaLocalidad(l.id)}>Alquiler de máquina de pádel en {l.nombre}</Link></h3>
+            </li>
+          ))}
+        </ul>
         <h2>Condiciones</h2>
         <p className="pending">
           Cancelaciones, reprogramaciones, fianza y responsabilidad por daños: pendientes de aprobación.

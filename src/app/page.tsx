@@ -197,7 +197,7 @@ export default function Inicio() {
             <li><span>3</span>Elige horario</li>
             <li><span>4</span>Reserva</li>
           </ol>
-          <p className="lede">{alquiler.resumen}. {lemas.repetir}</p>
+          <p className="lede">{alquiler.resumen}, {alquiler.pelotasTexto}. {lemas.repetir}</p>
           <Link className="btn btn--accent btn--lg" href={alquiler.ruta}>Empezar reserva</Link>
         </div>
       </section>

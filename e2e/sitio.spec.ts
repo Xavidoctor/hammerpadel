@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const PAGINAS = ["/", "/comprar", "/recogebolas", "/alquiler", "/como-funciona", "/entrenamientos", "/clubes", "/soporte", "/contacto", "/legal"];
+const PAGINAS = ["/", "/comprar", "/recogebolas", "/alquiler", "/alquiler/denia", "/alquiler/ondara", "/alquiler/la-xara", "/alquiler/pedreguer", "/como-funciona", "/entrenamientos", "/clubes", "/soporte", "/contacto", "/legal"];
 
 test.describe("páginas", () => {
   for (const ruta of PAGINAS) {
@@ -151,5 +151,35 @@ test.describe("menú: cierre automático", () => {
     await expect(nav).toBeVisible();
     await page.evaluate(() => scrollBy(0, 300));
     await expect(nav).toBeHidden();
+  });
+});
+
+test.describe("alquiler por localidad", () => {
+  for (const [id, nombre] of [["denia", "Dénia"], ["ondara", "Ondara"], ["la-xara", "La Xara"], ["pedreguer", "Pedreguer"]]) {
+    test(`/alquiler/${id}: H1 propio, datos estructurados, enlace a reserva y noindex sin datos locales`, async ({ page }) => {
+      await page.goto(`/alquiler/${id}`);
+      await expect(page.locator("h1")).toContainText(nombre);
+      const ld = JSON.parse((await page.locator('script[type="application/ld+json"]').first().textContent()) ?? "[]");
+      const servicio = ld.find((x: { "@type": string }) => x["@type"] === "Service");
+      expect(servicio.areaServed.name).toBe(nombre);
+      expect(servicio.offers.price).toBe("25.00");
+      expect(servicio.offers.description).toContain("60 pelotas");
+      expect(ld.some((x: { "@type": string }) => x["@type"] === "LocalBusiness")).toBe(false);
+      await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+      await page.getByRole("link", { name: `Reservar en ${nombre}` }).first().click();
+      await expect(page).toHaveURL(/\/alquiler#reservar$/);
+    });
+  }
+
+  test("una localidad inexistente da 404", async ({ page }) => {
+    const res = await page.goto("/alquiler/valencia");
+    expect(res?.status()).toBe(404);
+  });
+
+  test("/alquiler enlaza a las cuatro localidades", async ({ page }) => {
+    await page.goto("/alquiler");
+    for (const nombre of ["Dénia", "Ondara", "La Xara", "Pedreguer"]) {
+      await expect(page.getByRole("link", { name: `Alquiler de máquina de pádel en ${nombre}` })).toBeVisible();
+    }
   });
 });

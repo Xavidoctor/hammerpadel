@@ -510,3 +510,20 @@ html.hp-static .rent__copy { position: relative; left: auto; bottom: auto; paddi
   .photo--estudio img { max-height: 58svh; object-fit: contain; }
   .photo--estudio { justify-self: center; }
 }
+
+/* ------------------------------------------------ alquiler por localidad */
+.crumbs { max-width: var(--sc-maxw); margin: 0 auto var(--sc-5); font-size: var(--sc-t-sm); color: var(--sc-ink-soft); }
+.crumbs ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--sc-2); }
+.crumbs li + li::before { content: "/"; margin-right: var(--sc-2); color: var(--sc-hairline-strong); }
+.crumbs a { color: var(--sc-ink-soft); }
+.crumbs a:hover { color: var(--sc-ink); }
+.crumbs [aria-current] { color: var(--sc-ink); }
+.local { display: grid; gap: var(--sc-8); }
+.local__h2 { font-family: var(--sc-font-display); font-variation-settings: "wdth" 80; text-transform: uppercase;
+  font-size: var(--sc-t-xl); letter-spacing: var(--sc-track-snug); margin: 0 0 var(--sc-4); line-height: 1.05; }
+.local .prose h2 { margin-top: 0; }
+.faq { border-bottom: 1px solid var(--sc-hairline); padding: var(--sc-3) 0; }
+.faq summary { cursor: pointer; font-weight: 600; }
+.local .card h3 a { color: var(--sc-ink); }
+.local .card h3 a:hover { color: var(--sc-accent); }
+.reservar-ancla { scroll-margin-top: 6rem; }

@@ -5,12 +5,13 @@ import "../vendor/scrollcraft/scrollcraft.css";
 import "./globals.css";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { URL_SITIO } from "@/lib/sitio";
 
 /** PROTOTIPO LOCAL: no indexar hasta aprobar la publicación. */
 export const PROTOTIPO = true;
 
 export const metadata: Metadata = {
-  metadataBase: new URL("http://localhost:3000"),
+  metadataBase: new URL(URL_SITIO),
   title: {
     default: "Hammer Padel · Alquiler de máquina lanzapelotas de pádel",
     template: "%s · Hammer Padel",
