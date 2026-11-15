@@ -115,6 +115,18 @@ test.describe("la landing nunca bloquea la reserva ni la compra", () => {
     await expect(page).toHaveURL(/\/recogebolas$/);
   });
 
+  test("en /recogebolas el cursor también recoge las pelotas", async ({ page, isMobile }) => {
+    test.skip(isMobile, "con ratón");
+    await page.goto("/recogebolas");
+    await page.waitForSelector(".balls--juego", { state: "attached" });
+    const zona = (await page.locator(".zona-recogebolas").boundingBox())!;
+    for (let y = 100; y < 860; y += 60) for (let x = 10; x < 1430; x += 14) await page.mouse.move(x, y);
+    await expect(page.locator(".balls span.is-recogida").first()).toBeAttached();
+    expect(zona.height).toBeGreaterThan(900);
+    await page.getByRole("link", { name: "Solicitar compra" }).click();
+    await expect(page).toHaveURL(/\/contacto/);
+  });
+
   test("las páginas de compra y alquiler no cargan el motor", async ({ page }) => {
     for (const r of ["/comprar", "/alquiler"]) {
       await page.goto(r);

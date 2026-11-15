@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { AppMockup } from "@/components/AppMockup";
-import { CampoPelotas } from "@/components/CampoPelotas";
+import { ZonaRecogebolas } from "@/components/ZonaRecogebolas";
 import { CourtSvg } from "@/components/CourtSvg";
 import { ProductPhoto } from "@/components/ProductPhoto";
 import { ProductSlot } from "@/components/ProductSlot";
@@ -233,11 +233,11 @@ export default function Inicio() {
         </div>
       </section>
 
-      {/* ESCENA 6 · RECOGEBOLAS (venta). Fondo interactivo: con el ratón sobre el fondo, el cursor
-          es el Recogebolas Hammer y recoge las pelotas (CampoPelotas). Pelotas y cursor salen
-          del modelo 3D (produccion/escena-4). Texto y botón de compra nunca quedan tapados. */}
+      {/* Desde el recogebolas hasta el final: zona interactiva. Con el ratón sobre el fondo, el
+          cursor es el Recogebolas Hammer y recoge las pelotas repartidas por estas secciones. */}
+      <ZonaRecogebolas total={36}>
+      {/* ESCENA 6 · RECOGEBOLAS (venta). Pelotas y cursor salen del modelo 3D (produccion/escena-4). */}
       <section id="recogebolas" className="flow flow--balls" aria-labelledby="t-recoge">
-        <CampoPelotas />
         <div className="wrap split split--rev">
           <div className="stack" data-sc-in>
             <h2 id="t-recoge" className="display display--md">
@@ -272,6 +272,7 @@ export default function Inicio() {
           </div>
         </div>
       </section>
+      </ZonaRecogebolas>
     </ScrollCraftStage>
   );
 }

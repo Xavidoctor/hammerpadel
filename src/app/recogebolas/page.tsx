@@ -4,6 +4,7 @@ import { Price } from "@/components/Price";
 import { ProductJsonLd } from "@/components/ProductJsonLd";
 import { ProductPhoto } from "@/components/ProductPhoto";
 import { ProductVideo } from "@/components/ProductVideo";
+import { ZonaRecogebolas } from "@/components/ZonaRecogebolas";
 import { envio, lemas, recogebolas } from "@/content/catalogo";
 
 export const metadata: Metadata = {
@@ -14,6 +15,8 @@ export const metadata: Metadata = {
 
 export default function Recogebolas() {
   return (
+    // toda la página es zona del recogebolas: con el ratón, el cursor recoge las pelotas del fondo
+    <ZonaRecogebolas total={30}>
     <div className="page">
       <ProductJsonLd p={recogebolas} />
       <div className="product-page">
@@ -31,6 +34,7 @@ export default function Recogebolas() {
             <Link className="btn btn--accent btn--lg" href="/contacto?asunto=compra-recogebolas">Solicitar compra</Link>
             <Link className="btn btn--ghost" href="/comprar">Ver la máquina</Link>
           </div>
+          <p className="balls__pista">Pasa el ratón por el fondo: recoge tú las pelotas.</p>
           <p className="notice">
             <strong>Prototipo.</strong> Se vende por separado. Packs y promociones no están definidos.
           </p>
@@ -69,5 +73,6 @@ export default function Recogebolas() {
         </div>
       </section>
     </div>
+    </ZonaRecogebolas>
   );
 }
