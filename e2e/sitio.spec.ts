@@ -127,6 +127,38 @@ test.describe("la landing nunca bloquea la reserva ni la compra", () => {
     await expect(page).toHaveURL(/\/contacto/);
   });
 
+  for (const ruta of ["/", "/recogebolas"]) {
+    test(`en ${ruta} todas las pelotas se ven y se pueden recoger con el ratón`, async ({ page, isMobile }) => {
+      test.skip(isMobile, "en móvil no hay recogebolas");
+      await page.goto(ruta);
+      await page.waitForSelector(".balls--juego", { state: "attached" });
+      await page.waitForTimeout(800); // recolocación de las pelotas
+      const bolas = page.locator(".balls span");
+      const n = await bolas.count();
+      for (let i = 0; i < n; i++) {
+        const b = bolas.nth(i);
+        await b.scrollIntoViewIfNeeded();
+        const r = (await b.boundingBox())!;
+        const x = r.x + r.width / 2, y = r.y + r.height / 2;
+        // nada la tapa: ni foto, ni vídeo, ni enlace o botón
+        const tapa = await page.evaluate(([px, py]) => document.elementFromPoint(px, py)?.closest("a, button, video, .pvideo, .photo, img")?.tagName ?? null, [x, y]);
+        expect(tapa, `pelota ${i}`).toBeNull();
+        await page.mouse.move(x - 4, y);
+        await page.mouse.move(x, y);
+        await expect(b, `pelota ${i}`).toHaveClass(/is-recogida/);
+      }
+    });
+  }
+
+  test("en móvil no hay recogebolas ni pelotas", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "solo móvil");
+    for (const ruta of ["/", "/recogebolas"]) {
+      await page.goto(ruta);
+      await expect(page.locator(".balls")).toBeHidden();
+      await expect(page.locator(".balls__cursor")).toBeHidden();
+    }
+  });
+
   test("las páginas de compra y alquiler no cargan el motor", async ({ page }) => {
     for (const r of ["/comprar", "/alquiler"]) {
       await page.goto(r);
