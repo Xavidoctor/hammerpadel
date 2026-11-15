@@ -43,6 +43,7 @@ test.describe("la landing nunca bloquea la reserva ni la compra", () => {
     expect(await reservar.evaluate((el) => getComputedStyle(el.closest("[data-sc-cue]")!).opacity)).toBe("1");
     await expect(page.getByRole("link", { name: "Quiero mi propia Hammer X MAX" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Reservar entrenamiento" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Comprar recogebolas" })).toBeVisible();
     await ctx.close();
   });
 
@@ -51,6 +52,7 @@ test.describe("la landing nunca bloquea la reserva ni la compra", () => {
     const page = await ctx.newPage();
     await page.goto("/");
     await expect(page.getByRole("link", { name: /^Reservar sesión/ })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Comprar recogebolas" })).toBeVisible();
     // El clip de alquiler no se descarga con movimiento reducido.
     const pidioVideo = await page.evaluate(() => performance.getEntriesByType("resource").some((r) => r.name.endsWith(".mp4")));
     expect(pidioVideo).toBe(false);
@@ -74,8 +76,10 @@ test.describe("la landing nunca bloquea la reserva ni la compra", () => {
     const normal = await browser.newContext();
     const p1 = await normal.newPage();
     await p1.goto("/recogebolas");
-    const video = p1.locator("video.pvideo__media");
-    await expect(video).toHaveAttribute("poster", /recogebolas-poster\.webp$/);
+    // arriba, el recogebolas en 3D; en «Así se usa», el vídeo real
+    const video = p1.locator("video.pvideo__media").first();
+    await expect(video).toHaveAttribute("poster", /recogebolas-3d-poster\.webp$/);
+    await expect(p1.locator("video.pvideo__media").nth(1)).toHaveAttribute("poster", /recogebolas-poster\.webp$/);
     await expect(p1.locator("img[src$='completo.webp']")).toBeVisible();
     await video.scrollIntoViewIfNeeded();
     await p1.waitForFunction(() => {
@@ -93,6 +97,34 @@ test.describe("la landing nunca bloquea la reserva ni la compra", () => {
     );
     expect(pidioVideo).toBe(false);
     await reducido.close();
+  });
+
+  test("en la portada el cursor recoge las pelotas sin tapar el botón de compra", async ({ page, isMobile }) => {
+    test.skip(isMobile, "con ratón");
+    await page.goto("/");
+    await page.waitForSelector(".balls--juego", { state: "attached" });
+    const sec = page.locator("#recogebolas");
+    await sec.scrollIntoViewIfNeeded();
+    const b = (await sec.boundingBox())!;
+    for (let x = 10; x < b.width; x += 10) await page.mouse.move(b.x + x, b.y + b.height * 0.8);
+    await expect(page.locator(".balls span.is-recogida").first()).toBeAttached();
+    const comprar = page.getByRole("link", { name: "Comprar recogebolas" });
+    await comprar.hover();
+    await expect(page.locator(".balls__cursor")).not.toHaveClass(/is-activo/);
+    await comprar.click();
+    await expect(page).toHaveURL(/\/recogebolas$/);
+  });
+
+  test("en /recogebolas el cursor también recoge las pelotas", async ({ page, isMobile }) => {
+    test.skip(isMobile, "con ratón");
+    await page.goto("/recogebolas");
+    await page.waitForSelector(".balls--juego", { state: "attached" });
+    const zona = (await page.locator(".zona-recogebolas").boundingBox())!;
+    for (let y = 100; y < 860; y += 60) for (let x = 10; x < 1430; x += 14) await page.mouse.move(x, y);
+    await expect(page.locator(".balls span.is-recogida").first()).toBeAttached();
+    expect(zona.height).toBeGreaterThan(900);
+    await page.getByRole("link", { name: "Solicitar compra" }).click();
+    await expect(page).toHaveURL(/\/contacto/);
   });
 
   test("las páginas de compra y alquiler no cargan el motor", async ({ page }) => {

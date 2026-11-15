@@ -4,6 +4,7 @@ import { Price } from "@/components/Price";
 import { ProductJsonLd } from "@/components/ProductJsonLd";
 import { ProductPhoto } from "@/components/ProductPhoto";
 import { ProductVideo } from "@/components/ProductVideo";
+import { ZonaRecogebolas } from "@/components/ZonaRecogebolas";
 import { envio, lemas, recogebolas } from "@/content/catalogo";
 
 export const metadata: Metadata = {
@@ -14,17 +15,15 @@ export const metadata: Metadata = {
 
 export default function Recogebolas() {
   return (
+    // toda la página es zona del recogebolas: con el ratón, el cursor recoge las pelotas del fondo
+    <ZonaRecogebolas total={30}>
     <div className="page">
       <ProductJsonLd p={recogebolas} />
       <div className="product-page">
-        <ProductPhoto
-          src="/medios/recogebolas/completo.webp"
-          alt="Recogebolas Hammer completo: mango largo con dos empuñaduras y cesta de varillas con el logotipo Hammer"
-          ancho={898}
-          alto={1123}
-          claro
-          prioridad
-          className="photo--hero"
+        <ProductVideo
+          base="/medios/recogebolas/recogebolas-3d"
+          descripcion="Recogebolas Hammer en 3D rodando por una pista azul y recogiendo las pelotas, que se quedan dentro de la cesta"
+          className="pvideo--hero"
         />
         <div className="stack">
           <p className="kicker">Accesorio</p>
@@ -35,6 +34,7 @@ export default function Recogebolas() {
             <Link className="btn btn--accent btn--lg" href="/contacto?asunto=compra-recogebolas">Solicitar compra</Link>
             <Link className="btn btn--ghost" href="/comprar">Ver la máquina</Link>
           </div>
+          <p className="balls__pista">Pasa el ratón por el fondo: recoge tú las pelotas.</p>
           <p className="notice">
             <strong>Prototipo.</strong> Se vende por separado. Packs y promociones no están definidos.
           </p>
@@ -53,15 +53,26 @@ export default function Recogebolas() {
             base="/medios/recogebolas/recogebolas"
             descripcion="Recogebolas Hammer recogiendo pelotas en pista y vaciándolas en la máquina"
           />
-          <ProductPhoto
-            src="/medios/recogebolas/detalle.webp"
-            alt="Detalle de la cesta del recogebolas Hammer con el logotipo en el disco central"
-            ancho={1000}
-            alto={1000}
-            pie="Detalle de la cesta"
-          />
+          <div className="uso__fotos">
+            <ProductPhoto
+              src="/medios/recogebolas/completo.webp"
+              alt="Recogebolas Hammer completo: mango largo con dos empuñaduras y cesta de varillas con el logotipo Hammer"
+              ancho={898}
+              alto={1123}
+              claro
+              pie="El recogebolas completo"
+            />
+            <ProductPhoto
+              src="/medios/recogebolas/detalle.webp"
+              alt="Detalle de la cesta del recogebolas Hammer con el logotipo en el disco central"
+              ancho={1000}
+              alto={1000}
+              pie="Detalle de la cesta"
+            />
+          </div>
         </div>
       </section>
     </div>
+    </ZonaRecogebolas>
   );
 }
