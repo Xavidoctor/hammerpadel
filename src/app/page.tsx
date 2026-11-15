@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AppMockup } from "@/components/AppMockup";
+import { CampoPelotas } from "@/components/CampoPelotas";
 import { CourtSvg } from "@/components/CourtSvg";
 import { ProductPhoto } from "@/components/ProductPhoto";
 import { ProductSlot } from "@/components/ProductSlot";
@@ -232,13 +233,11 @@ export default function Inicio() {
         </div>
       </section>
 
-      {/* ESCENA 6 · RECOGEBOLAS (venta) */}
+      {/* ESCENA 6 · RECOGEBOLAS (venta). Fondo interactivo: con el ratón sobre el fondo, el cursor
+          es el Recogebolas Hammer y recoge las pelotas (CampoPelotas). Pelotas y cursor salen
+          del modelo 3D (produccion/escena-4). Texto y botón de compra nunca quedan tapados. */}
       <section id="recogebolas" className="flow flow--balls" aria-labelledby="t-recoge">
-        <div className="balls" aria-hidden="true">
-          {Array.from({ length: 28 }, (_, i) => (
-            <span key={i} style={{ left: `${(i * 37) % 97}%`, top: `${58 + ((i * 23) % 38)}%` }} />
-          ))}
-        </div>
+        <CampoPelotas />
         <div className="wrap split split--rev">
           <div className="stack" data-sc-in>
             <h2 id="t-recoge" className="display display--md">
@@ -249,6 +248,7 @@ export default function Inicio() {
             <div className="cta-row">
               <Link className="btn btn--accent" href={recogebolas.ruta}>Comprar recogebolas</Link>
             </div>
+            <p className="balls__pista">Pasa el ratón por el fondo: recoge tú las pelotas.</p>
           </div>
           <ProductVideo base="/medios/recogebolas/recogebolas" descripcion="Recogebolas Hammer recogiendo pelotas en pista y vaciándolas en la máquina" />
         </div>

@@ -1,0 +1,20 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#ddd}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script></head>
+<body><script type="module">
+// Visor del modelo del recogebolas sobre fondo claro, para compararlo con las fotos oficiales.
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { crearRecogebolas, texturaDisco, CESTA } from "./recogebolas.js";
+const W=900,H=1100;
+const r=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true}); r.setSize(W,H); r.shadowMap.enabled=true; r.toneMapping=THREE.AgXToneMapping;
+document.body.appendChild(r.domElement);
+const sc=new THREE.Scene(); sc.background=new THREE.Color(0xe4e6e9);
+sc.environment=new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(),0.04).texture;
+const sol=new THREE.DirectionalLight(0xffffff,2.2); sol.position.set(1.5,3,2); sol.castShadow=true; sc.add(sol);
+const suelo=new THREE.Mesh(new THREE.PlaneGeometry(5,5),new THREE.ShadowMaterial({opacity:0.2})); suelo.rotation.x=-Math.PI/2; suelo.receiveShadow=true; sc.add(suelo);
+const logo=await texturaDisco(THREE,"/public/marca/hammer-logo.svg");
+const m=crearRecogebolas(THREE,{logo}); m.position.y=CESTA.R; sc.add(m);
+const cam=new THREE.PerspectiveCamera(30,W/H,0.05,50);
+window.vista=(ang,alt=0.5,dist=2.2,ty=0.45,tz=-0.2)=>{cam.position.set(Math.sin(ang)*dist,alt,Math.cos(ang)*dist);cam.lookAt(0,ty,tz);r.render(sc,cam);return true};
+window.listo=true;
+</script></body></html>

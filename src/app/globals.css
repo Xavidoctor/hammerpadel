@@ -441,13 +441,39 @@ html.hp-static .train__lede { position: relative; top: auto; padding-top: var(--
 @media (max-width: 860px) { .split--app { grid-template-columns: 1fr; } }
 
 .flow--product { background: linear-gradient(180deg, #080a0f, var(--sc-canvas)); }
+/* ---- escena 6 · recogebolas: fondo interactivo (CampoPelotas) */
 .flow--balls { overflow: clip; background: radial-gradient(70% 60% at 30% 80%, color-mix(in oklab, var(--hp-court) 30%, transparent), transparent 70%), var(--sc-canvas); }
+.flow--balls > .wrap { position: relative; z-index: 1; }
 .balls { position: absolute; inset: 0; pointer-events: none; }
 .balls span {
-  position: absolute; width: clamp(10px, 1.1vw, 16px); aspect-ratio: 1; border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #f4ff9a, var(--sc-accent) 45%, #8aa50d);
-  opacity: 0.55;
+  position: absolute; border-radius: 50%;
+  background: url("/medios/recogebolas/pelotas.webp") 0 0 / 800% 100% no-repeat;
+  filter: drop-shadow(0 6px 8px rgb(0 0 0 / 0.55));
+  transition: opacity 0.7s ease;
 }
+.balls span.is-recogida {
+  opacity: 0; transform: translate(var(--dx, 0), var(--dy, 0)) scale(0.35);
+  transition: transform 0.2s ease-in, opacity 0.2s ease-in;
+}
+.balls--quieto .balls span, .balls--quieto .balls span.is-recogida { transition: none; }
+.balls__cursor {
+  position: fixed; left: 0; top: 0; z-index: 50; pointer-events: none;
+  width: 198.4px; height: 198.4px; opacity: 0; transition: opacity 0.15s ease;
+  background: url("/medios/recogebolas/cursor-recogebolas.webp") 0 0 / 5753.6px 198.4px no-repeat;
+  -webkit-mask-image: linear-gradient(to top, #000 55%, transparent 98%); mask-image: linear-gradient(to top, #000 55%, transparent 98%);
+  filter: drop-shadow(0 10px 12px rgb(0 0 0 / 0.6));
+}
+.balls__cursor.is-activo { opacity: 1; }
+.balls--juego:has(.balls__cursor.is-activo) { cursor: none; }
+.balls__cuenta {
+  position: absolute; z-index: 2; right: var(--sc-gutter); bottom: var(--sc-5); margin: 0;
+  font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); color: var(--sc-ink-soft);
+  opacity: 0; transition: opacity 0.3s ease;
+}
+.balls__cuenta.is-visible { opacity: 1; }
+.balls__pista { margin: 0; font-size: var(--sc-t-xs); color: var(--sc-ink-soft); display: none; }
+@media (hover: hover) and (pointer: fine) { .balls--juego .balls__pista { display: block; } }
+
 .flow--close { text-align: left; border-top: 1px solid var(--sc-hairline); }
 .close { display: grid; gap: var(--sc-6); justify-items: start; }
 .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--sc-3); width: 100%; }
@@ -597,7 +623,6 @@ html.hp-static .rent__intro { position: relative; left: auto; top: auto; padding
 .uso__grid { display: grid; grid-template-columns: minmax(0, 24rem) minmax(0, 1fr); gap: clamp(1.5rem, 5vw, 4rem); align-items: center; }
 .uso__grid .photo { max-width: 34rem; }
 @media (max-width: 860px) { .uso__grid { grid-template-columns: 1fr; } .uso__grid .photo { max-width: 22rem; margin-inline: auto; } }
-.flow--balls > .wrap { position: relative; z-index: 1; }
 
 .photo--estudio img {
   background: radial-gradient(75% 60% at 50% 42%, #f1f2f3 0%, #d4d7db 55%, #aeb3b9 100%);
@@ -769,3 +794,9 @@ html.hp-static .rent__intro { position: relative; left: auto; top: auto; padding
 .app-block__mock { justify-self: start; margin-top: var(--sc-4); }
 .app-block__note { grid-column: 1 / -1; margin: 0; font-size: var(--sc-t-sm); }
 @media (max-width: 860px) { .app-block { grid-template-columns: 1fr; } .app-block__list li { grid-template-columns: 2.75rem 1fr; } }
+
+/* /recogebolas: vídeo 3D en la cabecera y fotos reales en «Así se usa» */
+.pvideo--hero .pvideo__media { background: #05070d; }
+.uso__fotos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sc-4); align-items: start; }
+.uso__grid .uso__fotos .photo { max-width: none; }
+@media (max-width: 860px) { .uso__fotos { max-width: 30rem; margin-inline: auto; } }
