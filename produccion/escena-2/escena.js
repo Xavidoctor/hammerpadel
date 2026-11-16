@@ -168,7 +168,7 @@ export async function montar(canvas, w, h) {
   // derecha y la pista al fondo) y la rodea hasta el ángulo simétrico del otro lado.
   const cam = new THREE.PerspectiveCamera(vertical ? 62 : 50, w / h, 0.05, 120);
   const A0 = vertical ? 0.42 : 0.62;            // ángulo inicial respecto al eje de la pista
-  const RADIO = vertical ? 1.75 : 2.1;          // distancia horizontal a la máquina
+  const RADIO = vertical ? 1.75 : 2.6;          // escritorio: más atrás para ver la máquina entera          // distancia horizontal a la máquina
   const suave = (t) => t * t * (3 - 2 * t);
 
   // ---------- postproceso: brillo suave en focos y estelas ----------
@@ -185,9 +185,9 @@ export async function montar(canvas, w, h) {
     const a = A0 * (1 - 2 * tc);                       // +A0 -> -A0
     const k = 1 - Math.abs(1 - 2 * tc);                // 0 en los extremos, 1 en el centro
     const rad = RADIO + 0.35 * k;
-    cam.position.set(Math.sin(a) * rad, (vertical ? 1.42 : 1.45) + 0.75 * k, MAQ_Z - Math.cos(a) * rad);
+    cam.position.set(Math.sin(a) * rad, vertical ? 1.42 + 0.75 * k : 1.5 + 0.5 * k, MAQ_Z - Math.cos(a) * rad);
     if (vertical) cam.lookAt(-Math.sin(a) * 0.45, 0.05, MAQ_Z + 3.2);
-    else cam.lookAt(-Math.sin(a) * 1.4, 0.3, MAQ_Z + 4);
+    else cam.lookAt(-Math.sin(a) * 1.2, 0.05, MAQ_Z + 3.4);
     cam.aspect = w / h; cam.updateProjectionMatrix();
 
     for (const o of lanz) {

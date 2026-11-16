@@ -16,9 +16,15 @@ const escena = process.env.ESCENA || "escena-2"; // ESCENA=escena-3 para el alqu
 await p.goto(`http://localhost:4700/produccion/${escena}/render.html?w=${w}&h=${h}`);
 await p.waitForFunction(() => window.listo, null, { timeout: 120000 });
 const lienzo = p.locator("canvas");
+const datos = {}; // escena 3 en escritorio: posición de los nombres de los pueblos por fotograma
 for (let i = desde; i < hasta; i++) {
-  await p.evaluate((f) => window.fotograma(f), i / (n - 1));
+  const d = await p.evaluate((f) => window.fotograma(f), i / (n - 1));
+  if (d && typeof d === "object") datos[i] = d;
   await lienzo.screenshot({ path: `${dir}/f${String(i).padStart(4, "0")}.png` });
   if ((i - desde) % 25 === 0) console.log(`${w}x${h} ${i}/${n}`);
+}
+if (Object.keys(datos).length) {
+  const meta = await p.evaluate(() => window.meta && window.meta());
+  fs.writeFileSync(`${dir}/etiquetas-${desde}.json`, JSON.stringify({ n, meta, datos }));
 }
 await b.close();
