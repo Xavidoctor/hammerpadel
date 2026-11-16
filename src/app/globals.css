@@ -450,10 +450,11 @@ html.hp-static .train__lede { position: relative; top: auto; padding-top: var(--
    página /recogebolas. Las pelotas van por encima de los fondos de las secciones y por
    debajo de su contenido. */
 .flow--balls { overflow: clip; background: radial-gradient(70% 60% at 30% 80%, color-mix(in oklab, var(--hp-court) 30%, transparent), transparent 70%), var(--sc-canvas); }
-.zona-recogebolas { position: relative; z-index: 2; isolation: isolate; overflow: clip; }
-.zona-recogebolas > :is(section, div):not(.balls, .balls__cursor) { position: static; }
-.zona-recogebolas > :is(section, div):not(.balls, .balls__cursor) > * { position: relative; z-index: 1; }
-.balls { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+/* Sin :is() ni inset para que funcione también en navegadores de PC antiguos. */
+.zona-recogebolas { position: relative; z-index: 2; isolation: isolate; overflow: hidden; overflow: clip; }
+.zona-recogebolas > section, .zona-recogebolas > div:not(.balls):not(.balls__cursor) { position: static; }
+.zona-recogebolas > section > *, .zona-recogebolas > div:not(.balls):not(.balls__cursor) > * { position: relative; z-index: 1; }
+.balls { position: absolute; top: 0; right: 0; bottom: 0; left: 0; pointer-events: none; z-index: 0; }
 .balls span {
   position: absolute; border-radius: 50%;
   background: url("/medios/recogebolas/pelotas.webp") 0 0 / 800% 100% no-repeat;

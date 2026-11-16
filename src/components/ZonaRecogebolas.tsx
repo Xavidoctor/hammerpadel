@@ -103,8 +103,8 @@ export function ZonaRecogebolas({ children, total = 28 }: { children: React.Reac
       cur.style.transform = `translate3d(${x - FOCO.x * ESCALA}px, ${y - FOCO.y * ESCALA}px, 0) rotate(${inclinacion}deg)`;
     };
 
-    const mover = (e: PointerEvent) => {
-      if (e.pointerType === "touch") return;
+    const mover = (e: PointerEvent | MouseEvent) => {
+      if ("pointerType" in e && e.pointerType === "touch") return;
       const sobreFondo =
         e.clientY >= seccion.getBoundingClientRect().top && !(e.target as Element).closest(ZONAS_NORMALES);
       setActivo(sobreFondo);
@@ -126,11 +126,13 @@ export function ZonaRecogebolas({ children, total = 28 }: { children: React.Reac
     };
 
     const raiz = document.documentElement;
-    document.addEventListener("pointermove", mover);
+    // Navegadores sin Pointer Events (algunos PC antiguos): el ratón llega como mousemove.
+    const evMover = "PointerEvent" in window ? "pointermove" : "mousemove";
+    document.addEventListener(evMover, mover as EventListener);
     raiz.addEventListener("pointerleave", salir);
     document.addEventListener("pointerdown", tocar);
     return () => {
-      document.removeEventListener("pointermove", mover);
+      document.removeEventListener(evMover, mover as EventListener);
       raiz.removeEventListener("pointerleave", salir);
       document.removeEventListener("pointerdown", tocar);
       raiz.classList.remove("hp-cursor-recogebolas");
