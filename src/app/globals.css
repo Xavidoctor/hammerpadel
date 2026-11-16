@@ -322,7 +322,7 @@ html.hp-static [data-sc-stagger] > * {
   display: grid; gap: var(--sc-6); max-width: min(52rem, 60vw);
 }
 .hero-title { margin: 0; display: grid; gap: var(--sc-4); }
-.hero-title__brand { font-size: clamp(3.6rem, 1.5rem + 8.5vw, 10rem); }
+.hero-title__brand { font-size: min(clamp(3.6rem, 1.5rem + 8.5vw, 10rem), 15svh); } /* ventanas bajas (escala de Windows alta): que el titular no se meta bajo la cabecera */
 .hero-sub { margin: 0; font-size: var(--sc-t-md, 1.05rem); color: var(--sc-ink-soft); max-width: 44ch; line-height: 1.45; }
 .hero-title__claim { font-size: var(--sc-t-xl); font-weight: 500; color: var(--sc-ink); letter-spacing: var(--sc-track-snug); max-width: 34ch; line-height: 1.2; }
 
@@ -351,6 +351,11 @@ html.hp-static [data-sc-stagger] > * {
 }
 .train__num { color: var(--sc-accent); font-size: 0.45em; vertical-align: 0.9em; margin-right: 0.2em; }
 .train__label { font-size: clamp(2.6rem, 1rem + 5vw, 5rem); }
+/* Escritorio: el nombre del golpe va a la izquierda, bajo la frase, para no tapar la bola ni la máquina. */
+@media (min-width: 861px) and (min-aspect-ratio: 4/5) {
+  .train__ticker { top: 46%; }
+  .train__label { left: var(--sc-gutter); translate: 0 -50%; text-align: left; font-size: clamp(2.4rem, 1rem + 3.4vw, 4.6rem); }
+}
 .train__copy { position: absolute; inset: 0; pointer-events: none; z-index: var(--sc-z-copy); }
 .train__lede {
   position: absolute; left: var(--sc-gutter); top: clamp(5rem, 14vh, 9rem); margin: 0;
@@ -496,6 +501,19 @@ html.hp-cursor-recogebolas, html.hp-cursor-recogebolas body { cursor: none; }
 .rent__poster { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
 .rent__copy { position: absolute; z-index: var(--sc-z-copy); left: var(--sc-gutter); bottom: clamp(2.5rem, 10vh, 7rem); display: grid; gap: var(--sc-4); justify-items: start; max-width: 34rem; }
 .rent__intro { position: absolute; z-index: var(--sc-z-copy); left: var(--sc-gutter); top: calc(var(--bar-h, 4rem) + clamp(1.5rem, 6vh, 4rem)); display: grid; gap: var(--sc-3); max-width: 30rem; }
+/* Nombres de los pueblos sobre el mapa (escritorio): texto real sincronizado con el vídeo. */
+.mapa__etiquetas { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.mapa__etiquetas > span {
+  position: absolute; opacity: 0; white-space: nowrap; line-height: 1;
+  font-weight: 700; color: #f2f4f7; letter-spacing: -0.005em;
+  text-shadow: 0 1px 10px rgb(0 0 0 / 0.55);
+}
+.mapa__pueblo--der { translate: 0.4em -50%; }
+.mapa__pueblo--izq { translate: calc(-100% - 0.4em) -50%; }
+.mapa__pueblo--abajo { translate: -50% 0.35em; }
+.mapa__pueblo--on { text-shadow: 0 0 18px rgb(214 255 0 / 0.35), 0 1px 10px rgb(0 0 0 / 0.55); }
+.mapa__mar { translate: -50% -50%; font-weight: 400; color: #4d6b93; text-shadow: none; }
+@media (max-aspect-ratio: 1/1) { .mapa__etiquetas { display: none; } }
 .rent__intro .rent__towns { font-size: var(--sc-t-sm); color: var(--sc-ink-soft); }
 .rent__price { margin: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--sc-3); }
 .rent__price .price__num { font-size: clamp(3.4rem, 2rem + 5vw, 7rem); }
