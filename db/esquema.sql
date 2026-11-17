@@ -99,5 +99,5 @@ insert into localidades (id, nombre) values
   ('els-poblets', 'Els Poblets'), ('la-xara', 'La Xara'), ('denia', 'Dénia');
 insert into maquinas (id) values ('hp-1'), ('hp-2'), ('hp-3'), ('hp-4'), ('hp-5');
 insert into repartidores (id, nombre) values ('xavi', 'Xavi'), ('marc', 'Marc');
-insert into tarifas (id, duracion_min, precio_centimos) values ('sesion-90', 90, 2500);
+insert into tarifas (id, duracion_min, precio_centimos) values ('sesion-90', 90, 3200);
 

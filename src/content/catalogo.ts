@@ -38,20 +38,20 @@ export const recogebolas: Producto = {
   id: "recogebolas",
   nombre: "Recogebolas Hammer",
   descripcion: "Accesorio para recoger pelotas de forma cómoda y rápida.",
-  precioCentimos: 6500,
-  precioTexto: "65 €",
+  precioCentimos: 7500,
+  precioTexto: "75 €",
   ruta: "/recogebolas",
 };
 
 export const productos = [maquina, recogebolas] as const;
 
 export const alquiler = {
-  precioCentimos: 2500,
-  precioTexto: "25 €",
+  precioCentimos: 3200,
+  precioTexto: "32 €",
   duracionMinutos: 90,
   duracionTexto: "90 minutos",
   pelotasTexto: "60 pelotas incluidas",
-  resumen: "25 € por sesión de 90 minutos",
+  resumen: "32 € por sesión de 90 minutos",
   pelotas: 60,
   pelotasIncluidas: 60,
   incluyeTexto: "60 pelotas y 1 recogebolas incluidos",
