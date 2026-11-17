@@ -5,7 +5,7 @@
  * sesión mientras no haya pago online.
  * [CONFIRMADO] (14/11/2026): de lunes a domingo, antelación mínima 6 h, confirmación
  * manual (Xavi o Marc), reserva solo desde la web, también urbanizaciones y pistas
- * privadas, 1 € por pelota perdida. Precio 25 € (antes 20 €) con 60 pelotas incluidas.
+ * privadas, 1 € por pelota perdida. Precio 32 € (desde el 17-11-2026; antes 25 €) con 60 pelotas incluidas.
  * [PENDIENTE] política de cancelaciones y cambios.
  */
 export const servicio = {

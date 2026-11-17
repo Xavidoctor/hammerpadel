@@ -48,7 +48,7 @@ describe("RepositorioPostgres", () => {
     const r = await repo.crearReserva(solicitud(), AHORA);
     expect(r).toMatchObject({ ok: true, repartidorId: "marc", maquinaId: "hp-1" });
     const [fila] = await repo.reservasDesde(FECHA, 1);
-    expect(fila).toMatchObject({ inicio: 600, fin: 690, estado: "pendiente", localidadId: "denia", precioCentimos: 2500, segundoRecogebolas: false });
+    expect(fila).toMatchObject({ inicio: 600, fin: 690, estado: "pendiente", localidadId: "denia", precioCentimos: 3200, segundoRecogebolas: false });
     const dia = await repo.datosDia(FECHA);
     expect(dia.reservas).toHaveLength(1);
     expect(dia.reservas[0]).toMatchObject({ inicio: 600, fin: 690, repartidorId: "marc" });
@@ -57,7 +57,7 @@ describe("RepositorioPostgres", () => {
   it("cobra 2,50 € más con un segundo recogebolas y lo guarda", async () => {
     await repo.crearReserva(solicitud({ segundoRecogebolas: true }), AHORA);
     const [fila] = await repo.reservasDesde(FECHA, 1);
-    expect(fila).toMatchObject({ precioCentimos: 2750, segundoRecogebolas: true });
+    expect(fila).toMatchObject({ precioCentimos: 3450, segundoRecogebolas: true });
   });
 
   it("guarda la hora en UTC correctamente en horario de verano", async () => {
