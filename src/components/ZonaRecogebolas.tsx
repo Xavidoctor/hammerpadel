@@ -8,7 +8,8 @@ import { useEffect, useRef, useState } from "react";
  * Pelotas realistas (renderizadas desde el modelo 3D, produccion/escena-4/sprites.html)
  * repartidas por el fondo. Con ratón, sobre el fondo oscuro el cursor se convierte en el
  * Recogebolas Hammer y al pasar por encima de una pelota la recoge: la pelota entra y la
- * cesta del cursor se va llenando. Solo con ratón: en móvil y tabletas no se muestra.
+ * cesta del cursor se va llenando. En táctil: tocar una pelota la recoge y, sin soltar,
+ * deslizando el dedo el recogebolas lo sigue y recoge las que toca.
  *
  * Es decoración (aria-hidden): no tapa ni bloquea el texto ni el botón de compra; sobre
  * ellos vuelve el cursor normal. Sin JavaScript se ven las pelotas quietas.
@@ -19,6 +20,7 @@ const SPRITE = 320; // px de cada fotograma del cursor en el archivo
 const ESCALA = 0.62; // tamaño en pantalla del cursor
 const FOCO = { x: 114, y: 238 }; // centro de la cesta dentro del fotograma (px del archivo)
 const RADIO_CESTA = 52; // px en pantalla
+const TOQUE_ARRIBA = 56; // en táctil la cesta va por encima del dedo (px)
 
 // Pelotas repartidas por toda la zona (en % de su ancho y alto), de forma uniforme pero
 // irregular (secuencia de la razón áurea), y tamaño en px.
@@ -94,10 +96,9 @@ export function ZonaRecogebolas({ children, total = 28 }: { children: React.Reac
     const seccion = zona.current;
     const cur = cursor.current;
     if (!el || !seccion || !cur) return;
-    // solo con ratón: en móvil y tabletas no hay recogebolas (ni pelotas, ver CSS)
-    if (!window.matchMedia(SOLO_RATON).matches) return;
+    const tactil = !window.matchMedia(SOLO_RATON).matches;
     const reducido = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    seccion.classList.add("balls--juego");
+    seccion.classList.add("balls--juego", tactil ? "balls--tactil" : "balls--raton");
     if (reducido) seccion.classList.add("balls--quieto");
     let rellenar = 0;
 
@@ -158,7 +159,67 @@ export function ZonaRecogebolas({ children, total = 28 }: { children: React.Reac
     };
     const salir = () => setActivo(false);
 
+    // ---- Táctil: tocar una pelota la recoge. Si después (o tras mantener pulsado un momento)
+    // se desliza el dedo sin soltar, el recogebolas sigue al dedo y recoge lo que toca; mientras
+    // tanto la página no se desplaza. Un deslizamiento rápido sin mantener es un scroll normal.
+    const tactilEstado = { id: -1, modo: false, x0: 0, y0: 0, espera: 0, ocultar: 0 };
+    const enDedo = (x: number, y: number) => {
+      const yc = y - TOQUE_ARRIBA; // la cesta, por encima del dedo para que se vea
+      colocar(x, yc);
+      buscar(x, yc, RADIO_CESTA + 6);
+      buscar(x, y, 22); // y la que está justo bajo el dedo
+    };
+    const empezarModo = () => {
+      tactilEstado.modo = true;
+      raiz.classList.add("hp-recogiendo");
+    };
+    const terminar = () => {
+      window.clearTimeout(tactilEstado.espera);
+      tactilEstado.modo = false;
+      tactilEstado.id = -1;
+      raiz.classList.remove("hp-recogiendo");
+      window.clearTimeout(tactilEstado.ocultar);
+      tactilEstado.ocultar = window.setTimeout(() => setActivo(false), 700);
+    };
+    const tocar = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return terminar();
+      const t = e.touches[0];
+      const objetivo = e.target as Element;
+      if (!seccion.contains(objetivo) || objetivo.closest(ZONAS_NORMALES)) return;
+      window.clearTimeout(tactilEstado.ocultar);
+      tactilEstado.id = t.identifier;
+      tactilEstado.x0 = t.clientX;
+      tactilEstado.y0 = t.clientY;
+      const antes = estado.current.n;
+      setActivo(true);
+      enDedo(t.clientX, t.clientY);
+      if (estado.current.n > antes) empezarModo(); // ha recogido una pelota: ya puede deslizar
+      else tactilEstado.espera = window.setTimeout(empezarModo, 180);
+    };
+    const deslizar = (e: TouchEvent) => {
+      if (tactilEstado.id < 0) return;
+      const t = Array.from(e.changedTouches).find((x) => x.identifier === tactilEstado.id);
+      if (!t) return;
+      if (!tactilEstado.modo) {
+        // se movió antes de mantener: es un scroll, el recogebolas se va
+        if (Math.hypot(t.clientX - tactilEstado.x0, t.clientY - tactilEstado.y0) > 10) {
+          window.clearTimeout(tactilEstado.espera);
+          tactilEstado.id = -1;
+          setActivo(false);
+        }
+        return;
+      }
+      if (e.cancelable) e.preventDefault();
+      enDedo(t.clientX, t.clientY);
+    };
+
     const raiz = document.documentElement;
+    if (tactil) {
+      document.addEventListener("touchstart", tocar, { passive: true });
+      document.addEventListener("touchmove", deslizar, { passive: false });
+      document.addEventListener("touchend", terminar);
+      document.addEventListener("touchcancel", terminar);
+    }
     // Navegadores sin Pointer Events (algunos PC antiguos): el ratón llega como mousemove.
     const evMover = "PointerEvent" in window ? "pointermove" : "mousemove";
     document.addEventListener(evMover, mover as EventListener);
@@ -166,8 +227,14 @@ export function ZonaRecogebolas({ children, total = 28 }: { children: React.Reac
     return () => {
       document.removeEventListener(evMover, mover as EventListener);
       raiz.removeEventListener("pointerleave", salir);
-      raiz.classList.remove("hp-cursor-recogebolas");
-      seccion.classList.remove("balls--juego", "balls--quieto");
+      document.removeEventListener("touchstart", tocar);
+      document.removeEventListener("touchmove", deslizar);
+      document.removeEventListener("touchend", terminar);
+      document.removeEventListener("touchcancel", terminar);
+      window.clearTimeout(tactilEstado.espera);
+      window.clearTimeout(tactilEstado.ocultar);
+      raiz.classList.remove("hp-cursor-recogebolas", "hp-recogiendo");
+      seccion.classList.remove("balls--juego", "balls--quieto", "balls--tactil", "balls--raton");
       window.clearTimeout(rellenar);
     };
   }, [TOTAL]);
@@ -176,7 +243,7 @@ export function ZonaRecogebolas({ children, total = 28 }: { children: React.Reac
   // cambiar el tamaño de la zona (cambia el reparto del texto y las imágenes).
   useEffect(() => {
     const z = zona.current;
-    if (!z || !window.matchMedia(SOLO_RATON).matches) return;
+    if (!z) return;
     let t = 0;
     const recolocar = () => {
       window.clearTimeout(t);

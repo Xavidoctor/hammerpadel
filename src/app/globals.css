@@ -483,9 +483,12 @@ html.hp-cursor-recogebolas, html.hp-cursor-recogebolas body { cursor: none; }
 }
 .balls__cuenta.is-visible { opacity: 1; }
 .balls__pista { margin: 0; font-size: var(--sc-t-xs); color: var(--sc-ink-soft); display: none; }
-@media (hover: hover) and (pointer: fine) { .balls--juego .balls__pista { display: block; } }
-/* en móvil y tabletas no hay recogebolas ni pelotas (decisión de Xavi, 15-11-2026) */
-@media not ((hover: hover) and (pointer: fine)) { .balls, .balls__cursor, .balls__cuenta { display: none; } }
+.balls--juego .balls__pista { display: block; }
+.balls__pista .solo-tactil, .balls--tactil .balls__pista .solo-raton { display: none; }
+.balls--tactil .balls__pista .solo-tactil { display: inline; }
+/* táctil: sin menú de pulsación larga sobre el fondo y sin seleccionar texto mientras se recoge */
+.balls--tactil { -webkit-touch-callout: none; }
+html.hp-recogiendo, html.hp-recogiendo body { -webkit-user-select: none; user-select: none; }
 
 .flow--close { text-align: left; border-top: 1px solid var(--sc-hairline); }
 .close { display: grid; gap: var(--sc-6); justify-items: start; }

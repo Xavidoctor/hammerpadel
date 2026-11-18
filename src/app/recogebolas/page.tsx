@@ -34,7 +34,10 @@ export default function Recogebolas() {
             <Link className="btn btn--accent btn--lg" href="/contacto?asunto=compra-recogebolas">Solicitar compra</Link>
             <Link className="btn btn--ghost" href="/comprar">Ver la máquina</Link>
           </div>
-          <p className="balls__pista">Pasa el ratón por el fondo: recoge tú las pelotas.</p>
+          <p className="balls__pista">
+            <span className="solo-raton">Pasa el ratón por el fondo: recoge tú las pelotas.</span>
+            <span className="solo-tactil">Toca una pelota y, sin soltar, desliza el dedo para recoger las demás.</span>
+          </p>
           <p className="notice">
             <strong>Prototipo.</strong> Se vende por separado. Packs y promociones no están definidos.
           </p>

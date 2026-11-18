@@ -256,7 +256,10 @@ export default function Inicio() {
             <div className="cta-row">
               <Link className="btn btn--accent" href={recogebolas.ruta}>Comprar recogebolas</Link>
             </div>
-            <p className="balls__pista">Pasa el ratón por el fondo: recoge tú las pelotas.</p>
+            <p className="balls__pista">
+            <span className="solo-raton">Pasa el ratón por el fondo: recoge tú las pelotas.</span>
+            <span className="solo-tactil">Toca una pelota y, sin soltar, desliza el dedo para recoger las demás.</span>
+          </p>
           </div>
           <ProductVideo base="/medios/recogebolas/recogebolas" descripcion="Recogebolas Hammer recogiendo pelotas en pista y vaciándolas en la máquina" />
         </div>
