@@ -25,8 +25,8 @@ test.describe("precios confirmados", () => {
     await page.goto("/");
     const html = await page.content();
     expect(html).toContain("2.499 €");
-    expect(html).toContain("65 €");
-    expect(html).toContain("25 €");
+    expect(html).toContain("75 €");
+    expect(html).toContain("32 €");
     expect(html).toContain("60 pelotas");
     for (const l of ["Dénia", "Ondara", "La Xara", "Pedreguer", "El Verger", "Els Poblets"]) expect(html).toContain(l);
   });
@@ -244,7 +244,7 @@ test.describe("alquiler por localidad", () => {
       const ld = JSON.parse((await page.locator('script[type="application/ld+json"]').first().textContent()) ?? "[]");
       const servicio = ld.find((x: { "@type": string }) => x["@type"] === "Service");
       expect(servicio.areaServed.name).toBe(nombre);
-      expect(servicio.offers.price).toBe("25.00");
+      expect(servicio.offers.price).toBe("32.00");
       expect(servicio.offers.description).toContain("60 pelotas");
       expect(ld.some((x: { "@type": string }) => x["@type"] === "LocalBusiness")).toBe(false);
       await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
@@ -273,7 +273,7 @@ test.describe("páginas de contenido", () => {
     const faqs = bloques.map((b) => JSON.parse(b)).filter((d) => d["@type"] === "FAQPage");
     expect(faqs.length).toBe(2);
     const texto = JSON.stringify(faqs);
-    expect(texto).toContain("25 €");
+    expect(texto).toContain("32 €");
     expect(texto).not.toMatch(/pendiente/i);
     await page.getByText("¿Tengo que ir a recoger la máquina?").click();
     await expect(page.getByText(/Llevamos la máquina a tu pista/).first()).toBeVisible();

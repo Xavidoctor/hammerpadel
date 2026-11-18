@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AppMockup } from "@/components/AppMockup";
 import { ZonaRecogebolas } from "@/components/ZonaRecogebolas";
+import { EtiquetasMapa } from "@/components/EtiquetasMapa";
 import { CourtSvg } from "@/components/CourtSvg";
 import { ProductPhoto } from "@/components/ProductPhoto";
 import { ProductSlot } from "@/components/ProductSlot";
@@ -55,7 +56,8 @@ export default function Inicio() {
           ) : medios.foto ? (
             <>
               <picture>
-                {medios.fotoMovil ? <source media="(max-width: 860px)" srcSet={medios.fotoMovil} /> : null}
+                {medios.fotoMovil ? <source media="(max-aspect-ratio: 1/1)" srcSet={medios.fotoMovil} /> : null}
+                {medios.fotoUltra ? <source media="(min-aspect-ratio: 2/1)" srcSet={medios.fotoUltra} /> : null}
                 <img
                   className={medios.video ? "sc-stage__poster pista__photo" : "pista__photo pista__photo--fx"}
                   src={medios.foto}
@@ -67,6 +69,7 @@ export default function Inicio() {
                 <video
                   data-sc-scrub
                   data-sc-src={medios.video}
+                  {...(medios.videoBase ? { "data-hp-base": medios.videoBase } : {})}
                   {...(medios.videoMovil ? { "data-sc-src-mobile": medios.videoMovil } : {})}
                   muted
                   playsInline
@@ -117,13 +120,15 @@ export default function Inicio() {
       <section id="entrenamiento" className="act act--train" data-sc-act="scrub" data-sc-span="3.4" data-sc-dwell="0.2" data-sc-drift="#0a1020" aria-labelledby="t-train">
         <div data-sc-stage className="stage">
           <picture>
-            <source media="(max-width: 860px)" srcSet="/medios/entrenamiento/poster-m.webp" />
+            <source media="(max-aspect-ratio: 1/1)" srcSet="/medios/entrenamiento/poster-m.webp" />
+            <source media="(min-aspect-ratio: 2/1)" srcSet="/medios/entrenamiento/poster-uw.webp" />
             <img className="sc-stage__poster train__poster" src="/medios/entrenamiento/poster.webp" width={1920} height={1080} loading="lazy"
               alt="Máquina lanzapelotas Hammer X MAX en 3D lanzando una bola en una pista azul" />
           </picture>
           <video
             data-sc-scrub
             data-sc-src="/medios/entrenamiento/maquina-3d.mp4"
+            data-hp-base="/medios/entrenamiento/maquina-3d"
             data-sc-src-mobile="/medios/entrenamiento/maquina-3d-m.mp4"
             muted
             playsInline
@@ -161,17 +166,20 @@ export default function Inicio() {
       <section id="alquiler" className="act act--rent" data-sc-act="scrub" data-sc-span="3" data-sc-dwell="0.3" data-sc-clip-map="travel" data-sc-drift="#0b0d10" aria-labelledby="t-rent">
         <div data-sc-stage className="stage">
           <picture>
-            <source media="(max-width: 860px)" srcSet="/medios/alquiler/poster-m.webp" />
-            <img className="sc-stage__poster rent__poster" src="/medios/alquiler/poster.webp" alt="" width={1600} height={900} loading="lazy" />
+            <source media="(max-aspect-ratio: 1/1)" srcSet="/medios/alquiler/poster-m.webp" />
+            <source media="(min-aspect-ratio: 2/1)" srcSet="/medios/alquiler/poster-uw.webp" />
+            <img className="sc-stage__poster rent__poster" src="/medios/alquiler/poster.webp" alt="" width={1920} height={1080} loading="lazy" />
           </picture>
           <video
             data-sc-scrub
             data-sc-src="/medios/alquiler/alquiler-3d.mp4"
+            data-hp-base="/medios/alquiler/alquiler-3d"
             data-sc-src-mobile="/medios/alquiler/alquiler-3d-m.mp4"
             muted
             playsInline
             aria-hidden="true"
           />
+          <EtiquetasMapa />
           <div className="sc-scrim sc-scrim--lead" aria-hidden="true" />
           <div className="rent__intro" data-sc-cue="0 0.4 0 0.15">
             <p className="kicker">Alquiler en la Marina Alta</p>
