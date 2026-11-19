@@ -127,6 +127,57 @@ test.describe("la landing nunca bloquea la reserva ni la compra", () => {
     await expect(page).toHaveURL(/\/contacto/);
   });
 
+  for (const ruta of ["/", "/recogebolas"]) {
+    test(`en ${ruta} todas las pelotas se ven y se pueden recoger con el ratón`, async ({ page, isMobile }) => {
+      test.skip(isMobile, "en móvil no hay recogebolas");
+      await page.goto(ruta);
+      await page.waitForSelector(".balls--juego", { state: "attached" });
+      await page.waitForTimeout(800); // recolocación de las pelotas
+      const bolas = page.locator(".balls span");
+      const n = await bolas.count();
+      for (let i = 0; i < n; i++) {
+        const b = bolas.nth(i);
+        await b.scrollIntoViewIfNeeded();
+        const r = (await b.boundingBox())!;
+        const x = r.x + r.width / 2, y = r.y + r.height / 2;
+        // nada la tapa: ni foto, ni vídeo, ni enlace o botón
+        const tapa = await page.evaluate(([px, py]) => document.elementFromPoint(px, py)?.closest("a, button, video, .pvideo, .photo, img")?.tagName ?? null, [x, y]);
+        expect(tapa, `pelota ${i}`).toBeNull();
+        await page.mouse.move(x - 4, y);
+        await page.mouse.move(x, y);
+        await expect(b, `pelota ${i}`).toHaveClass(/is-recogida/);
+      }
+    });
+  }
+
+  test("en móvil: tocar una pelota y deslizar sin soltar recoge las demás sin mover la página", async ({ page, isMobile, browserName }) => {
+    test.skip(!isMobile || browserName !== "chromium", "táctil (CDP)");
+    await page.goto("/recogebolas");
+    await page.waitForSelector(".balls--tactil", { state: "attached" });
+    await page.waitForTimeout(800);
+    // dos pelotas visibles en pantalla
+    const vista = page.viewportSize()!;
+    const cajas = [];
+    for (const b of await page.locator(".balls span").all()) {
+      const r = await b.boundingBox();
+      if (r && r.y > 80 && r.y + r.height < vista.height - 20) cajas.push(r);
+      if (cajas.length === 2) break;
+    }
+    expect(cajas.length).toBe(2);
+    const [a, z] = cajas.map((r) => ({ x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) }));
+    const cdp = await page.context().newCDPSession(page);
+    const scroll0 = await page.evaluate(() => window.scrollY);
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: a.x, y: a.y }] });
+    for (let k = 1; k <= 20; k++) {
+      const x = a.x + ((z.x - a.x) * k) / 20, y = a.y + ((z.y - a.y) * k) / 20;
+      await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x, y }] });
+    }
+    await expect(page.locator(".balls__cursor")).toHaveClass(/is-activo/);
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    expect(await page.locator(".balls span.is-recogida").count()).toBeGreaterThanOrEqual(2);
+    expect(await page.evaluate(() => window.scrollY)).toBe(scroll0);
+  });
+
   test("las páginas de compra y alquiler no cargan el motor", async ({ page }) => {
     for (const r of ["/comprar", "/alquiler"]) {
       await page.goto(r);
