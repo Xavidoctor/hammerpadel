@@ -88,14 +88,14 @@ for i in range(N):
         cy = 0.5 + 0.12 * s
         roll = 1.2 * (1 - s)
     else:
-        z = 1.05 + 0.55 * s
+        # escritorio: acercamiento contenido (máx. 1,25x) para no ampliar píxeles de la foto
+        z = 1.0 + 0.25 * s
         cx = 0.47 + 0.03 * s
-        cy = 0.47 + 0.15 * s
+        cy = 0.47 + 0.13 * s
         roll = 1.1 * (1 - s)
-    # recorte: alto visible de la foto = h / z (en vertical el ancho se ajusta a 9:16)
-    vis_h = h / z
-    esc = H / vis_h
-    vis_w = W / esc
+    # recorte: la foto cubre el fotograma (vale para 16:9, 21:9 y 9:16) y z acerca a partir de ahí
+    esc = max(W / w, H / h) * z
+    vis_w, vis_h = W / esc, H / esc
     # limitar el centro para no salir de la foto
     mx, my = vis_w / 2 / w, vis_h / 2 / h
     cxp = min(max(cx, mx + 0.01), 1 - mx - 0.01) * w

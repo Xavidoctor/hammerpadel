@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { AppMockup } from "@/components/AppMockup";
+import { ZonaRecogebolas } from "@/components/ZonaRecogebolas";
+import { EtiquetasMapa } from "@/components/EtiquetasMapa";
 import { CourtSvg } from "@/components/CourtSvg";
 import { ProductPhoto } from "@/components/ProductPhoto";
 import { ProductSlot } from "@/components/ProductSlot";
 import { ProductVideo } from "@/components/ProductVideo";
 import { Price } from "@/components/Price";
 import { MotionToggle, ScrollCraftStage } from "@/components/ScrollCraftStage";
-import { alquiler, localidades, localidadesTexto, maquina, recogebolas } from "@/content/catalogo";
+import { alquiler, listaLocalidades, localidades, maquina, recogebolas } from "@/content/catalogo";
 import { app } from "@/content/app";
 import { HORIZONTAL, VERTICAL, golpes } from "@/lib/pista";
 import { mediosPista } from "@/content/medios";
@@ -54,7 +56,8 @@ export default function Inicio() {
           ) : medios.foto ? (
             <>
               <picture>
-                {medios.fotoMovil ? <source media="(max-width: 860px)" srcSet={medios.fotoMovil} /> : null}
+                {medios.fotoMovil ? <source media="(max-aspect-ratio: 1/1)" srcSet={medios.fotoMovil} /> : null}
+                {medios.fotoUltra ? <source media="(min-aspect-ratio: 2/1)" srcSet={medios.fotoUltra} /> : null}
                 <img
                   className={medios.video ? "sc-stage__poster pista__photo" : "pista__photo pista__photo--fx"}
                   src={medios.foto}
@@ -66,6 +69,7 @@ export default function Inicio() {
                 <video
                   data-sc-scrub
                   data-sc-src={medios.video}
+                  {...(medios.videoBase ? { "data-hp-base": medios.videoBase } : {})}
                   {...(medios.videoMovil ? { "data-sc-src-mobile": medios.videoMovil } : {})}
                   muted
                   playsInline
@@ -96,7 +100,7 @@ export default function Inicio() {
             </h1>
             <p className="hero-sub">
               Alquila la máquina lanzapelotas por {alquiler.precioTexto} la sesión de 90 minutos en{" "}
-              {localidadesTexto}.
+              {listaLocalidades}.
             </p>
             <div className="cta-row">
               <Link className="btn btn--accent" href={alquiler.ruta}>
@@ -116,13 +120,15 @@ export default function Inicio() {
       <section id="entrenamiento" className="act act--train" data-sc-act="scrub" data-sc-span="3.4" data-sc-dwell="0.2" data-sc-drift="#0a1020" aria-labelledby="t-train">
         <div data-sc-stage className="stage">
           <picture>
-            <source media="(max-width: 860px)" srcSet="/medios/entrenamiento/poster-m.webp" />
+            <source media="(max-aspect-ratio: 1/1)" srcSet="/medios/entrenamiento/poster-m.webp" />
+            <source media="(min-aspect-ratio: 2/1)" srcSet="/medios/entrenamiento/poster-uw.webp" />
             <img className="sc-stage__poster train__poster" src="/medios/entrenamiento/poster.webp" width={1920} height={1080} loading="lazy"
               alt="Máquina lanzapelotas Hammer X MAX en 3D lanzando una bola en una pista azul" />
           </picture>
           <video
             data-sc-scrub
             data-sc-src="/medios/entrenamiento/maquina-3d.mp4"
+            data-hp-base="/medios/entrenamiento/maquina-3d"
             data-sc-src-mobile="/medios/entrenamiento/maquina-3d-m.mp4"
             muted
             playsInline
@@ -160,17 +166,20 @@ export default function Inicio() {
       <section id="alquiler" className="act act--rent" data-sc-act="scrub" data-sc-span="3" data-sc-dwell="0.3" data-sc-clip-map="travel" data-sc-drift="#0b0d10" aria-labelledby="t-rent">
         <div data-sc-stage className="stage">
           <picture>
-            <source media="(max-width: 860px)" srcSet="/medios/alquiler/poster-m.webp" />
-            <img className="sc-stage__poster rent__poster" src="/medios/alquiler/poster.webp" alt="" width={1600} height={900} loading="lazy" />
+            <source media="(max-aspect-ratio: 1/1)" srcSet="/medios/alquiler/poster-m.webp" />
+            <source media="(min-aspect-ratio: 2/1)" srcSet="/medios/alquiler/poster-uw.webp" />
+            <img className="sc-stage__poster rent__poster" src="/medios/alquiler/poster.webp" alt="" width={1920} height={1080} loading="lazy" />
           </picture>
           <video
             data-sc-scrub
             data-sc-src="/medios/alquiler/alquiler-3d.mp4"
+            data-hp-base="/medios/alquiler/alquiler-3d"
             data-sc-src-mobile="/medios/alquiler/alquiler-3d-m.mp4"
             muted
             playsInline
             aria-hidden="true"
           />
+          <EtiquetasMapa />
           <div className="sc-scrim sc-scrim--lead" aria-hidden="true" />
           <div className="rent__intro" data-sc-cue="0 0.4 0 0.15">
             <p className="kicker">Alquiler en la Marina Alta</p>
@@ -185,7 +194,7 @@ export default function Inicio() {
               <span className="price__num">{alquiler.precioTexto}</span>
               <span className="rent__dur">{alquiler.duracionMinutos} min · {alquiler.pelotasTexto}</span>
             </p>
-            <p className="rent__where">La llevamos a tu pista, también en urbanizaciones y pistas privadas.</p>
+            <p className="rent__where">La llevamos a tu pista, también en urbanizaciones y pistas privadas. Con un recogebolas incluido (el segundo, {alquiler.recogebolasExtraTexto} más).</p>
             <Link className="btn btn--accent" href={alquiler.ruta}>Reservar entrenamiento</Link>
           </div>
         </div>
@@ -232,13 +241,11 @@ export default function Inicio() {
         </div>
       </section>
 
-      {/* ESCENA 6 · RECOGEBOLAS (venta) */}
+      {/* Desde el recogebolas hasta el final: zona interactiva. Con el ratón sobre el fondo, el
+          cursor es el Recogebolas Hammer y recoge las pelotas repartidas por estas secciones. */}
+      <ZonaRecogebolas total={36}>
+      {/* ESCENA 6 · RECOGEBOLAS (venta). Pelotas y cursor salen del modelo 3D (produccion/escena-4). */}
       <section id="recogebolas" className="flow flow--balls" aria-labelledby="t-recoge">
-        <div className="balls" aria-hidden="true">
-          {Array.from({ length: 28 }, (_, i) => (
-            <span key={i} style={{ left: `${(i * 37) % 97}%`, top: `${58 + ((i * 23) % 38)}%` }} />
-          ))}
-        </div>
         <div className="wrap split split--rev">
           <div className="stack" data-sc-in>
             <h2 id="t-recoge" className="display display--md">
@@ -249,6 +256,10 @@ export default function Inicio() {
             <div className="cta-row">
               <Link className="btn btn--accent" href={recogebolas.ruta}>Comprar recogebolas</Link>
             </div>
+            <p className="balls__pista">
+            <span className="solo-raton">Pasa el ratón por el fondo: recoge tú las pelotas.</span>
+            <span className="solo-tactil">Toca una pelota y, sin soltar, desliza el dedo para recoger las demás.</span>
+          </p>
           </div>
           <ProductVideo base="/medios/recogebolas/recogebolas" descripcion="Recogebolas Hammer recogiendo pelotas en pista y vaciándolas en la máquina" />
         </div>
@@ -262,7 +273,7 @@ export default function Inicio() {
             <p>
               Hammer Padel alquila una máquina lanzapelotas para entrenar pádel de forma autónoma:
               repetir golpes, trabajar situaciones de juego y aprovechar mejor el tiempo en pista.
-              El alquiler de máquina de pádel está disponible en {localidadesTexto}{" "}
+              El alquiler de máquina de pádel está disponible en {listaLocalidades}{" "}
               por {alquiler.resumen}.
             </p>
             <p>
@@ -272,6 +283,7 @@ export default function Inicio() {
           </div>
         </div>
       </section>
+      </ZonaRecogebolas>
     </ScrollCraftStage>
   );
 }

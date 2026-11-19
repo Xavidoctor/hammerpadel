@@ -58,6 +58,32 @@ Capturas de escritorio y móvil (con el servidor arrancado en otra ventana):
 npm run shots -- http://localhost:3000 lab/capturas
 ```
 
+## Formulario de contacto (envío gratuito)
+
+El formulario de `/contacto` y `/clubes` lo envía el propio servidor de la web por SMTP,
+con una cuenta de correo que ya tengas (por ejemplo, Gmail). No hay que contratar nada.
+
+1. En tu cuenta de Google, activa la verificación en dos pasos y crea una
+   «contraseña de aplicación» (Cuenta de Google → Seguridad → Contraseñas de aplicaciones).
+2. Crea un archivo `.env.local` en la raíz del proyecto (no se sube a GitHub):
+
+   ```
+   CONTACTO_SMTP_USER=tu-cuenta@gmail.com
+   CONTACTO_SMTP_PASS=la-contraseña-de-aplicación
+   # Opcional: otra dirección que reciba los mensajes
+   # CONTACTO_DESTINO=otra@direccion.com
+   ```
+3. Reinicia `npm run start`. Cada mensaje llega con «Responder a» apuntando al cliente.
+
+Sin estas variables, el formulario no finge que envía: si en `src/content/contacto.ts` hay un
+email público, ofrece abrir el correo del visitante con el mensaje ya escrito (mailto); si no, avisa
+de que el envío aún no está activo. Incluye campo trampa contra bots y un límite de 5 envíos por IP
+cada 10 minutos. Gmail permite unos 500 envíos al día, de sobra para un formulario de contacto.
+
+## Publicar en Netlify
+
+Ver [docs/despliegue-netlify.md](docs/despliegue-netlify.md): conexión del repositorio, variables de entorno y dominio. Configuración en `netlify.toml`.
+
 ## Estructura
 
 ```

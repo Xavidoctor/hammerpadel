@@ -1,8 +1,12 @@
 import type { MetadataRoute } from "next";
+import { esIndexable, paginasLocalidad, rutaLocalidad } from "@/content/localidades";
+import { URL_SITIO as BASE } from "@/lib/sitio";
 
-const BASE = "http://localhost:3000"; // Sustituir por el dominio definitivo.
-const rutas = ["", "/comprar", "/recogebolas", "/alquiler", "/como-funciona", "/entrenamientos", "/clubes", "/soporte", "/contacto"];
+const rutas = ["", "/comprar", "/recogebolas", "/alquiler", "/como-funciona", "/entrenamientos", "/clubes", "/soporte", "/contacto", "/legal", "/legal/aviso-legal", "/legal/privacidad", "/legal/cookies", "/legal/condiciones-alquiler", "/legal/condiciones-venta"];
+
+/** Las páginas por localidad entran solo cuando tienen contenido local propio. */
+export const rutasLocalidad = paginasLocalidad.filter(esIndexable).map((p) => rutaLocalidad(p.id));
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return rutas.map((r) => ({ url: `${BASE}${r}` }));
+  return [...rutas, ...rutasLocalidad].map((r) => ({ url: `${BASE}${r}` }));
 }

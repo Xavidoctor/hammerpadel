@@ -11,3 +11,6 @@ produccion/prototipo/frames/
 scrollcraft/builds/*/lab/
 test-results/
 playwright-report/
+
+# Netlify (carpeta local de netlify-cli)
+.netlify/

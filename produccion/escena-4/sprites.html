@@ -1,0 +1,47 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:transparent}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script></head>
+<body><canvas id="c"></canvas><script type="module">
+// Sprites para la portada interactiva (fondo transparente):
+//  - pelota(i): pelota de pádel realista con una orientación distinta por variante
+//  - cursor(n): el Recogebolas Hammer con n pelotas dentro de la cesta
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { materialPelota } from "../escena-2/comun.js";
+import { mulberry } from "../escena-2/maquina.js";
+import { crearRecogebolas, texturaDisco, CESTA } from "./recogebolas.js";
+import { huecosCesta } from "./escena.js";
+const q = new URLSearchParams(location.search);
+const W = +q.get("w") || 256, H = +q.get("h") || 256;
+const c = document.getElementById("c"); c.style.width = W + "px"; c.style.height = H + "px";
+const r = new THREE.WebGLRenderer({ canvas: c, antialias: true, alpha: true, preserveDrawingBuffer: true });
+r.setSize(W, H, false); r.setPixelRatio(1); r.setClearColor(0x000000, 0);
+r.toneMapping = THREE.NeutralToneMapping; r.toneMappingExposure = 1.0; r.outputColorSpace = THREE.SRGBColorSpace;
+const sc = new THREE.Scene();
+sc.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture;
+sc.environmentIntensity = 0.35;
+sc.add(new THREE.HemisphereLight(0xbfd0ff, 0x0a0d18, 0.4));
+const clave = new THREE.DirectionalLight(0xfff8ec, 3.2); clave.position.set(-1.2, 2.2, 1.6); sc.add(clave);
+const recorte = new THREE.DirectionalLight(0x9fb8ff, 1.6); recorte.position.set(1.5, 0.6, -1.8); sc.add(recorte);
+const R_BOLA = 0.0335;
+const fieltro = materialPelota(THREE).clone(); fieltro.color.setRGB(1, 1, 0.42);
+
+// ---- pelota sola
+const bola = new THREE.Mesh(new THREE.SphereGeometry(R_BOLA, 64, 48), fieltro); sc.add(bola);
+const camB = new THREE.OrthographicCamera(-R_BOLA * 1.04, R_BOLA * 1.04, R_BOLA * 1.04, -R_BOLA * 1.04, 0.01, 2);
+camB.position.set(0, 0, 1); camB.lookAt(0, 0, 0);
+const rnd = mulberry(21);
+const giros = Array.from({ length: 8 }, () => [rnd() * 6.28, rnd() * 6.28, rnd() * 6.28]);
+
+// ---- recogebolas con pelotas
+const logo = await texturaDisco(THREE, "/public/marca/hammer-logo.svg");
+const rb = crearRecogebolas(THREE, { logo }); sc.add(rb);
+const huecos = huecosCesta();
+const dentro = huecos.map((h, i) => { const m = new THREE.Mesh(new THREE.SphereGeometry(R_BOLA, 32, 24), fieltro); m.position.copy(h); m.rotation.set(...giros[i % 8]); rb.add(m); return m; });
+rb.rotation.y = -0.75; rb.userData.cesta.rotation.x = 0.4;
+const camR = new THREE.PerspectiveCamera(22, W / H, 0.05, 20);
+camR.position.set(-0.05, 0.66, 1.9); camR.lookAt(0.11, 0.19, 0);
+
+window.pelota = (i) => { rb.visible = false; bola.visible = true; bola.rotation.set(...giros[i]); r.render(sc, camB); return true; };
+window.cursor = (n) => { rb.visible = true; bola.visible = false; dentro.forEach((m, k) => (m.visible = k < n)); r.render(sc, camR); return true; };
+window.listo = true;
+</script></body></html>

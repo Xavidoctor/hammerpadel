@@ -1,63 +1,70 @@
 /**
- * Modelo de dominio de reservas (diseño §8). Solo tipos y lógica pura: no hay
- * base de datos ni reservas reales en el prototipo.
+ * Modelo de dominio de reservas (diseño §8). Solo tipos y lógica pura: la
+ * base de datos llegará en la fase B, cuando Xavi apruebe el proveedor.
  *
  * Tiempo: cada día se trabaja en minutos locales (Europe/Madrid) desde las
- * 00:00. En la base de datos real se guardará como timestamptz (UTC).
+ * 00:00. En la base de datos se guardará como timestamptz (UTC).
  */
 export type Minutos = number;
 
-export type Ubicacion = { id: string; nombre: string; activa: boolean };
+/** Fecha local en Madrid, formato YYYY-MM-DD. */
+export type Fecha = string;
+
+export type Repartidor = { id: string; nombre: string };
 
 export type Maquina = {
   id: string;
   estado: "activa" | "mantenimiento" | "baja";
-  /** Ubicaciones donde la máquina puede prestar servicio. */
-  ubicaciones: string[];
 };
 
-/** Horario en el que una máquina puede trabajar un día de la semana (0 = domingo). */
-export type ReglaDisponibilidad = {
-  maquinaId: string;
-  diaSemana: number;
-  inicio: Minutos;
-  fin: Minutos;
-};
+export type EstadoReserva =
+  | "retenida" // fase D: mientras se paga online
+  | "pendiente"
+  | "confirmada"
+  | "cancelada"
+  | "completada"
+  | "no_presentado";
 
-export type EstadoReserva = "retenida" | "pendiente" | "confirmada" | "cancelada" | "completada" | "no_presentado";
+export const ESTADOS_QUE_OCUPAN: readonly EstadoReserva[] = ["retenida", "pendiente", "confirmada"];
 
-export type Reserva = {
+/** Reserva vista por el cálculo de disponibilidad (sin datos personales). */
+export type ReservaDia = {
   id: string;
   maquinaId: string;
-  ubicacionId: string;
-  fecha: string; // YYYY-MM-DD
+  repartidorId: string;
+  localidadId: string;
+  fecha: Fecha;
   inicio: Minutos;
   fin: Minutos;
   estado: EstadoReserva;
 };
 
+/**
+ * Tramo sin servicio. Sin `maquinaId` ni `repartidorId` bloquea todo el
+ * servicio (por ejemplo, un festivo); con `maquinaId`, solo esa máquina; con
+ * `repartidorId`, solo ese repartidor (su día libre).
+ */
 export type Bloqueo = {
-  maquinaId: string;
-  fecha: string;
+  maquinaId?: string;
+  repartidorId?: string;
+  fecha: Fecha;
   inicio: Minutos;
   fin: Minutos;
   motivo: "mantenimiento" | "festivo" | "manual";
 };
 
 /**
- * Logística entre sesiones. Solo aplica si el modelo operativo lo requiere
- * (por ejemplo, si la máquina se lleva a distintas pistas). Todo a 0 = sin
- * traslados.
+ * Cómo presta el repartidor el servicio:
+ * - "deja_y_vuelve": monta la máquina, se va y vuelve a recogerla.
+ * - "se_queda": permanece en la pista toda la sesión.
  */
-export type Logistica = {
-  /** Preparación antes de cada sesión en destino (montaje, carga). */
-  preparacion: Minutos;
-  /** Recogida tras cada sesión. */
-  recogida: Minutos;
-  /** Minutos de traslado entre dos ubicaciones distintas. */
-  traslado: (desde: string, hasta: string) => Minutos;
+export type ModoReparto = "deja_y_vuelve" | "se_queda";
+
+/** Trabajo de un repartidor en un lugar y un tramo de tiempo. */
+export type Tarea = {
+  reservaId: string;
+  tipo: "entrega" | "recogida" | "sesion_completa";
+  localidadId: string;
+  inicio: Minutos;
+  fin: Minutos;
 };
-
-export type Tarifa = { id: string; duracion: Minutos; precioCentimos: number };
-
-export const ESTADOS_QUE_OCUPAN: EstadoReserva[] = ["retenida", "pendiente", "confirmada"];

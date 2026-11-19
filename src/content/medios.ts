@@ -22,6 +22,10 @@ export function mediosPista() {
      *  a partir de la propia foto apagada con produccion/iluminar-pista.py. */
     luces: [0, 1, 2].map((n) => url(`luz-${n}.webp`)).filter((u): u is string => u !== null),
     fotoMovil: url("pista-m.webp") ?? url("pista.webp"),
+    /** Póster 21:9 para pantallas ultrapanorámicas (primer fotograma del vídeo 21:9). */
+    fotoUltra: url("pista-uw.webp"),
+    /** Escritorio: si existen pista-2k/-uw/-uwhd.mp4, la web elige la versión según la pantalla. */
+    videoBase: existe("pista-2k.mp4") ? "/medios/pista/pista" : null,
     video: url("pista.mp4"),
     videoMovil: url("pista-m.mp4"),
   };

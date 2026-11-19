@@ -20,13 +20,17 @@
     "@fontsource-variable/archivo": "5.3.0",
     "geist": "1.9.2",
     "next": "16.4.6",
+    "nodemailer": "10.3.1",
+    "pg": "8.23.1",
     "react": "19.3.1",
     "react-dom": "19.3.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.14.0",
+    "@electric-sql/pglite": "0.5.16",
     "@playwright/test": "1.63.0",
     "@types/node": "22.19.1",
+    "@types/pg": "8.23.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.2.3",
     "eslint": "9.39.5",
@@ -35,5 +39,12 @@
     "three": "0.186.1",
     "typescript": "5.9.3",
     "vitest": "5.1.0"
-  }
+  },
+  "browserslist": [
+    "chrome >= 87",
+    "edge >= 87",
+    "firefox >= 78",
+    "safari >= 14",
+    "ios_saf >= 14"
+  ]
 }

@@ -44,6 +44,12 @@ export async function montar(canvas, w, h) {
   r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
   r.toneMapping = THREE.AgXToneMapping; r.toneMappingExposure = 1.05; r.outputColorSpace = THREE.SRGBColorSpace;
   const vertical = h > w;
+  // Escritorio: los nombres de los pueblos NO van dentro del vídeo; fotograma() devuelve su
+  // posición en pantalla y la web los dibuja como texto real (nítido a cualquier tamaño).
+  const textoHtml = !vertical;
+  // Escritorio: el mapa se desplaza a la derecha (desplazamiento de lente) para dejar libre
+  // la columna del titular; el desplazamiento desaparece al bajar a la pista.
+  const DESPLAZA = vertical ? 0 : 0.08;
 
   const sc = new THREE.Scene();
   sc.background = new THREE.Color(0x05070c);
@@ -181,7 +187,7 @@ export async function montar(canvas, w, h) {
   // ================= CÁMARA =================
   const cam = new THREE.PerspectiveCamera(vertical ? 58 : 42, w / h, 0.05, 300000);
   const centro = puntos.reduce((a, b) => a.clone().add(b), new THREE.Vector3()).multiplyScalar(1 / puntos.length).setY(0);
-  const DIST0 = vertical ? 33000 : 17000;          // vista cenital: los cuatro pueblos y la costa
+  const DIST0 = vertical ? 33000 : 21000;          // vista cenital: los cuatro pueblos y la costa
   const final = vertical
     ? { t: new THREE.Vector3(-2.6, 0.2, 6.2), d: 6.2, e: 0.5, az: 0.9 }
     : { t: new THREE.Vector3(-1.4, 0.45, 3.6), d: 5.2, e: 0.3, az: 1.1 };
@@ -236,10 +242,10 @@ export async function montar(canvas, w, h) {
     p = cl(p);
     const { pos, t, d } = poseSuave(p);
     cam.position.copy(pos); cam.lookAt(t);
-    cam.near = Math.max(0.05, d * 0.002); cam.far = Math.max(400, d * 20); cam.updateProjectionMatrix();
-
     // mapa: visible arriba, se funde al bajar de ~2,5 km a ~250 m
     const fm = cl((Math.log(d) - Math.log(500)) / (Math.log(3000) - Math.log(500)));
+    if (DESPLAZA) cam.setViewOffset(w, h, -DESPLAZA * w * suave(cl((Math.log(d) - Math.log(150)) / (Math.log(3000) - Math.log(150)))), 0, w, h);
+    cam.near = Math.max(0.05, d * 0.002); cam.far = Math.max(400, d * 20); cam.updateProjectionMatrix();
     for (const [m, op] of fundibles) m.opacity = op * fm;
     mapa.visible = fm > 0.001;
     const escalaTxt = d * (vertical ? 0.036 : 0.05);
@@ -254,7 +260,9 @@ export async function montar(canvas, w, h) {
       o.hs.scale.setScalar(d * 0.07 * (1 + 1.5 * Math.exp(-Math.max(0, p - o.q.p) * 14)));
       o.et.material.opacity = fm * mezcla(0.35, 1, on);
       o.et.scale.set(escalaTxt * o.et.userData.aspecto, escalaTxt, 1);
+      if (textoHtml) o.et.visible = false;
     }
+    if (textoHtml) marTxt.visible = false;
 
     // pista: trazo amarillo → césped → cerramiento → focos
     const ap = tramo(p, 0.48, 0.6);
@@ -283,8 +291,24 @@ export async function montar(canvas, w, h) {
     marca.scale.setScalar(1 + 0.08 * Math.sin(p * 90));
 
     comp.render();
+    if (!textoHtml || fm <= 0.001) return null;
+    // datos de las etiquetas: [x, y, alto del texto, opacidad, encendido], x/y/alto en fracción del fotograma
+    mapa.updateMatrixWorld(true);
+    const arriba = new THREE.Vector3(0, 1, 0).applyQuaternion(cam.quaternion);
+    const proyecta = (sp, op, on) => {
+      const a = sp.getWorldPosition(new THREE.Vector3());
+      const b = a.clone().addScaledVector(arriba, escalaTxt / 1.4).project(cam);
+      a.project(cam);
+      const r3 = (v) => Math.round(v * 10000) / 10000;
+      return [r3((a.x + 1) / 2), r3((1 - a.y) / 2), r3(Math.abs(b.y - a.y) / 2), r3(op), r3(on)];
+    };
+    return {
+      p: Math.round(p * 10000) / 10000,
+      pueblos: pueblos.map((o) => proyecta(o.et, fm * mezcla(0.35, 1, tramo(p, o.q.p, o.q.p + 0.04)), tramo(p, o.q.p, o.q.p + 0.04))),
+      mar: proyecta(marTxt, fm * 0.9, 0),
+    };
   }
-  return { fotograma };
+  return { fotograma, pueblos: PUEBLOS.map((q) => ({ nombre: q.nombre, lado: q.lado })) };
 }
 
 function halotex(THREE) {
