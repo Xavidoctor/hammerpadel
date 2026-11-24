@@ -469,10 +469,11 @@ html.hp-static .train__lede { position: relative; top: auto; padding-top: var(--
 .balls__cursor {
   position: fixed; left: 0; top: 0; z-index: 50; pointer-events: none;
   width: 198.4px; height: 198.4px; opacity: 0; transition: opacity 0.15s ease;
-  background: url("/medios/recogebolas/cursor-recogebolas.webp") 0 0 / 5753.6px 198.4px no-repeat;
+  background: 0 0 / 5753.6px 198.4px no-repeat;
   -webkit-mask-image: linear-gradient(to top, #000 55%, transparent 98%); mask-image: linear-gradient(to top, #000 55%, transparent 98%);
   filter: drop-shadow(0 10px 12px rgb(0 0 0 / 0.6));
 }
+.balls__cursor--listo { background-image: url("/medios/recogebolas/cursor-recogebolas.webp"); }
 .balls__cursor.is-activo { opacity: 1; }
 html.hp-cursor-recogebolas, html.hp-cursor-recogebolas body { cursor: none; }
 .balls__cuenta {

@@ -46,4 +46,5 @@ export const MENSAJES_RECHAZO: Record<string, string> = {
   ocupada: "Esa hora acaba de ocuparse. Elige otra.",
   fecha: "Esa fecha no se puede reservar.",
   limite: "Ya tienes reservas ese día. Si necesitas más, llámanos.",
+  saturado: "Ahora mismo hay muchas solicitudes. Inténtalo en un rato o llámanos.",
 };

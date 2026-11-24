@@ -29,7 +29,7 @@ export type SolicitudReserva = {
 
 export type ResultadoCrear =
   | { ok: true; id: string; repartidorId: string; maquinaId: string }
-  | { ok: false; motivo: Motivo | "fecha" | "limite" | "ocupada" };
+  | { ok: false; motivo: Motivo | "fecha" | "limite" | "ocupada" | "saturado" };
 
 export type ReservaAdmin = {
   id: string;
@@ -53,6 +53,13 @@ export type BloqueoAdmin = Bloqueo & { id: number; fechaFin: Fecha; nota: string
 
 /** Máximo de reservas activas de un mismo cliente en un mismo día (anti-abuso). */
 export const MAX_RESERVAS_CLIENTE_DIA = 2;
+
+/**
+ * Tope global de reservas pendientes creadas desde la web en la última hora.
+ * Evita que alguien llene el calendario con datos inventados; las reservas
+ * reales (5 máquinas, confirmación a mano) quedan muy por debajo.
+ */
+export const MAX_PENDIENTES_HORA = 20;
 
 export class RepositorioPostgres implements RepositorioReservas {
   readonly prototipo = false;
@@ -84,6 +91,11 @@ export class RepositorioPostgres implements RepositorioReservas {
           minInicio: minInicioDelDia(aj, s.fecha, ahora),
         });
         if (!r.ok) return r;
+
+        const [{ recientes }] = await tx.query<{ recientes: number }>(
+          "select count(*)::int recientes from reservas where estado = 'pendiente' and creada > now() - interval '1 hour'",
+        );
+        if (recientes >= MAX_PENDIENTES_HORA) return { ok: false as const, motivo: "saturado" as const };
 
         const [cliente] = await tx.query<{ id: string }>(
           `insert into clientes (nombre, telefono, email) values ($1, $2, $3)
