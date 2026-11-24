@@ -31,6 +31,15 @@
     # enviar sus formularios a otra dirección. No limita scripts ni vídeos.
     Content-Security-Policy = "frame-ancestors 'self'; base-uri 'self'; object-src 'none'; form-action 'self'"
 
+# Vídeos e imágenes de la web: el navegador los guarda un día y, después, los
+# sigue usando mientras comprueba si han cambiado (una semana). Sin nombres con
+# huella, no conviene más: un vídeo re-renderizado con el mismo nombre tardaría
+# en verse.
+[[headers]]
+  for = "/medios/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400, stale-while-revalidate=604800"
+
 # El panel de reservas no debe guardarse en cachés intermedias.
 [[headers]]
   for = "/admin/*"

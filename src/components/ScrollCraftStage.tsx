@@ -31,16 +31,49 @@ export function varianteVideo(ancho: number, alto: number, dpr: number) {
   if (ancho / alto >= 2) return fisicoAncho > 2700 ? "uw" : "uwhd";
   return fisicoAncho > 2100 || fisicoAlto > 1200 ? "2k" : "hd";
 }
-function elegirVideos(raiz: HTMLElement) {
+/**
+ * Elige el vídeo de cada escena y retrasa la descarga de las que no son la
+ * primera. El motor empieza a bajar un vídeo cuando su escena está a 3
+ * pantallas, y como la portada abre con la pista, el vídeo de la máquina
+ * (hasta 12 MB) se descargaba nada más entrar, a la vez que la foto inicial.
+ * Ahora el motor no ve la dirección de esas escenas hasta que el visitante
+ * empieza a bajar (la escena está a 2 pantallas): la primera carga va antes
+ * y quien no baja no gasta datos en vídeos que no verá.
+ */
+function elegirVideos(raiz: HTMLElement): () => void {
   const v = varianteVideo(innerWidth, innerHeight, devicePixelRatio || 1);
-  raiz.querySelectorAll<HTMLVideoElement>("video[data-hp-base]").forEach((el) => {
-    const base = el.dataset.hpBase!;
+  const videos = Array.from(raiz.querySelectorAll<HTMLVideoElement>("video[data-sc-scrub]"));
+  videos.forEach((el) => {
+    const base = el.dataset.hpBase;
+    if (!base) return;
     const src = v === "m" ? el.getAttribute("data-sc-src-mobile") || `${base}.mp4` : v === "hd" ? `${base}.mp4` : `${base}-${v}.mp4`;
     el.setAttribute("data-sc-src", src);
     // El motor da prioridad al vídeo móvil por ancho de ventana: se decide aquí.
     el.removeAttribute("data-sc-src-mobile");
     el.dataset.hpVariante = v;
   });
+
+  const diferidos = videos.slice(1).filter((el) => el.dataset.hpBase && el.closest("section"));
+  if (!diferidos.length || !("IntersectionObserver" in window)) return () => {};
+  const escena = new Map<Element, HTMLVideoElement>();
+  for (const el of diferidos) {
+    el.dataset.hpSrc = el.getAttribute("data-sc-src") ?? "";
+    el.removeAttribute("data-sc-src");
+    escena.set(el.closest("section")!, el);
+  }
+  const io = new IntersectionObserver(
+    (entradas) => {
+      for (const e of entradas) {
+        const el = escena.get(e.target);
+        if (!e.isIntersecting || !el) continue;
+        el.setAttribute("data-sc-src", el.dataset.hpSrc!);
+        io.unobserve(e.target);
+      }
+    },
+    { rootMargin: "0px 0px 100% 0px" },
+  );
+  escena.forEach((_, s) => io.observe(s));
+  return () => io.disconnect();
 }
 
 function leerPreferencia() {
@@ -73,6 +106,7 @@ export function ScrollCraftStage({ children }: { children: React.ReactNode }) {
     }
 
     let api: { destroy?: () => void } | undefined;
+    let soltarVideos = () => {};
     let cancelado = false;
     // Si el motor no llega en 4 s, se muestra todo estático.
     const red = setTimeout(() => {
@@ -83,7 +117,7 @@ export function ScrollCraftStage({ children }: { children: React.ReactNode }) {
     import("../vendor/scrollcraft/scrollcraft.js")
       .then(() => {
         if (cancelado || !ref.current || !window.ScrollCraft) return;
-        elegirVideos(ref.current);
+        soltarVideos = elegirVideos(ref.current);
         api = window.ScrollCraft.mount(ref.current);
         root.classList.add("hp-motion");
       })
@@ -92,6 +126,7 @@ export function ScrollCraftStage({ children }: { children: React.ReactNode }) {
     return () => {
       cancelado = true;
       clearTimeout(red);
+      soltarVideos();
       api?.destroy?.();
       root.classList.remove("hp-motion");
     };

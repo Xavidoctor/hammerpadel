@@ -90,6 +90,21 @@ export function ZonaRecogebolas({ children, total = 28 }: { children: React.Reac
   const estado = useRef({ recogidas: Array(TOTAL).fill(false) as boolean[], n: 0, ultimoX: 0 });
   const [cuenta, setCuenta] = useState(0);
   const [activo, setActivo] = useState(false);
+  // La imagen del recogebolas (cesta con 0..28 pelotas, ~290 KB) se descarga
+  // cuando la zona está a una pantalla, no al abrir la portada.
+  const [cerca, setCerca] = useState(false);
+  useEffect(() => {
+    const z = zona.current;
+    if (!z || !("IntersectionObserver" in window)) return setCerca(true);
+    const io = new IntersectionObserver((e) => {
+      if (e.some((x) => x.isIntersecting)) {
+        setCerca(true);
+        io.disconnect();
+      }
+    }, { rootMargin: "100% 0px" });
+    io.observe(z);
+    return () => io.disconnect();
+  }, []);
 
   useEffect(() => {
     const el = campo.current;
@@ -283,7 +298,7 @@ export function ZonaRecogebolas({ children, total = 28 }: { children: React.Reac
           />
         ))}
       </div>
-      <div ref={cursor} className={`balls__cursor${activo ? " is-activo" : ""}`} aria-hidden="true" />
+      <div ref={cursor} className={`balls__cursor${cerca ? " balls__cursor--listo" : ""}${activo ? " is-activo" : ""}`} aria-hidden="true" />
       <p className={`balls__cuenta${cuenta && activo ? " is-visible" : ""}`} aria-hidden="true">
         {cuenta === TOTAL ? "¡Pista recogida!" : `${cuenta} / ${TOTAL} pelotas`}
       </p>
