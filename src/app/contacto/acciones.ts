@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { createTransport } from "nodemailer";
 import { contacto } from "@/content/contacto";
 import { permitido } from "@/lib/contacto/limite";
+import { ipCliente } from "@/lib/servidor/limitador";
 import { asuntoCorreo, cuerpoCorreo, enlaceMailto, validar, type Campo } from "@/lib/contacto/mensaje";
 
 export type EstadoContacto = {
@@ -43,9 +44,7 @@ async function procesar(f: FormData): Promise<EstadoContacto> {
     return { estado: "error", errores: v.errores, aviso: "Revisa los campos marcados.", valores: recoger(f) };
   }
 
-  const h = await headers();
-  const ip = (h.get("x-forwarded-for") ?? "").split(",")[0].trim() || h.get("x-real-ip") || "local";
-  if (!permitido(ip)) {
+  if (!permitido(ipCliente(await headers()))) {
     return {
       estado: "fallo",
       aviso: "Has enviado varios mensajes seguidos. Espera unos minutos y vuelve a intentarlo.",

@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { COOKIE, DURACION_S, contrasenaCorrecta, crearCookie, leerCookie } from "@/lib/admin/sesion";
@@ -8,6 +8,10 @@ import { MAQUINAS, REPARTIDORES } from "@/lib/reservas/ajustes";
 import { RepositorioPostgres } from "@/lib/reservas/postgres";
 import { db } from "@/lib/servidor/db";
 import { esFecha } from "@/lib/reservas/tiempo";
+import { crearLimitador, ipCliente } from "@/lib/servidor/limitador";
+
+/** Freno contra quien prueba contraseñas: 10 intentos cada 15 minutos por IP. */
+const intentoPermitido = crearLimitador({ ventanaMs: 15 * 60 * 1000, maximo: 10 });
 import type { EstadoReserva } from "@/lib/reservas/tipos";
 
 async function usuario(): Promise<string> {
@@ -25,6 +29,7 @@ function repo(): RepositorioPostgres {
 export async function entrar(_: string | null, f: FormData): Promise<string | null> {
   const quien = String(f.get("quien") ?? "");
   if (!REPARTIDORES.some((r) => r.id === quien)) return "Elige quién eres.";
+  if (!intentoPermitido(ipCliente(await headers()))) return "Demasiados intentos. Espera 15 minutos.";
   if (!contrasenaCorrecta(String(f.get("contrasena") ?? ""))) {
     await new Promise((r) => setTimeout(r, 800)); // frena intentos repetidos
     return "Contraseña incorrecta.";

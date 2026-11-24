@@ -5,7 +5,7 @@ import { btree_gist } from "@electric-sql/pglite/contrib/btree_gist";
 import { beforeEach, describe, expect, it } from "vitest";
 import { AJUSTES } from "./ajustes";
 import { horasLibres } from "./disponibilidad";
-import { RepositorioPostgres, type SolicitudReserva } from "./postgres";
+import { MAX_PENDIENTES_HORA, RepositorioPostgres, type SolicitudReserva } from "./postgres";
 import { validarSolicitud } from "./solicitud";
 import type { Db } from "../servidor/db";
 
@@ -86,6 +86,24 @@ describe("RepositorioPostgres", () => {
     await repo.crearReserva(solicitud({ inicio: 480 }), AHORA);
     await repo.crearReserva(solicitud({ inicio: 720 }), AHORA);
     expect(await repo.crearReserva(solicitud({ inicio: 960 }), AHORA)).toEqual({ ok: false, motivo: "limite" });
+  });
+
+  it("frena una avalancha de reservas pendientes en la última hora", async () => {
+    const cliente = await pg.query<{ id: string }>(
+      "insert into clientes (nombre, telefono, email) values ('Bot', '600000999', 'bot@example.com') returning id",
+    );
+    const ya = await repo.crearReserva(solicitud({ fecha: "2026-11-20" }), AHORA);
+    expect(ya.ok).toBe(true);
+    await pg.query(
+      `insert into reservas (cliente_id, localidad_id, pista, maquina_id, repartidor_id, tarifa_id, sesion, ciclo, estado, precio_centimos, forma_pago)
+       select $1, localidad_id, pista, maquina_id, repartidor_id, tarifa_id,
+              tstzrange(lower(sesion) + make_interval(days => g), upper(sesion) + make_interval(days => g)),
+              tstzrange(lower(ciclo) + make_interval(days => g), upper(ciclo) + make_interval(days => g)),
+              'pendiente', precio_centimos, forma_pago
+         from reservas, generate_series(1, $2::int) g`,
+      [cliente.rows[0].id, MAX_PENDIENTES_HORA - 1],
+    );
+    expect(await repo.crearReserva(solicitud({ email: "otro@example.com" }), AHORA)).toEqual({ ok: false, motivo: "saturado" });
   });
 
   it("rechaza fechas fuera de la ventana y horas sin antelación", async () => {
